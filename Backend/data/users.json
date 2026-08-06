@@ -43,5 +43,104 @@
     "password": "$2b$10$vNQ9VIY36K7hhpx5gya1r./P/DoBq6K4fHwlrMKA1/0DbdPJb4tvi",
     "role": "customer",
     "createdAt": "2026-07-14T12:42:16.937Z"
+  },
+  {
+    "id": "ef5d4f15-828f-4f6a-b2d7-df44ea397e82",
+    "email": "nadilx007@gmail.com",
+    "fullName": "nadilx",
+    "phone": "yohi@gmail.com",
+    "password": "$2b$10$ItLfvA98CrDSDlVdZXLb6.YDOhFlwwEgr6QZ0PBeX4oMnuaQti.86",
+    "role": "customer",
+    "createdAt": "2026-08-05T21:00:04.907Z"
+  },
+  {
+    "id": "2d24c3ee-10bb-404b-b726-ecf91bd8aee1",
+    "email": "test@gmail.com",
+    "fullName": "test1t",
+    "phone": "0767240074",
+    "password": "$2b$10$pjlKCjPda.vCzvP987X/DuNCYUzfex2CqiMM8P5XmIhgK.YxGNSMq",
+    "role": "customer",
+    "createdAt": "2026-08-05T21:05:25.005Z"
+  },
+  {
+    "id": "b06f908a-4eeb-41bc-9dbf-be77d9003f1d",
+    "email": "1@gmail.com",
+    "fullName": "salon1",
+    "phone": "0767240074",
+    "password": "$2b$10$bhm1XA8phxTg72RrjkKvTeiijM0jwU/ho6tUS96wmu4bMYImiO2qq",
+    "role": "customer",
+    "createdAt": "2026-08-06T04:57:45.166Z"
+  },
+  {
+    "id": "fb74a52d-3e06-401f-8fde-a05dbcbe11ae",
+    "email": "test2@gmail.com",
+    "fullName": "test2",
+    "phone": "07672744411",
+    "password": "$2b$10$PQGfcwpoLXFeJbGXTqX4cOAqavxZf2NTw5rXpdHKnXx/FVgIJNesW",
+    "role": "customer",
+    "createdAt": "2026-08-06T05:06:09.488Z"
+  },
+  {
+    "id": "b12e36c9-7114-4eef-b0f7-3740dc663892",
+    "email": "salon1@gmail.com",
+    "fullName": "salon1",
+    "phone": "07672400000",
+    "password": "$2b$10$BbyARDlYrMOkt3EwWN/EtOupf66VNCK9zO2akIHIfZXC4QPMM.wwi",
+    "role": "customer",
+    "createdAt": "2026-08-06T05:07:27.729Z"
+  },
+  {
+    "id": "3b43b919-ce31-4824-8e4c-2f49cb082246",
+    "email": "s@gmail.com",
+    "fullName": "salon1",
+    "phone": "7465658552",
+    "password": "$2b$10$g/yX.4U/.mmHjhrMk1tBfeKu4aw8pFjGAdl9fcPts6I.f6ROGBbw2",
+    "role": "customer",
+    "createdAt": "2026-08-06T05:11:18.327Z"
+  },
+  {
+    "id": "36eb528e-4271-44f9-90eb-3777d66f3350",
+    "email": "owner-1785993448614@example.com",
+    "fullName": "Test Salon Owner",
+    "phone": "0771234567",
+    "password": "$2b$10$PMmw9lxhHKmaBrUzi4K3y.gi0VRUtQW8H3DZXmcm/W2gs1.4dm7oi",
+    "role": "customer",
+    "createdAt": "2026-08-06T05:17:29.345Z"
+  },
+  {
+    "id": "88e22a29-39a6-46c9-89c6-28b82625b002",
+    "email": "ss@gmail.com",
+    "fullName": "test1",
+    "phone": "0765984551",
+    "password": "$2b$10$PVf71Axy3vcEmSdYUvukoOCAz2EJiT4S1L8ZE5ZLUR8Sf/xiuBHY2",
+    "role": "customer",
+    "createdAt": "2026-08-06T05:24:33.346Z"
+  },
+  {
+    "id": "8009ed99-c971-42a4-9c74-d1850ad42203",
+    "email": "nadilx07@gmail.com",
+    "fullName": "Nadil",
+    "phone": "0767240074",
+    "password": "$2b$10$21g8ruNqRLvZc2DSlAp0K.3JSTHdjf2ag7/HHBB.iqbhDRCWGK3y.",
+    "role": "customer",
+    "createdAt": "2026-08-06T05:42:11.955Z"
+  },
+  {
+    "id": "f2e412df-4445-4e21-af5d-5c35cb54600d",
+    "email": "dd@gmail.com",
+    "fullName": "yohasalon",
+    "phone": "0756489565",
+    "password": "$2b$10$en1JwSTXq0iZk8bzsejeO.T3lHh16B4VcXUvVtMRFMZXETmLKNSSS",
+    "role": "customer",
+    "createdAt": "2026-08-06T08:59:02.266Z"
+  },
+  {
+    "id": "3004199d-a8f7-4047-b7c4-b4f290811204",
+    "email": "d@gmail.com",
+    "fullName": "yohasalon",
+    "phone": "56565656565",
+    "password": "$2b$10$aF.Xerrw4HLOs3QnxLfXOe5G8YN7cVkI7heJuMDIuIYy16rmW8JjK",
+    "role": "customer",
+    "createdAt": "2026-08-06T09:00:11.562Z"
   }
 ]

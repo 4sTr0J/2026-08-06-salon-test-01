@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Portal — StylePulse Master Control</title>
+    <meta name="description" content="Super Admin Portal for StylePulse. Approve and manage registered Salon Owner accounts.">
+
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="admin.css?v=1.0">
+</head>
+
+<body class="admin-page">
+
+    <!-- Ambient Glow Background -->
+    <div class="admin-bg-ambient">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- View 1: Super Admin Login Screen (If not authenticated) -->
+    <div id="admin-login-container" class="admin-login-wrapper">
+        <div class="admin-login-card">
+            <div class="admin-card-header">
+                <img src="component/logo.png" alt="StylePulse Logo" class="admin-logo">
+                <h1>SUPER ADMIN <span class="gold-text">PORTAL</span></h1>
+                <p>Restricted access for Super Admin verification & salon management</p>
+            </div>
+
+            <div id="admin-alert" class="admin-alert hidden"></div>
+
+            <form id="admin-login-form" class="admin-form">
+                <div class="form-group">
+                    <label for="admin-email">Admin Email Address</label>
+                    <div class="input-wrapper">
+                        <span class="icon">👑</span>
+                        <input type="email" id="admin-email" value="annyafernando915@gmail.com" readonly required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="admin-password">Master Security Password</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔒</span>
+                        <input type="password" id="admin-password" placeholder="Enter admin password (admin123)" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="admin-submit-btn">
+                    <span>ACCESS CONTROL CENTER</span>
+                    <span>→</span>
+                </button>
+            </form>
+            <div class="back-home-wrapper">
+                <a href="index.html" class="back-home-link">← Return to Main Website</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- View 2: Super Admin Dashboard Control Center -->
+    <div id="admin-dashboard-container" class="admin-dashboard-wrapper hidden">
+        
+        <!-- Header Navbar -->
+        <header class="admin-navbar">
+            <div class="nav-brand">
+                <img src="component/logo.png" alt="StylePulse" class="nav-logo">
+                <span class="brand-title">StylePulse <span class="gold-text">CONTROL CENTER</span></span>
+            </div>
+
+            <div class="nav-user">
+                <span class="admin-email-tag">👑 Admin: <strong>annyafernando915@gmail.com</strong></span>
+                <button type="button" id="admin-logout-btn" class="logout-btn">LOG OUT</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="dashboard-main">
+            
+            <!-- Page Title Row -->
+            <div class="page-title-row">
+                <div>
+                    <h2>Salon Owner Approval Requests</h2>
+                    <p>Review and verify incoming Salon Owner registration requests to prevent fake accounts.</p>
+                </div>
+                <button type="button" id="refresh-btn" class="refresh-btn">🔄 Refresh Requests</button>
+            </div>
+
+            <!-- Stats Overview Cards Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon pending-icon">⏳</div>
+                    <div class="stat-info">
+                        <span id="stat-pending-count" class="stat-number gold-text">0</span>
+                        <span class="stat-label">Pending Approvals</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon approved-icon">✓</div>
+                    <div class="stat-info">
+                        <span id="stat-approved-count" class="stat-number green-text">0</span>
+                        <span class="stat-label">Approved Active Salons</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon total-icon">👥</div>
+                    <div class="stat-info">
+                        <span id="stat-total-count" class="stat-number">0</span>
+                        <span class="stat-label">Total Registration Requests</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search & Filter Controls -->
+            <div class="table-controls-row">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="search-input" placeholder="Search by name, email, or phone number...">
+                </div>
+
+                <div class="filter-tabs">
+                    <button type="button" class="filter-tab active" data-filter="all">All Requests</button>
+                    <button type="button" class="filter-tab" data-filter="pending">Pending Approval</button>
+                    <button type="button" class="filter-tab" data-filter="approved">Approved Salons</button>
+                </div>
+            </div>
+
+            <!-- Registrations Table -->
+            <div class="table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>SALON BUSINESS & OWNER</th>
+                            <th>BUSINESS LICENSE ID</th>
+                            <th>PHYSICAL ADDRESS</th>
+                            <th>CONTACT & PORTFOLIO</th>
+                            <th>VERIFICATION STATUS</th>
+                            <th>ADMIN PERMISSION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="owners-table-body">
+                        <!-- Dynamic Rows rendered via admin.js -->
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="admin.js?v=3.0"></script>
+</body>
+
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StylePulse - Customer Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="index.css?v=60">
+    
+    <style>
+        .dashboard-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding-inline: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        .dashboard-header {
+            margin-bottom: 3rem;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .dashboard-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dashboard-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            animation: slideUp 1s ease-out;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--gold-glow);
+            border-color: #ffcc00;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 204, 102, 0.2);
+            padding-bottom: 1rem;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .card-content {
+            flex: 1;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem 0;
+            color: rgba(255, 224, 130, 0.5);
+            font-style: italic;
+        }
+
+        .action-btn {
+            background: var(--accent-gradient);
+            color: #000000;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Fixed Top Navigation Header -->
+    <header class="navbar" id="main-header" style="background: rgba(8, 6, 5, 0.95); border-bottom: 1px solid rgba(255, 184, 43, 0.3);">
+        <div class="nav-left">
+            <a href="index.html" class="nav-logo">
+                <img src="component/logo.png" alt="StylePulse Logo" class="logo-img">
+            </a>
+            <nav class="nav-links">
+                <a href="salons.html" class="nav-link">EXPLORE SALONS</a>
+                <a href="dashboard.html" class="nav-link active">DASHBOARD</a>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <div style="color: var(--text-secondary); margin-right: 1.5rem; font-size: 0.9rem;" id="user-email-display"></div>
+            <button id="logout-btn" class="nav-login" style="border: none; cursor: pointer; background: transparent; font-family: 'Poppins', sans-serif; color: #ffffff;">LOG OUT</button>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Welcome back, <span id="user-name-display">...</span>.</h1>
+            <p class="dashboard-subtitle">Here is an overview of your StylePulse account.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Upcoming Appointments Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span class="card-icon">📅</span>
+                    <h2 class="card-title">Upcoming Appointments</h2>
+                </div>
+                <div class="card-content">
+                    <div class="empty-state">
+                        You have no upcoming appointments.
+                    </div>
+                </div>
+                <a href="salons.html" class="action-btn">Book New Appointment</a>
+            </div>
+
+            <!-- Profile Overview Card -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <span class="card-icon">👤</span>
+                    <h2 class="card-title">Profile Overview</h2>
+                </div>
+                <div class="card-content">
+                    <p><strong>Name:</strong> <span id="profile-name">...</span></p>
+                    <p style="margin-top: 0.5rem;"><strong>Email:</strong> <span id="profile-email">...</span></p>
+                    <p style="margin-top: 0.5rem;"><strong>Role:</strong> <span id="profile-role" style="text-transform: capitalize;">...</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Box Container -->
+    <div id="alert-box" class="alert-box">
+        <div class="alert-content">
+            <span id="alert-icon" class="alert-icon"></span>
+            <span id="alert-message" class="alert-message"></span>
+        </div>
+    </div>
+    
+    <style>
+        .alert-box {
+            position: fixed; top: 20px; right: -400px;
+            background: rgba(12, 11, 8, 0.95); border-left: 4px solid;
+            padding: 16px 24px; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999; backdrop-filter: blur(10px);
+            display: flex; align-items: center;
+        }
+        .alert-box.show { right: 20px; }
+        .alert-box.success { border-color: #2ecc71; }
+        .alert-box.error { border-color: #e74c3c; }
+        .alert-content { display: flex; align-items: center; gap: 12px; }
+        .alert-message { font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500; color: #fff; }
+    </style>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

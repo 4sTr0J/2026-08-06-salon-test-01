@@ -1,11 +1,23 @@
 import { createClient } from "@supabase/supabase-js";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'placeholder_key';
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+
+const readEnv = (name) => {
+    const value = process.env[name];
+    return typeof value === "string" ? value.trim() : "";
+};
+
+const supabaseUrl = readEnv("SUPABASE_URL") || "https://placeholder.supabase.co";
+const supabaseAnonKey = readEnv("SUPABASE_ANON_KEY") || "placeholder_key";
+const supabaseServiceRoleKey = readEnv("SUPABASE_SERVICE_ROLE_KEY");
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {

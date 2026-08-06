@@ -1,0 +1,13 @@
+{
+  "name": "stylepulse-workspace",
+  "version": "1.0.0",
+  "description": "Root workspace to run frontend and backend simultaneously",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "concurrently \"npm start --prefix Backend\" \"npm start --prefix Frontend\"",
+    "install:all": "npm install && npm install --prefix Backend && npm install --prefix Frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

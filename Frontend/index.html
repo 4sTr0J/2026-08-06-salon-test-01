@@ -1,13 +1,362 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StylePulse - Salon Booking</title>
-    </head>
-    <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-    </body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StylePulse - Interactive Experience</title>
+    <meta name="description" content="A premium, smooth scroll-driven interactive video landing page for StylePulse.">
+
+    <!-- Premium Google Fonts: Poppins & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="index.css?v=60">
+</head>
+<body>
+    <!-- Premium Loader Overlay -->
+    <div id="loader" class="loader-container">
+        <div class="loader-content">
+            <h1 class="loader-title">StylePulse</h1>
+            <p id="loader-status" class="loader-subtitle">Loading assets...</p>
+            <div class="progress-bar-bg">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
+            <div id="loader-percent" class="loader-percentage">0%</div>
+        </div>
+    </div>
+
+    <!-- Fixed Top Navigation Header -->
+    <header class="navbar" id="main-header">
+        <div class="nav-left">
+            <a href="#" class="nav-logo">
+                <img src="component/logo.png" alt="StylePulse Logo" class="logo-img">
+            </a>
+            <nav class="nav-links">
+                <a href="#" class="nav-link active" id="nav-home">HOME</a>
+                <a href="#" class="nav-link" id="nav-about">ABOUT</a>
+                <a href="#" class="nav-link" id="nav-services">SERVICES</a>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <a href="signup.html" class="btn-trial">START FREE TRIAL</a>
+            <a href="login.html" class="nav-login">LOG IN</a>
+        </div>
+    </header>
+
+    <!-- The fullscreen visible rendering canvas -->
+    <canvas id="animation-canvas"></canvas>
+
+    <!-- Hero Content Overlay (Bottom Left Entrance View) -->
+    <div id="hero-content" class="hero-content">
+        <h1 class="hero-title">Seamless Booking.<br>Flawless Style.</h1>
+        <p class="hero-subtitle">Where smart scheduling meets your ultimate salon experience.</p>
+    </div>
+
+    <!-- Frame 1: Video 1 End / Transition Section Overlay -->
+    <div id="end-content" class="end-content">
+        <div class="end-frame-wrapper">
+            <!-- SVG Vector Outer Frame with Live Moving Shine Beam and Lens Flares -->
+            <svg class="frame-svg outer-svg" viewBox="0 0 1000 500" preserveAspectRatio="none">
+                <defs>
+                    <filter id="laser-flare-glow" x="-40%" y="-40%" width="180%" height="180%">
+                        <feGaussianBlur stdDeviation="6" result="blur1" />
+                        <feGaussianBlur stdDeviation="2" result="blur2" />
+                        <feMerge>
+                            <feMergeNode in="blur1" />
+                            <feMergeNode in="blur2" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                    <linearGradient id="shine-beam-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ffaa00" stop-opacity="0.2" />
+                        <stop offset="50%" stop-color="#ffcc00" stop-opacity="0.9" />
+                        <stop offset="85%" stop-color="#ffffff" stop-opacity="1" />
+                        <stop offset="100%" stop-color="#ffaa00" stop-opacity="0.3" />
+                    </linearGradient>
+                </defs>
+
+                <path class="outer-base-path" d="M 0,28 L 28,0 L 435,0 L 460,20 L 972,20 L 1000,48 L 1000,452 L 972,480 L 460,480 L 435,500 L 28,500 L 0,472 Z" fill="rgba(8, 8, 11, 0.94)" stroke="#e59418" stroke-width="1.8" vector-effect="non-scaling-stroke" />
+                <path class="outer-inner-accent" d="M 3,29 L 29,3 L 434,3 L 459,23 L 971,23 L 997,49 L 997,451 L 971,477 L 459,477 L 434,497 L 29,497 L 3,471 Z" fill="none" stroke="rgba(255, 204, 102, 0.35)" stroke-width="1" vector-effect="non-scaling-stroke" />
+                <path class="live-beam-outer" d="M 0,28 L 28,0 L 435,0 L 460,20 L 972,20 L 1000,48 L 1000,452 L 972,480 L 460,480 L 435,500 L 28,500 L 0,472 Z" fill="none" stroke="url(#shine-beam-grad)" stroke-width="3" stroke-linecap="round" filter="url(#laser-flare-glow)" vector-effect="non-scaling-stroke" />
+            </svg>
+
+            <div class="end-container">
+                <div id="end-heading-col" class="end-col-left">
+                    <svg class="frame-svg pod-svg" viewBox="0 0 440 500" preserveAspectRatio="none">
+                        <defs>
+                            <filter id="pod-flare-glow" x="-40%" y="-40%" width="180%" height="180%">
+                                <feGaussianBlur stdDeviation="5" result="blur1" />
+                                <feGaussianBlur stdDeviation="2" result="blur2" />
+                                <feMerge>
+                                    <feMergeNode in="blur1" />
+                                    <feMergeNode in="blur2" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <path class="pod-base-path" d="M 0,28 L 28,0 L 418,0 L 440,22 L 440,478 L 418,500 L 28,500 L 0,472 Z" fill="rgba(5, 5, 7, 0.98)" stroke="#ffaa00" stroke-width="1.8" vector-effect="non-scaling-stroke" />
+                        <path class="live-beam-pod" d="M 0,28 L 28,0 L 418,0 L 440,22 L 440,478 L 418,500 L 28,500 L 0,472 Z" fill="none" stroke="url(#shine-beam-grad)" stroke-width="2.5" stroke-linecap="round" filter="url(#pod-flare-glow)" vector-effect="non-scaling-stroke" />
+                        <line x1="440" y1="22" x2="440" y2="478" stroke="#ffffff" stroke-width="2" filter="url(#pod-flare-glow)" vector-effect="non-scaling-stroke" class="pod-vertical-shine" />
+                    </svg>
+
+                    <div class="pod-inner-content">
+                        <div class="badge-pill">
+                            <svg class="diamond-icon" viewBox="0 0 24 24" fill="none" stroke="#ffc14d" stroke-width="2">
+                                <polygon points="12 2 22 8.5 12 22 2 8.5 12 2" />
+                                <line x1="2" y1="8.5" x2="22" y2="8.5" />
+                                <polyline points="12 2 9 8.5 12 22 15 8.5 12 2" />
+                            </svg>
+                            <span>Luxury Booking Platform</span>
+                        </div>
+                        <h2 class="end-title">
+                            REIMAGINING<br>
+                            THE MODERN<br>
+                            <span class="highlight-gold">SALON</span><br>
+                            EXPERIENCE
+                        </h2>
+                        <div class="title-divider"></div>
+                        <div class="tech-notches">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="end-text-col" class="end-col-right">
+                    <p class="end-description">
+                        Elevate your self-care routine with a booking platform designed specifically around your lifestyle. StylePulse connects you directly with premier stylists, tailored service packages, and real-time time slots that fit your calendar. Experience a bespoke beauty journey where every detail—from selecting your favorite professional to receiving automated confirmation alerts—is crafted to deliver total relaxation and effortless elegance.
+                    </p>
+                    <a href="login.html" class="btn-get-started">
+                        <span>Get Started</span>
+                        <svg class="btn-arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frame 2: Video 2 End Section HUD Cyber Overlay (Accurate Replica of Image 2) -->
+    <div id="services-content" class="services-content">
+        <div class="services-frame-wrapper">
+            <!-- Cyber HUD SVG Vector Outer Frame matching Image 2 cut corners, corner notches & glowing gold double borders -->
+            <svg class="hud-svg-outer" viewBox="0 0 1000 540" preserveAspectRatio="none">
+                <defs>
+                    <filter id="hud-gold-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="6" result="blur1" />
+                        <feGaussianBlur stdDeviation="2" result="blur2" />
+                        <feMerge>
+                            <feMergeNode in="blur1" />
+                            <feMergeNode in="blur2" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+
+                    <linearGradient id="hud-beam-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ff9900" stop-opacity="0.3" />
+                        <stop offset="35%" stop-color="#ffcc00" stop-opacity="1" />
+                        <stop offset="70%" stop-color="#ffffff" stop-opacity="1" />
+                        <stop offset="100%" stop-color="#ffaa00" stop-opacity="0.4" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Base Dark Glass Container & Glowing Outer Gold Chamfer Frame Stroke with Corner Stepped Notches -->
+                <path class="hud-base-path" d="M 0,55 L 20,35 L 20,20 L 55,0 L 430,0 L 450,22 L 550,22 L 570,0 L 945,0 L 980,20 L 980,35 L 1000,55 L 1000,485 L 980,505 L 980,520 L 945,540 L 570,540 L 550,518 L 450,518 L 430,540 L 55,540 L 20,520 L 20,505 L 0,485 Z" fill="#080504" stroke="#ffaa00" stroke-width="2.2" vector-effect="non-scaling-stroke" />
+
+                <!-- Inner Gold Accent Line -->
+                <path class="hud-inner-accent" d="M 5,58 L 24,39 L 24,24 L 58,5 L 428,5 L 448,27 L 552,27 L 572,5 L 942,5 L 976,24 L 976,39 L 995,58 L 995,482 L 976,501 L 976,516 L 942,535 L 572,535 L 552,513 L 448,513 L 428,535 L 58,535 L 24,516 L 24,501 L 5,482 Z" fill="none" stroke="rgba(255, 204, 102, 0.45)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+
+                <!-- Corner Cyber Armor Bevel Highlights (Matching Image 2 outer frame cutouts) -->
+                <path d="M 0,55 L 20,35 L 20,20 L 55,0" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#hud-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 945,0 L 980,20 L 980,35 L 1000,55" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#hud-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 1000,485 L 980,505 L 980,520 L 945,540" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#hud-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 55,540 L 20,520 L 20,505 L 0,485" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#hud-gold-glow)" vector-effect="non-scaling-stroke" />
+
+                <!-- Live Animated Moving Beam on HUD Outer Border -->
+                <path class="hud-live-beam" d="M 0,55 L 20,35 L 20,20 L 55,0 L 430,0 L 450,22 L 550,22 L 570,0 L 945,0 L 980,20 L 980,35 L 1000,55 L 1000,485 L 980,505 L 980,520 L 945,540 L 570,540 L 550,518 L 450,518 L 430,540 L 55,540 L 20,520 L 20,505 L 0,485 Z" fill="none" stroke="url(#hud-beam-grad)" stroke-width="3" stroke-linecap="round" filter="url(#hud-gold-glow)" vector-effect="non-scaling-stroke" />
+
+                <!-- Center Vertical Glowing Divider Line with Top & Bottom Flare Circles (Matching Image 2) -->
+                <line x1="475" y1="24" x2="475" y2="516" stroke="#ffaa00" stroke-width="2" filter="url(#hud-gold-glow)" vector-effect="non-scaling-stroke" class="hud-center-divider" />
+                <circle cx="475" cy="24" r="5" fill="#ffffff" filter="url(#hud-gold-glow)" />
+                <circle cx="475" cy="516" r="5" fill="#ffffff" filter="url(#hud-gold-glow)" />
+
+                <!-- Top Center Yellow Slashed Accent Bars /// -->
+                <g class="hud-slashed-bars top-bars">
+                    <polygon points="485,6 494,6 487,18 478,18" fill="#ffcc00" />
+                    <polygon points="498,6 507,6 500,18 491,18" fill="#ffcc00" />
+                    <polygon points="511,6 520,6 513,18 504,18" fill="#ffcc00" />
+                </g>
+
+                <!-- Bottom Center Yellow Slashed Accent Bars /// -->
+                <g class="hud-slashed-bars bottom-bars">
+                    <polygon points="478,522 487,522 480,534 471,534" fill="#ffcc00" />
+                    <polygon points="491,522 500,522 493,534 484,534" fill="#ffcc00" />
+                    <polygon points="504,522 513,522 506,534 497,534" fill="#ffcc00" />
+                </g>
+            </svg>
+
+            <!-- Inner Layout Container for Image 2 Content -->
+            <div class="services-container">
+                <!-- Left Side: Badge, Title, Underline & Interactive Tag Options -->
+                <div class="services-col-left">
+                    <div class="badge-pill services-badge">
+                        <svg class="diamond-icon" viewBox="0 0 24 24" fill="none" stroke="#ffc14d" stroke-width="2">
+                            <polygon points="12 2 22 8.5 12 22 2 8.5 12 2" />
+                            <line x1="2" y1="8.5" x2="22" y2="8.5" />
+                            <polyline points="12 2 9 8.5 12 22 15 8.5 12 2" />
+                        </svg>
+                        <span>Luxury Booking Platform</span>
+                    </div>
+
+                    <h1 class="services-title">
+                        <span class="title-white">OUR</span><br>
+                        <span class="highlight-services-gold">SERVICES</span>
+                    </h1>
+
+                    <div class="services-line-divider"></div>
+
+                    <!-- Interactive Tagging Options -->
+                    <div class="services-tag-options">
+                        <button class="tag-chip active" data-tag="all">
+                            <span class="tag-icon">✨</span> Instant Booking
+                        </button>
+                        <button class="tag-chip" data-tag="slots">
+                            <span class="tag-icon">⚡</span> Real-Time Slots
+                        </button>
+                        <button class="tag-chip" data-tag="stylists">
+                            <span class="tag-icon">✂️</span> Preferred Stylists
+                        </button>
+                        <button class="tag-chip" data-tag="reminders">
+                            <span class="tag-icon">🔔</span> Auto Reminders
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Side: Exact Paragraph Text from Image 2 -->
+                <div class="services-col-right">
+                    <p id="services-description-text" class="services-description">
+                        We offer a comprehensive suite of digital booking features designed to simplify your scheduling needs and elevate your salon experience. Our intelligent platform is dedicated to providing you with seamless appointment management, utilizing real-time availability and secure instant confirmations. Whether you are looking to quickly secure a slot with your preferred stylist or receive automated reminders for your upcoming visit, we have the perfect digital solution to save you time and eliminate hassle. Experience the pinnacle of effortless booking with StylePulse, where your convenience is our top priority.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frame 3: Video 3 End Section HUD Cyber Overlay (Exact Image 3) -->
+    <div id="frame3-content" class="frame3-content">
+        <div class="frame3-wrapper">
+            <!-- Cyber HUD SVG Vector Outer Frame matching Image 3 with corner notches, slashed bars & dotted notches -->
+            <svg class="hud-svg-outer" viewBox="0 0 1000 520" preserveAspectRatio="none">
+                <defs>
+                    <filter id="f3-gold-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="6" result="blur1" />
+                        <feGaussianBlur stdDeviation="2" result="blur2" />
+                        <feMerge>
+                            <feMergeNode in="blur1" />
+                            <feMergeNode in="blur2" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+
+                    <linearGradient id="f3-beam-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ff9900" stop-opacity="0.3" />
+                        <stop offset="35%" stop-color="#ffcc00" stop-opacity="1" />
+                        <stop offset="70%" stop-color="#ffffff" stop-opacity="1" />
+                        <stop offset="100%" stop-color="#ffaa00" stop-opacity="0.4" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Base Dark Glass Container & Glowing Outer Gold Chamfer Frame Stroke -->
+                <path class="hud-base-path" d="M 0,55 L 20,35 L 20,20 L 55,0 L 430,0 L 450,22 L 550,22 L 570,0 L 945,0 L 980,20 L 980,35 L 1000,55 L 1000,465 L 980,485 L 980,500 L 945,520 L 570,520 L 550,498 L 450,498 L 430,520 L 55,520 L 20,500 L 20,485 L 0,465 Z" fill="#080504" stroke="#ffaa00" stroke-width="2.2" vector-effect="non-scaling-stroke" />
+
+                <!-- Inner Gold Accent Line -->
+                <path class="hud-inner-accent" d="M 5,58 L 24,39 L 24,24 L 58,5 L 428,5 L 448,27 L 552,27 L 572,5 L 942,5 L 976,24 L 976,39 L 995,58 L 995,462 L 976,481 L 976,496 L 942,515 L 572,515 L 552,493 L 448,493 L 428,515 L 58,515 L 24,496 L 24,481 L 5,462 Z" fill="none" stroke="rgba(255, 204, 102, 0.45)" stroke-width="1.2" vector-effect="non-scaling-stroke" />
+
+                <!-- Corner Cyber Armor Bevel Highlights -->
+                <path d="M 0,55 L 20,35 L 20,20 L 55,0" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#f3-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 945,0 L 980,20 L 980,35 L 1000,55" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#f3-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 1000,465 L 980,485 L 980,500 L 945,520" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#f3-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 55,520 L 20,500 L 20,485 L 0,465" fill="none" stroke="#ffcc00" stroke-width="3" filter="url(#f3-gold-glow)" vector-effect="non-scaling-stroke" />
+
+                <!-- Top Left/Right Slashed Bars /// -->
+                <g class="slashed-bars" stroke="#ffaa00" stroke-width="2">
+                    <line x1="160" y1="12" x2="167" y2="20" />
+                    <line x1="172" y1="12" x2="179" y2="20" />
+                    <line x1="184" y1="12" x2="191" y2="20" />
+                    <line x1="196" y1="12" x2="203" y2="20" />
+
+                    <line x1="790" y1="12" x2="797" y2="20" />
+                    <line x1="802" y1="12" x2="809" y2="20" />
+                    <line x1="814" y1="12" x2="821" y2="20" />
+                    <line x1="826" y1="12" x2="833" y2="20" />
+                </g>
+
+                <!-- Live Animated Moving Beam on HUD Outer Border -->
+                <path class="hud-live-beam" d="M 0,55 L 20,35 L 20,20 L 55,0 L 430,0 L 450,22 L 550,22 L 570,0 L 945,0 L 980,20 L 980,35 L 1000,55 L 1000,465 L 980,485 L 980,500 L 945,520 L 570,520 L 550,498 L 450,498 L 430,520 L 55,520 L 20,500 L 20,485 L 0,465 Z" fill="none" stroke="url(#f3-beam-grad)" stroke-width="3" stroke-linecap="round" filter="url(#f3-gold-glow)" vector-effect="non-scaling-stroke" />
+
+                <!-- Center Vertical Glowing Divider Line -->
+                <line x1="485" y1="24" x2="485" y2="496" stroke="#ffaa00" stroke-width="2" filter="url(#f3-gold-glow)" vector-effect="non-scaling-stroke" class="hud-center-divider" />
+                <circle cx="485" cy="24" r="5" fill="#ffffff" filter="url(#f3-gold-glow)" />
+                <circle cx="485" cy="496" r="5" fill="#ffffff" filter="url(#f3-gold-glow)" />
+
+                <!-- Top Center Dotted Tech Notches -->
+                <g class="top-dotted-notches">
+                    <circle cx="440" cy="11" r="2" fill="#ffcc00" />
+                    <circle cx="450" cy="11" r="2" fill="#ffcc00" />
+                    <circle cx="460" cy="11" r="2" fill="#ffcc00" />
+                    <circle cx="540" cy="11" r="2" fill="#ffcc00" />
+                    <circle cx="550" cy="11" r="2" fill="#ffcc00" />
+                    <circle cx="560" cy="11" r="2" fill="#ffcc00" />
+                </g>
+
+                <!-- Bottom Center Dotted Tech Notches -->
+                <g class="bottom-dotted-notches">
+                    <circle cx="440" cy="509" r="2" fill="#ffcc00" />
+                    <circle cx="450" cy="509" r="2" fill="#ffcc00" />
+                    <circle cx="460" cy="509" r="2" fill="#ffcc00" />
+                    <circle cx="540" cy="509" r="2" fill="#ffcc00" />
+                    <circle cx="550" cy="509" r="2" fill="#ffcc00" />
+                    <circle cx="560" cy="509" r="2" fill="#ffcc00" />
+                </g>
+            </svg>
+
+            <!-- Inner Layout Container -->
+            <div class="frame3-container">
+                <!-- Left Column: Badge & Title -->
+                <div class="frame3-col-left">
+                    <div class="badge-pill services-badge">
+                        <svg class="diamond-icon" viewBox="0 0 24 24" fill="none" stroke="#ffc14d" stroke-width="2">
+                            <polygon points="12 2 22 8.5 12 22 2 8.5 12 2" />
+                            <line x1="2" y1="8.5" x2="22" y2="8.5" />
+                            <polyline points="12 2 9 8.5 12 22 15 8.5 12 2" />
+                        </svg>
+                        <span>Luxury Booking Platform</span>
+                    </div>
+
+                    <h1 class="frame3-title">
+                        <span class="title-white">WHY CHOOSE</span><br>
+                        <span class="highlight-services-gold">STYLEPULSE?</span>
+                    </h1>
+
+                    <div class="services-line-divider"></div>
+                </div>
+
+                <!-- Right Column: Paragraph Text -->
+                <div class="frame3-col-right">
+                    <p id="frame3-description-text" class="frame3-description">
+                        Choosing StylePulse means stepping into a world where managing your beauty appointments is as relaxing as the services themselves. We eliminate the frustration of waiting on hold or dealing with double bookings by offering a seamless, 24/7 online platform. With our intelligent AI-driven system, you can instantly view real-time availability, securely select your favorite stylist, and lock in your appointment with absolute certainty. Plus, our automated SMS and email reminders ensure you never miss a visit, giving you total peace of mind and complete control over your self-care schedule.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden video element used for background frame extraction -->
+    <video id="scrolly-video" playsinline muted style="display: none;"></video>
+
+    <script src="index.js?v=92"></script>
+</body>
+
 </html>

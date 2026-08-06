@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up — StylePulse Luxury Salon Platform</title>
+    <meta name="description" content="Create your StylePulse account to unlock luxury salon booking and smart appointment scheduling.">
+
+    <!-- Premium Google Fonts: Poppins & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="signup.css?v=5.0">
+</head>
+
+<body class="auth-page">
+
+    <!-- Background Ambient Glow & Floating FX -->
+    <div class="auth-bg-ambient">
+        <div class="bg-glow-orb orb-1"></div>
+        <div class="bg-glow-orb orb-2"></div>
+        <div class="bg-grid-overlay"></div>
+    </div>
+
+    <!-- Back to Main Website Header Link -->
+    <div class="top-nav-bar">
+        <a href="index.html" class="back-home-link">
+            <span class="back-arrow">←</span> BACK TO STYLEPULSE
+        </a>
+    </div>
+
+    <!-- Main Auth Section -->
+    <main class="auth-container">
+        <div class="auth-card-wrapper">
+
+            <!-- Cyber HUD SVG Vector Frame -->
+            <svg class="auth-hud-svg" viewBox="0 0 600 820" preserveAspectRatio="none">
+                <defs>
+                    <filter id="signup-gold-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="6" result="blur1" />
+                        <feGaussianBlur stdDeviation="2" result="blur2" />
+                        <feMerge>
+                            <feMergeNode in="blur1" />
+                            <feMergeNode in="blur2" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                    <linearGradient id="signup-beam-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ff9900" stop-opacity="0.2" />
+                        <stop offset="50%" stop-color="#ffcc00" stop-opacity="1" />
+                        <stop offset="100%" stop-color="#ffaa00" stop-opacity="0.3" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Base Dark Chamfer Path -->
+                <path class="hud-base-path" d="M 0,45 L 20,25 L 20,15 L 45,0 L 250,0 L 265,15 L 335,15 L 350,0 L 555,0 L 580,15 L 580,25 L 600,45 L 600,775 L 580,795 L 580,805 L 555,820 L 350,820 L 335,805 L 265,805 L 250,820 L 45,820 L 20,805 L 20,795 L 0,775 Z" fill="#090605" stroke="#ffaa00" stroke-width="2" vector-effect="non-scaling-stroke" />
+
+                <!-- Inner Accent Stroke -->
+                <path d="M 5,48 L 23,30 L 23,20 L 48,5 L 248,5 L 263,18 L 337,18 L 352,5 L 552,5 L 577,20 L 577,30 L 595,48 L 595,772 L 577,790 L 577,800 L 552,815 L 352,815 L 337,802 L 263,802 L 248,815 L 48,815 L 23,800 L 23,790 L 5,772 Z" fill="none" stroke="rgba(255, 204, 102, 0.4)" stroke-width="1" vector-effect="non-scaling-stroke" />
+
+                <!-- Cyber Bevel Corner Glows -->
+                <path d="M 0,45 L 20,25 L 20,15 L 45,0" fill="none" stroke="#ffcc00" stroke-width="2.5" filter="url(#signup-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 555,0 L 580,15 L 580,25 L 600,45" fill="none" stroke="#ffcc00" stroke-width="2.5" filter="url(#signup-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 600,775 L 580,795 L 580,805 L 555,820" fill="none" stroke="#ffcc00" stroke-width="2.5" filter="url(#signup-gold-glow)" vector-effect="non-scaling-stroke" />
+                <path d="M 45,820 L 20,805 L 20,795 L 0,775" fill="none" stroke="#ffcc00" stroke-width="2.5" filter="url(#signup-gold-glow)" vector-effect="non-scaling-stroke" />
+
+                <!-- Moving Laser Beam -->
+                <path class="hud-live-beam" d="M 0,45 L 20,25 L 20,15 L 45,0 L 250,0 L 265,15 L 335,15 L 350,0 L 555,0 L 580,15 L 580,25 L 600,45 L 600,775 L 580,795 L 580,805 L 555,820 L 350,820 L 335,805 L 265,805 L 250,820 L 45,820 L 20,805 L 20,795 L 0,775 Z" fill="none" stroke="url(#signup-beam-grad)" stroke-width="2.5" filter="url(#signup-gold-glow)" vector-effect="non-scaling-stroke" />
+            </svg>
+
+            <!-- Card Inner Form Content -->
+            <div class="auth-card-body">
+                
+                <!-- Logo & Header -->
+                <div class="auth-header">
+                    <a href="index.html" class="logo-link">
+                        <img src="component/logo.png" alt="StylePulse Logo" class="auth-logo-img">
+                    </a>
+                    <h1 class="auth-title">CREATE <span class="highlight-gold">ACCOUNT</span></h1>
+                    <p class="auth-subtitle">Join StylePulse for instant luxury booking & AI salon scheduling</p>
+                </div>
+
+                <!-- Account Type Selector Tabs -->
+                <div class="role-selector-tabs">
+                    <button type="button" class="role-tab active" data-type="client">
+                        <span class="tab-icon">✨</span> Client Account
+                    </button>
+                    <button type="button" class="role-tab" data-type="owner">
+                        <span class="tab-icon">👑</span> Salon Owner
+                    </button>
+                </div>
+
+                <!-- Feedback Banner Message -->
+                <div id="auth-alert" class="auth-alert hidden"></div>
+
+                <!-- Signup Form -->
+                <form id="signup-form" class="auth-form" novalidate>
+                    
+                    <!-- Full Name Field -->
+                    <div class="form-group">
+                        <label for="fullname" class="form-label">Full Name</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="fullname" name="fullname" class="form-input" placeholder="Alexander Wright" required autocomplete="name">
+                        </div>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📧</span>
+                            <input type="email" id="email" name="email" class="form-input" placeholder="alex@domain.com" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <!-- Phone Number Field -->
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📱</span>
+                            <input type="tel" id="phone" name="phone" class="form-input" placeholder="+1 (555) 019-2834" autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Salon Verification Fields Container (Injected ONLY for Salon Owner) -->
+                    <div id="salon-fields-container"></div>
+
+                    <!-- Password Field & Strength Indicator -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" name="password" class="form-input" placeholder="Minimum 8 characters" required autocomplete="new-password">
+                            <button type="button" id="toggle-password-btn" class="toggle-password" title="Toggle password visibility">
+                                👁️
+                            </button>
+                        </div>
+                        <!-- Strength Bar -->
+                        <div class="strength-meter">
+                            <div class="strength-bar-bg">
+                                <div id="strength-bar-fill" class="strength-bar-fill"></div>
+                            </div>
+                            <span id="strength-label" class="strength-label">Password strength: Weak</span>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="form-group">
+                        <label for="confirm-password" class="form-label">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="confirm-password" name="confirm-password" class="form-input" placeholder="Re-enter password" required autocomplete="new-password">
+                        </div>
+                    </div>
+
+                    <!-- Terms Checkbox -->
+                    <div class="form-options">
+                        <label class="custom-checkbox-container">
+                            <input type="checkbox" id="terms-agree" name="terms" required>
+                            <span class="checkmark"></span>
+                            <span class="checkbox-label">I agree to the <a href="#" class="inline-link">Terms of Service</a> & <a href="#" class="inline-link">Privacy Policy</a></span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-btn" class="auth-submit-btn">
+                        <span class="btn-text">CREATE YOUR ACCOUNT</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="auth-divider">
+                    <span class="divider-line"></span>
+                    <span class="divider-text">OR REGISTER WITH</span>
+                    <span class="divider-line"></span>
+                </div>
+
+                <!-- Social Signup Grid -->
+                <div class="social-login-grid">
+                    <button type="button" class="social-btn google-btn">
+                        <svg class="social-icon" viewBox="0 0 24 24">
+                            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+                            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+                            <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15s.7 5.3 1.9 7.7l3.7-2.9c-.3-.7-.5-1.5-.5-2.3z"/>
+                            <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+                        </svg>
+                        <span>Google</span>
+                    </button>
+                    <button type="button" class="social-btn apple-btn">
+                        <svg class="social-icon" viewBox="0 0 24 24" fill="#ffffff">
+                            <path d="M18.7 19.5c-.8 1.2-1.7 2.4-3 2.4-1.3 0-1.7-.8-3.2-.8-1.5 0-2 .8-3.2.8-1.3 0-2.3-1.3-3.1-2.4-1.7-2.5-3-7.1-1.2-10.2.9-1.5 2.5-2.5 4.3-2.5 1.3 0 2.6.9 3.4.9.8 0 2.4-1.1 4-1 .7 0 2.6.2 3.8 2-3.1 1.8-2.6 6.5.6 7.8-.6 1.4-1.5 2.9-2.4 4.2zM15.5 4.6c.7-.9 1.2-2.1 1-3.3-1 .1-2.3.7-3 1.5-.6.7-1.2 1.9-1 3.1 1.2.1 2.3-.5 3-1.3z"/>
+                        </svg>
+                        <span>Apple</span>
+                    </button>
+                </div>
+
+                <!-- Footer Link to Login -->
+                <div class="auth-footer">
+                    <p>Already have a StylePulse account? <a href="login.html" class="auth-link">Log In Here</a></p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="signup.js?v=6.0"></script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-﻿create table if not exists public.profiles (
+create table if not exists public.users (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text not null,
   email text not null unique,
@@ -24,7 +24,7 @@ create table if not exists public.login_logs (
   is_active boolean not null default true
 );
 
-alter table public.profiles enable row level security;
+alter table public.users enable row level security;
 alter table public.login_logs enable row level security;
 
 create or replace function public.handle_updated_at()
@@ -39,21 +39,21 @@ begin
 end;
 $$;
 
-drop policy if exists "Profiles are viewable by owner" on public.profiles;
+drop policy if exists "Profiles are viewable by owner" on public.users;
 create policy "Profiles are viewable by owner"
-on public.profiles
+on public.users
 for select
 using (auth.uid() = id);
 
-drop policy if exists "Profiles can be inserted by owner" on public.profiles;
+drop policy if exists "Profiles can be inserted by owner" on public.users;
 create policy "Profiles can be inserted by owner"
-on public.profiles
+on public.users
 for insert
 with check (auth.uid() = id);
 
-drop policy if exists "Profiles can be updated by owner" on public.profiles;
+drop policy if exists "Profiles can be updated by owner" on public.users;
 create policy "Profiles can be updated by owner"
-on public.profiles
+on public.users
 for update
 using (auth.uid() = id)
 with check (auth.uid() = id);
@@ -77,9 +77,9 @@ for update
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
-drop trigger if exists profiles_set_updated_at on public.profiles;
+drop trigger if exists profiles_set_updated_at on public.users;
 create trigger profiles_set_updated_at
-before update on public.profiles
+before update on public.users
 for each row
 execute function public.handle_updated_at();
 

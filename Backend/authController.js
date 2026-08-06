@@ -48,13 +48,37 @@ const getSafeUserPayload = (user) => ({
     role: user?.app_metadata?.role || user?.user_metadata?.role || user?.role || "customer"
 });
 
-const saveProfileToSupabase = async ({ id, fullName, email, phone }) => {
+const saveProfileToSupabase = async ({ id, fullName, email, phone, role, isApproved, salonName, salonRegId, salonAddress, salonWebsite }) => {
     if (!isSupabaseConfigured()) return;
-    const { error } = await supabase.from("users").upsert(
-        { id, full_name: fullName, email, phone, role: "customer" },
-        { onConflict: "id" }
-    );
-    if (error) console.warn("Users persistence skipped:", error.message);
+    const client = supabaseAdmin || supabase;
+    
+    if (role === 'owner') {
+        const { error } = await client.from("salon_owners").insert({
+            id,
+            full_name: fullName,
+            email,
+            phone,
+            role: 'owner',
+            salon_name: salonName,
+            salon_reg_id: salonRegId,
+            salon_address: salonAddress,
+            salon_website: salonWebsite,
+            is_approved: false
+        });
+        if (error) console.warn("Salon owners persistence skipped:", error.message);
+    } else {
+        const { error } = await client.from("users").upsert(
+            { 
+                id, 
+                full_name: fullName, 
+                email, 
+                phone, 
+                role: role || "customer"
+            },
+            { onConflict: "id" }
+        );
+        if (error) console.warn("Users persistence skipped:", error.message);
+    }
 };
 
 const recordLoginActivity = async (req, user, session) => {
@@ -84,8 +108,10 @@ const recordLoginActivity = async (req, user, session) => {
 
 export const register = async (req, res) => {
     try {
-        const { email, phone, password } = req.body;
+        const { email, phone, password, salonName, salonRegId, salonAddress, salonWebsite } = req.body;
         const fullName = req.body.fullName || req.body.name;
+        const reqRole = req.body.role === 'owner' ? 'owner' : 'customer';
+        const isApproved = reqRole === 'owner' ? false : true;
 
         if (!fullName || !email || !phone || !password) {
             return res.status(400).json({ success: false, message: "All fields are required." });
@@ -107,28 +133,41 @@ export const register = async (req, res) => {
                         email: normalizedEmail,
                         password,
                         email_confirm: true,
-                        user_metadata: { fullName, phone, role: "customer" },
-                        app_metadata: { role: "customer" }
+                        user_metadata: { fullName, phone, role: reqRole },
+                        app_metadata: { role: reqRole }
                     });
                     if (error) return res.status(400).json({ success: false, message: error.message });
                     authUser = data.user;
 
-                    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
-                    if (!loginError) authSession = loginData.session;
+                    if (isApproved) {
+                        const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+                        if (!loginError) authSession = loginData.session;
+                    }
                 } else {
                     const { data, error } = await supabase.auth.signUp({
                         email: normalizedEmail,
                         password,
-                        options: { data: { fullName, phone, role: "customer" } }
+                        options: { data: { fullName, phone, role: reqRole } }
                     });
                     if (error) return res.status(400).json({ success: false, message: error.message });
                     authUser = data.user;
-                    authSession = data.session;
+                    authSession = isApproved ? data.session : null;
                 }
 
                 if (!authUser) return res.status(400).json({ success: false, message: "Registration failed. Please try again." });
 
-                await saveProfileToSupabase({ id: authUser.id, fullName, email: normalizedEmail, phone });
+                await saveProfileToSupabase({ 
+                    id: authUser.id, 
+                    fullName, 
+                    email: normalizedEmail, 
+                    phone, 
+                    role: reqRole, 
+                    isApproved,
+                    salonName,
+                    salonRegId,
+                    salonAddress,
+                    salonWebsite
+                });
 
                 // Also save to local storage as a fallback
                 const localUsers = getLocalUsers();
@@ -209,30 +248,43 @@ export const login = async (req, res) => {
 
         const normalizedEmail = normalizeEmail(email);
 
-        // ---- Try Supabase if configured ----
-        let supabaseError = null;
+        // ---- Strict Supabase Authentication ----
         if (isSupabaseConfigured()) {
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
                 if (error) {
-                    supabaseError = error.message;
-                    console.warn("Supabase login error (trying local fallback):", error.message);
-                } else {
-                    await recordLoginActivity(req, data.user, data.session);
-                    return res.status(200).json({
-                        success: true,
-                        message: "Login successful.",
-                        user: getSafeUserPayload(data.user),
-                        token: data.session?.access_token,
-                        session: data.session
-                    });
+                    return res.status(401).json({ success: false, message: error.message });
                 }
+                // Check if user is approved
+                const client = supabaseAdmin || supabase;
+                const userRole = data.user.user_metadata?.role || data.user.app_metadata?.role || 'customer';
+                
+                if (userRole === 'owner') {
+                    const { data: salonProfile } = await client
+                        .from('salon_owners')
+                        .select('is_approved')
+                        .eq('id', data.user.id)
+                        .maybeSingle();
+                    
+                    if (salonProfile && salonProfile.is_approved === false) {
+                        return res.status(401).json({ success: false, message: "Your account is pending approval by the admin." });
+                    }
+                }
+                
+                await recordLoginActivity(req, data.user, data.session);
+                return res.status(200).json({
+                    success: true,
+                    message: "Login successful.",
+                    user: getSafeUserPayload(data.user),
+                    token: data.session?.access_token,
+                    session: data.session
+                });
             } catch (supabaseErr) {
-                console.warn("Supabase login failed, falling back to local:", supabaseErr.message);
+                return res.status(500).json({ success: false, message: "Internal server error during authentication." });
             }
         }
 
-        // ---- Local fallback ----
+        // ---- Local fallback (Only runs if Supabase is NOT configured) ----
         const localUsers = getLocalUsers();
         const localUser = localUsers.find(u => u.email === normalizedEmail);
         if (!localUser) {
@@ -284,6 +336,57 @@ export const logout = async (req, res) => {
 
         return res.status(200).json({ success: true, message: "Logged out successfully." });
     } catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// =========================
+// GET ALL APPROVED SALONS
+// =========================
+export const getApprovedSalons = async (req, res) => {
+    if (!isSupabaseConfigured()) {
+        return res.status(500).json({ success: false, message: "Database not configured." });
+    }
+
+    try {
+        const client = supabaseAdmin || supabase;
+        const { data, error } = await client
+            .from("salon_owners")
+            .select("id, salon_name, salon_address, salon_website, full_name, email")
+            .eq("is_approved", true);
+
+        if (error) throw error;
+
+        return res.status(200).json({ success: true, salons: data });
+    } catch (err) {
+        console.error("Error fetching approved salons:", err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// =========================
+// GET SERVICES OF A PARTICULAR SALON
+// =========================
+export const getSalonServices = async (req, res) => {
+    if (!isSupabaseConfigured()) {
+        return res.status(500).json({ success: false, message: "Database not configured." });
+    }
+
+    try {
+        const client = supabaseAdmin || supabase;
+        const { id } = req.params;
+
+        const { data, error } = await client
+            .from("salon_owner_services")
+            .select("*")
+            .eq("owner_id", id)
+            .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        return res.status(200).json({ success: true, services: data });
+    } catch (err) {
+        console.error("Error fetching salon services:", err);
         return res.status(500).json({ success: false, message: err.message });
     }
 };
