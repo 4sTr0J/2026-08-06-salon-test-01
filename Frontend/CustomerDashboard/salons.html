@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StylePulse - Explore Salons</title>
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="../index.css?v=60">
+    
+    <style>
+        :root {
+            --bg-light: #f8f9fa;
+            --text-dark: #1a1a1a;
+            --text-muted: #7c7c8a;
+            --orange-primary: #ff9f1c;
+            --orange-gradient: linear-gradient(135deg, #ffb03a 0%, #ff7b00 100%);
+            --orange-card-gradient: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --border-light: rgba(0, 0, 0, 0.08);
+            --card-bg: #ffffff;
+            --navbar-bg: #ffffff;
+            --navbar-text: #1a1a1a;
+        }
+
+        body.dark-theme {
+            --bg-light: #0d0c0f;
+            --text-dark: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-light: rgba(255, 255, 255, 0.1);
+            --card-bg: #151419;
+            --navbar-bg: #151419;
+            --navbar-text: #f3f4f6;
+        }
+
+        html,
+        body.explorer-page {
+            background: var(--bg-light) !important;
+            color: var(--text-dark) !important;
+            font-family: 'Poppins', sans-serif;
+            height: auto !important;
+            min-height: 100vh !important;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-y: auto !important;
+        }
+
+        .explorer-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 24px 20px 100px 20px;
+            box-sizing: border-box;
+        }
+
+        /* Top Header & Location styling */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            margin-top: 80px; /* offset for fixed navbar */
+        }
+
+        .location-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .location-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .location-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .profile-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 2px solid var(--orange-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--orange-primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .profile-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Search Bar & Action Button styling */
+        .search-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            height: 52px;
+            border-radius: 14px;
+            border: 1px solid var(--border-light);
+            background: var(--card-bg);
+            padding-left: 48px;
+            padding-right: 16px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--text-dark);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--orange-primary);
+            box-shadow: 0 4px 15px rgba(255, 159, 28, 0.15);
+        }
+
+        .filter-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: var(--orange-gradient);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 159, 28, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 159, 28, 0.4);
+        }
+
+        .filter-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #ffffff;
+        }
+
+        /* Section header */
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .see-all-link {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .see-all-link:hover {
+            color: var(--orange-primary);
+        }
+
+        /* Special Promo Banners Carousel */
+        .promo-carousel {
+            margin-bottom: 32px;
+        }
+
+        .promo-card {
+            background: var(--orange-card-gradient);
+            border-radius: 24px;
+            padding: 24px;
+            color: #ffffff;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+            box-sizing: border-box;
+        }
+
+        .promo-badge {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--orange-primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            width: max-content;
+            margin-bottom: 12px;
+        }
+
+        .promo-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 0 4px 0;
+            line-height: 1.2;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .promo-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin: 0 0 16px 0;
+        }
+
+        .promo-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .promo-terms {
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+
+        .claim-btn {
+            background: #ffffff;
+            color: var(--orange-primary);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .claim-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 14px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #d1d5db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--orange-primary);
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        /* Circular Services Category Filters */
+        .categories-row {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            margin-bottom: 32px;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+        }
+
+        .categories-row::-webkit-scrollbar {
+            display: none; /* Hide scrollbar Chrome/Safari */
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 72px;
+            cursor: pointer;
+        }
+
+        .category-circle {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .category-item:hover .category-circle,
+        .category-item.active .category-circle {
+            background: var(--orange-gradient);
+            border-color: transparent;
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(255, 159, 28, 0.3);
+        }
+
+        .category-name {
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            text-align: center;
+        }
+
+        .category-item.active .category-name {
+            color: var(--orange-primary);
+            font-weight: 700;
+        }
+
+        /* Top Rated Salons list */
+        .salons-list-section {
+            margin-top: 8px;
+        }
+
+        .salons-scroll-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .modern-salon-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .modern-salon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-color: rgba(255, 159, 28, 0.3);
+        }
+
+        .salon-image-wrapper {
+            height: 150px;
+            position: relative;
+            width: 100%;
+            background: #eee;
+        }
+
+        .salon-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .salon-rating-tag {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: var(--card-bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .salon-info-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .salon-title-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .salon-services-list {
+            font-size: 0.8rem;
+            color: var(--orange-primary);
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .salon-addr-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .select-salon-action-btn {
+            margin-top: auto;
+            border: none;
+            background: var(--orange-gradient);
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 10px;
+            border-radius: 0 0 20px 20px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+
+        .empty-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .navbar {
+            background: var(--navbar-bg) !important;
+            border-bottom: 1px solid var(--border-light) !important;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .navbar .nav-link {
+            color: var(--navbar-text) !important;
+        }
+        .navbar .nav-link.active {
+            color: var(--orange-primary) !important;
+        }
+        .navbar .nav-login {
+            color: var(--navbar-text) !important;
+            border: 1px solid var(--border-light) !important;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .navbar .nav-login:hover {
+            background: var(--bg-light);
+        }
+    </style>
+</head>
+<body class="explorer-page">
+
+    <!-- Fixed Top Navigation Header -->
+    <header class="navbar" id="main-header" style="position: fixed; width: 100%; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+        <div class="nav-left" style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1200px; margin: 0 auto; padding-inline: 20px; height: 64px;">
+            <div style="display: flex; align-items: center; gap: 24px;">
+                <a href="../index.html" class="nav-logo">
+                    <img src="../component/logo.png" alt="StylePulse Logo" style="height: 36px; object-fit: contain;">
+                </a>
+                <nav class="nav-links" style="display: flex; gap: 20px;">
+                    <a href="salons.html" class="nav-link active" style="text-decoration: none; font-weight: 600; font-size: 0.9rem;">EXPLORE SALONS</a>
+                    <a href="dashboard.html" class="nav-link" style="text-decoration: none; font-weight: 600; font-size: 0.9rem;">MY DASHBOARD</a>
+                </nav>
+            </div>
+            <div class="nav-right" style="display: flex; align-items: center; gap: 16px;">
+                <button id="theme-toggle-btn" style="border: none; cursor: pointer; background: transparent; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%;" title="Switch Theme">🌙</button>
+                <div style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600;" id="user-email-display"></div>
+                <button id="logout-btn" class="nav-login" style="border: none; cursor: pointer; background: transparent; font-family: inherit; font-size: 0.85rem; font-weight: 600;">LOG OUT</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="explorer-container">
+        
+        <!-- Location Header & Profile -->
+        <div class="top-header">
+            <div class="location-info">
+                <span class="location-label">Location</span>
+                <span class="location-value">📍 Colombo, Sri Lanka</span>
+            </div>
+            <div class="profile-badge" id="profile-badge-initials">SP</div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-row">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-bar" class="search-input" placeholder="Search Salon, Specialist, Services...">
+            </div>
+            <button class="filter-btn" title="Advanced Filter">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Promotional Carousel Banners -->
+        <div class="section-header-row">
+            <h2 class="section-title">#Special For You</h2>
+            <a href="#" class="see-all-link">See All</a>
+        </div>
+        <div class="promo-carousel">
+            <div class="promo-card">
+                <div>
+                    <div class="promo-badge">Limited time!</div>
+                    <h3 class="promo-title">Get Special Discount</h3>
+                    <p class="promo-subtitle">Up to 40% OFF on all styling packages</p>
+                </div>
+                <div class="promo-footer">
+                    <span class="promo-terms">All Salons available | T&C Applied</span>
+                    <button class="claim-btn">Claim</button>
+                </div>
+            </div>
+            <div class="carousel-dots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <!-- Services circular category list -->
+        <div class="section-header-row">
+            <h2 class="section-title">Services</h2>
+            <a href="#" class="see-all-link">See All</a>
+        </div>
+        <div class="categories-row">
+            <div class="category-item active" data-category="all">
+                <div class="category-circle">✨</div>
+                <span class="category-name">All Services</span>
+            </div>
+            <div class="category-item" data-category="Haircuts">
+                <div class="category-circle">✂️</div>
+                <span class="category-name">Haircuts</span>
+            </div>
+            <div class="category-item" data-category="Make Up">
+                <div class="category-circle">💄</div>
+                <span class="category-name">Make Up</span>
+            </div>
+            <div class="category-item" data-category="Shaving">
+                <div class="category-circle">🪒</div>
+                <span class="category-name">Shaving</span>
+            </div>
+            <div class="category-item" data-category="Massage">
+                <div class="category-circle">💆</div>
+                <span class="category-name">Massage</span>
+            </div>
+            <div class="category-item" data-category="Nail Care">
+                <div class="category-circle">💅</div>
+                <span class="category-name">Nail Care</span>
+            </div>
+        </div>
+
+        <!-- Top Rated Salons list -->
+        <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 class="section-title" style="margin: 0;">Top Rated Salons</h2>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="sp-sort-select" style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Sort By:</label>
+                <select id="sp-sort-select" style="background: var(--card-bg); color: var(--text-dark); border: 1px solid var(--border-light); border-radius: 8px; padding: 6px 12px; font-family: inherit; font-size: 0.85rem; font-weight: 600; outline: none; cursor: pointer; transition: border-color 0.2s;">
+                    <option value="default">Default</option>
+                    <option value="rating">Rating (Highest first)</option>
+                    <option value="sentiment">NLP Sentiment (Most Positive first)</option>
+                    <option value="reviews">Review Count</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="salons-list-section">
+            <div class="salons-scroll-container" id="salons-list-container">
+                <div class="empty-results">Loading registered salons...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Alert Box Notification -->
+    <div id="alert-box" class="alert-box">
+        <div class="alert-content">
+            <span id="alert-icon" class="alert-icon"></span>
+            <span id="alert-message" class="alert-message"></span>
+        </div>
+    </div>
+    
+    <style>
+        .alert-box {
+            position: fixed; top: 80px; right: -400px;
+            background: rgba(255, 255, 255, 0.98); border-left: 4px solid;
+            padding: 16px 24px; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999; backdrop-filter: blur(10px);
+            display: flex; align-items: center;
+        }
+        .alert-box.show { right: 20px; }
+        .alert-box.success { border-color: #2ecc71; }
+        .alert-box.error { border-color: #e74c3c; }
+        .alert-content { display: flex; align-items: center; gap: 12px; }
+        .alert-message { font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
+    </style>
+
+    <!-- Frontend Redesigned script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const token = localStorage.getItem("stylepulse_token");
+            const userString = localStorage.getItem("stylepulse_user");
+            let user = null;
+
+            if (userString) {
+                try { user = JSON.parse(userString); } catch (e) { user = null; }
+            }
+
+            if (!token || !user) {
+                window.location.href = "../login.html";
+                return;
+            }
+
+            // Set profile details
+            document.getElementById("user-email-display").textContent = user.email.toUpperCase();
+            if (user.email) {
+                const initials = user.email.substring(0, 2).toUpperCase();
+                document.getElementById("profile-badge-initials").textContent = initials;
+            }
+
+            // Logout
+            const logoutBtn = document.getElementById("logout-btn");
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", () => {
+                    localStorage.removeItem("stylepulse_token");
+                    localStorage.removeItem("stylepulse_user");
+                    window.location.href = "../login.html";
+                });
+            }
+
+            // Theme toggle logic
+            const themeToggleBtn = document.getElementById("theme-toggle-btn");
+            const currentTheme = localStorage.getItem("stylepulse_theme") || "light";
+            if (currentTheme === "dark") {
+                document.body.classList.add("dark-theme");
+                themeToggleBtn.textContent = "☀️";
+            } else {
+                themeToggleBtn.textContent = "🌙";
+            }
+
+            themeToggleBtn.addEventListener("click", () => {
+                if (document.body.classList.contains("dark-theme")) {
+                    document.body.classList.remove("dark-theme");
+                    localStorage.setItem("stylepulse_theme", "light");
+                    themeToggleBtn.textContent = "🌙";
+                } else {
+                    document.body.classList.add("dark-theme");
+                    localStorage.setItem("stylepulse_theme", "dark");
+                    themeToggleBtn.textContent = "☀️";
+                }
+            });
+
+            const container = document.getElementById("salons-list-container");
+            const searchBar = document.getElementById("search-bar");
+            const categoryItems = document.querySelectorAll(".category-item");
+
+            let allSalons = [];
+            let currentFilterCategory = "all";
+            let currentSearchQuery = "";
+
+            // Fetch salons (services are pre-loaded in the response by the backend)
+            try {
+                const res = await fetch("http://localhost:5001/api/auth/salons", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const data = await res.json();
+                
+                if (data.success && data.salons) {
+                    allSalons = data.salons;
+                    applyFilterAndSearch();
+                } else {
+                    container.innerHTML = `<div class="empty-results">Failed to load salons list.</div>`;
+                }
+            } catch (err) {
+                console.error("Salons load error:", err);
+                container.innerHTML = `<div class="empty-results">Server connection error. Please try again.</div>`;
+            }
+
+            // Category select logic
+            categoryItems.forEach(item => {
+                item.addEventListener("click", () => {
+                    categoryItems.forEach(c => c.classList.remove("active"));
+                    item.classList.add("active");
+                    currentFilterCategory = item.getAttribute("data-category");
+                    applyFilterAndSearch();
+                });
+            });
+
+            // Sort query listener
+            const sortSelect = document.getElementById("sp-sort-select");
+            sortSelect.addEventListener("change", () => {
+                applyFilterAndSearch();
+            });
+
+            // Search query listener
+            searchBar.addEventListener("input", (e) => {
+                currentSearchQuery = e.target.value.toLowerCase().trim();
+                applyFilterAndSearch();
+            });
+
+            function applyFilterAndSearch() {
+                let filtered = [...allSalons];
+
+                // 1. Filter by category
+                if (currentFilterCategory !== "all") {
+                    filtered = filtered.filter(salon => {
+                        return salon.services.some(service => 
+                            service.name.toLowerCase().includes(currentFilterCategory.toLowerCase())
+                        );
+                    });
+                }
+
+                // 2. Filter by search query (name, address, or service name)
+                if (currentSearchQuery) {
+                    filtered = filtered.filter(salon => {
+                        const matchesName = salon.salon_name.toLowerCase().includes(currentSearchQuery);
+                        const matchesAddress = (salon.salon_address || '').toLowerCase().includes(currentSearchQuery);
+                        const matchesService = salon.services.some(service => 
+                            service.name.toLowerCase().includes(currentSearchQuery)
+                        );
+                        return matchesName || matchesAddress || matchesService;
+                    });
+                }
+
+                // 3. Sort according to selected sort type
+                const sortType = sortSelect.value;
+                if (sortType === "rating") {
+                    // Bayesian weighted rating: WR = (v/(v+m)) * R + (m/(v+m)) * C
+                    // R = salon's raw avg rating, v = number of reviews
+                    // C = global mean rating (assumed 3.0), m = minimum reviews to trust (3)
+                    const C = 3.0; // global mean rating
+                    const m = 3;   // minimum reviews needed before trusting raw average
+                    const weightedRating = (s) => {
+                        const R = s.averageRating || 0;
+                        const v = s.reviewCount || 0;
+                        if (v === 0) return 0;
+                        return (v / (v + m)) * R + (m / (v + m)) * C;
+                    };
+                    filtered.sort((a, b) => weightedRating(b) - weightedRating(a));
+                } else if (sortType === "sentiment") {
+                    filtered.sort((a, b) => (b.averageSentiment || 0) - (a.averageSentiment || 0));
+                } else if (sortType === "reviews") {
+                    filtered.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
+                }
+
+                renderSalons(filtered);
+            }
+
+            function renderSalons(salons) {
+                if (salons.length === 0) {
+                    container.innerHTML = `<div class="empty-results">No salons match your search criteria.</div>`;
+                    return;
+                }
+
+                container.innerHTML = salons.map(s => {
+                    const rating = s.averageRating && s.averageRating > 0 ? s.averageRating.toFixed(1) : "0.0";
+                    const servicesText = s.services && s.services.length > 0 
+                        ? s.services.map(ser => ser.name).slice(0, 3).join(", ") 
+                        : "Luxury Styling & Treatments";
+                    
+                    const reviewsLabel = s.reviewCount !== undefined ? ` &nbsp;·&nbsp; ${s.reviewCount} review(s)` : '';
+                    const sentimentLabel = s.averageSentiment !== undefined && s.reviewCount > 0 
+                        ? ` &nbsp;·&nbsp; Sentiment: ${s.averageSentiment > 0 ? '😊' : s.averageSentiment < 0 ? '😞' : '😐'}`
+                        : '';
+
+                    return `
+                        <div class="modern-salon-card" onclick="selectSalon('${s.id}', \`${s.salon_name.replace(/'/g, "\\'")}\`, \`${(s.salon_address || '').replace(/'/g, "\\'")}\`, \`${(s.salon_website || '')}\`, \`${s.salon_image || ''}\`)">
+                            <div class="salon-image-wrapper">
+                                <img class="salon-img" src="${s.salon_image || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=500&q=80'}" alt="${s.salon_name}">
+                                <div class="salon-rating-tag">★ ${rating}</div>
+                            </div>
+                            <div class="salon-info-body">
+                                <h3 class="salon-title-text">${s.salon_name}</h3>
+                                <div class="salon-services-list">${servicesText}</div>
+                                <div class="salon-addr-text" style="display:flex; align-items:center; flex-wrap:wrap;">
+                                    <span>📍 ${s.salon_address || 'Colombo, Sri Lanka'}</span>
+                                    <span style="font-size:0.75rem; color:var(--text-muted); margin-top:2px; width:100%">${reviewsLabel}${sentimentLabel}</span>
+                                </div>
+                            </div>
+                            <button class="select-salon-action-btn">Select Salon</button>
+                        </div>
+                    `;
+                }).join('');
+            }
+        });
+
+        function selectSalon(id, name, address, website, image) {
+            localStorage.setItem("stylepulse_selected_salon_id", id);
+            localStorage.setItem("stylepulse_selected_salon_name", name);
+            localStorage.setItem("stylepulse_selected_salon_address", address || "");
+            localStorage.setItem("stylepulse_selected_salon_website", website || "");
+            localStorage.setItem("stylepulse_selected_salon_image", image || "");
+            
+            const alertBox = document.getElementById("alert-box");
+            const alertMessage = document.getElementById("alert-message");
+            alertMessage.textContent = `Selected ${name}! Opening service menu...`;
+            alertBox.className = "alert-box show success";
+            
+            setTimeout(() => {
+                window.location.href = "salon-services.html";
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

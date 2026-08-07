@@ -70,3 +70,39 @@ export const approveOwner = async (req, res) => {
         return res.status(500).json({ success: false, message: err.message });
     }
 };
+
+export const deleteOwner = async (req, res) => {
+    const { id } = req.params;
+
+    if (!isSupabaseConfigured()) {
+        return res.status(500).json({ success: false, message: "Database not configured." });
+    }
+
+    if (!supabaseAdmin) {
+        return res.status(403).json({ success: false, message: "Server is missing Admin Key to delete users." });
+    }
+
+    try {
+        // Cascade delete will clean up services and reviews if foreign keys are configured,
+        // but we explicitly delete from salon_owners table first.
+        const { error: dbError } = await supabaseAdmin
+            .from("salon_owners")
+            .delete()
+            .eq("id", id);
+
+        if (dbError) throw dbError;
+
+        // Also delete from auth.users to completely revoke login credentials!
+        const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id);
+        
+        // Note: if deleteUser fails because user doesn't exist in auth anymore, we can ignore it
+        if (authError && !authError.message.includes("User not found")) {
+            console.warn("Auth user deletion warning:", authError.message);
+        }
+
+        return res.status(200).json({ success: true, message: "Salon owner removed successfully." });
+    } catch (err) {
+        console.error("Error deleting owner:", err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};

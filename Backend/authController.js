@@ -350,14 +350,58 @@ export const getApprovedSalons = async (req, res) => {
 
     try {
         const client = supabaseAdmin || supabase;
-        const { data, error } = await client
+        let response = await client
             .from("salon_owners")
-            .select("id, salon_name, salon_address, salon_website, full_name, email")
-            .eq("is_approved", true);
+            .select("id, salon_name, salon_address, salon_website, salon_image, full_name, email");
 
-        if (error) throw error;
+        // Fallback if salon_image column does not exist (Postgres code 42703)
+        if (response.error && response.error.code === "42703") {
+            console.log("Fallback: salon_image column not found in DB. Querying without it.");
+            response = await client
+                .from("salon_owners")
+                .select("id, salon_name, salon_address, salon_website, full_name, email");
+        }
 
-        return res.status(200).json({ success: true, salons: data });
+        if (response.error) throw response.error;
+
+        // Fetch ratings, sentiment averages, and services for each salon in parallel
+        const salonsWithData = await Promise.all(response.data.map(async (salon) => {
+            try {
+                // 1. Fetch reviews
+                const { data: reviews, error: rError } = await client
+                    .from('salon_reviews')
+                    .select('rating, sentiment_score')
+                    .eq('salon_id', salon.id);
+
+                if (!rError && reviews && reviews.length > 0) {
+                    const totalRating = reviews.reduce((sum, r) => sum + r.rating, 0);
+                    const totalSentiment = reviews.reduce((sum, r) => sum + parseFloat(r.sentiment_score || 0), 0);
+                    salon.averageRating = parseFloat((totalRating / reviews.length).toFixed(1));
+                    salon.averageSentiment = parseFloat((totalSentiment / reviews.length).toFixed(2));
+                    salon.reviewCount = reviews.length;
+                } else {
+                    salon.averageRating = 0.0;
+                    salon.averageSentiment = 0.0;
+                    salon.reviewCount = 0;
+                }
+
+                // 2. Fetch services
+                const { data: services, error: sError } = await client
+                    .from('salon_owner_services')
+                    .select('*')
+                    .eq('owner_id', salon.id);
+
+                salon.services = (!sError && services) ? services : [];
+            } catch (err) {
+                salon.averageRating = 0.0;
+                salon.averageSentiment = 0.0;
+                salon.reviewCount = 0;
+                salon.services = [];
+            }
+            return salon;
+        }));
+
+        return res.status(200).json({ success: true, salons: salonsWithData });
     } catch (err) {
         console.error("Error fetching approved salons:", err);
         return res.status(500).json({ success: false, message: err.message });
@@ -387,6 +431,107 @@ export const getSalonServices = async (req, res) => {
         return res.status(200).json({ success: true, services: data });
     } catch (err) {
         console.error("Error fetching salon services:", err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// =========================
+// BOOK APPOINTMENT (CUSTOMER)
+// =========================
+export const bookAppointment = async (req, res) => {
+    if (!isSupabaseConfigured()) {
+        return res.status(500).json({ success: false, message: "Database not configured." });
+    }
+
+    try {
+        const client = supabaseAdmin || supabase;
+        const { salonId, serviceName, date, time } = req.body;
+        const userEmail = req.user.email;
+        
+        // Extract full name from req.user payload
+        const fullName = req.user.fullName || req.user.name || userEmail.split('@')[0];
+
+        if (!salonId || !serviceName || !date || !time) {
+            return res.status(400).json({ success: false, message: "salonId, serviceName, date, and time are required." });
+        }
+
+        const { data, error } = await client
+            .from("appointments")
+            .insert({
+                salon_id: salonId,
+                customer_name: fullName,
+                customer_email: userEmail,
+                service_name: serviceName,
+                appointment_date: date,
+                appointment_time: time,
+                appointment_datetime: `${date}T${time}:00`,
+                reminder_time: `${date}T${time}:00`,
+                reminder_status: "Pending",
+                booking_status: "Confirmed" // Default status
+            })
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return res.status(201).json({ success: true, message: "Appointment booked successfully.", appointment: data });
+    } catch (err) {
+        console.error("Error booking appointment:", err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// =========================
+// GET CUSTOMER APPOINTMENTS
+// =========================
+export const getCustomerAppointments = async (req, res) => {
+    if (!isSupabaseConfigured()) {
+        return res.status(500).json({ success: false, message: "Database not configured." });
+    }
+
+    try {
+        const client = supabaseAdmin || supabase;
+        const userEmail = req.user.email;
+
+        // Fetch user appointments
+        const { data: appointments, error: apptError } = await client
+            .from("appointments")
+            .select("*")
+            .eq("customer_email", userEmail)
+            .order("appointment_date", { ascending: true });
+
+        if (apptError) throw apptError;
+
+        // Fetch salons list to map names
+        const { data: salons, error: salonsError } = await client
+            .from("salon_owners")
+            .select("id, salon_name, salon_address");
+
+        const salonsMap = {};
+        if (!salonsError && salons) {
+            salons.forEach(s => {
+                salonsMap[s.id] = s;
+            });
+        }
+
+        // Fetch reviewed appointment IDs
+        const { data: reviews } = await client
+            .from("salon_reviews")
+            .select("appointment_id")
+            .eq("customer_email", userEmail);
+
+        const reviewedIds = new Set((reviews || []).map(r => r.appointment_id));
+
+        const mapped = appointments.map(a => ({
+            ...a,
+            salon_name: salonsMap[a.salon_id]?.salon_name || "Premium Salon",
+            salon_address: salonsMap[a.salon_id]?.salon_address || "",
+            isReviewed: reviewedIds.has(a.id)
+        }));
+
+        return res.status(200).json({ success: true, appointments: mapped });
+    } catch (err) {
+        console.error("Error fetching customer appointments:", err);
         return res.status(500).json({ success: false, message: err.message });
     }
 };

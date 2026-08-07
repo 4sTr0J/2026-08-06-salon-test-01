@@ -119,10 +119,19 @@
             </div>
 
             <!-- Search & Filter Controls -->
-            <div class="table-controls-row">
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="search-input" placeholder="Search by name, email, or phone number...">
+            <div class="table-controls-row" style="display:flex; justify-content:space-between; align-items:center; gap:15px; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:15px; flex-wrap:wrap; flex:1;">
+                    <div class="search-box" style="margin:0; flex:1; max-width:400px;">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="search-input" placeholder="Search by name, email, or phone number...">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <label for="sort-registered" style="font-size:0.85rem; font-weight:600; color:rgba(255,255,255,0.6); text-transform:uppercase;">Sort Date:</label>
+                        <select id="sort-registered" style="background:#151419; color:#fff; border:1px solid rgba(255,184,43,0.3); border-radius:8px; padding:8px 12px; outline:none; font-family:inherit; font-weight:600; cursor:pointer;">
+                            <option value="newest">Newest to Oldest</option>
+                            <option value="oldest">Oldest to Newest</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="filter-tabs">

@@ -4,6 +4,10 @@ import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import salonOwnerRoutes from "./routes/salonOwnerRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+import aiRoutes from "./AI Agent/src/routes/ai.routes.js";
+import reviewRoutes from "./salon_reviews/reviewRoutes.js";
+import { startReminderScheduler } from "./Appointments and notification/jobs/reminderScheduler.js";
 
 dotenv.config();
 
@@ -25,7 +29,8 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.get("/", (req, res) => {
     res.send("Salon Booking API is running");
@@ -33,9 +38,13 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/owner", salonOwnerRoutes);
+app.use("/api/appointments", appointmentRoutes);
+app.use("/api/ai", aiRoutes);
+app.use("/api/reviews", reviewRoutes);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`[Backend Services Active on port ${PORT}]`);
+    startReminderScheduler();
 });

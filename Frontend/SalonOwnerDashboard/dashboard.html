@@ -40,6 +40,9 @@
                 <button class="menu-item active" data-tab="overview">
                     <span class="menu-icon">📊</span> Overview
                 </button>
+                <button class="menu-item" data-tab="reviews">
+                    <span class="menu-icon">⭐</span> Customer Reviews
+                </button>
                 <button class="menu-item" data-tab="services">
                     <span class="menu-icon">💇</span> Services
                 </button>
@@ -68,7 +71,10 @@
                     <p class="salon-name-display" id="salon-name-title">✨ Luxury Salon Branch</p>
                 </div>
                 <div class="header-profile">
-                    <div class="profile-info">
+                    <div class="profile-info" style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <div class="profile-avatar-container" style="margin-bottom: 0.5rem;">
+                            <img id="owner-profile-preview" src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=50&q=80" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #ffcc00; box-shadow: 0 0 10px rgba(255, 184, 43, 0.4);" alt="Salon Logo">
+                        </div>
                         <span class="owner-tag">Verified Owner</span>
                         <span class="owner-email" id="owner-email-display">owner@stylepulse.com</span>
                     </div>
@@ -131,6 +137,57 @@
                 </div>
             </section>
 
+            <!-- Tab Content: Customer Reviews -->
+            <section id="tab-reviews" class="tab-section">
+                <div class="tab-header-flex" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:1.5rem;">
+                    <div>
+                        <h2 class="section-title">⭐ Customer Reviews</h2>
+                        <p class="section-subtitle">Read feedback, star ratings, and NLP sentiment metrics collected from your clients.</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label for="review-service-filter" style="font-size:0.85rem; font-weight:600; color:rgba(255,255,255,0.6); text-transform:uppercase;">Filter Service:</label>
+                        <select id="review-service-filter" style="background:#151419; color:#fff; border:1px solid rgba(255,184,43,0.3); border-radius:8px; padding:8px 12px; outline:none; font-family:inherit; font-weight:600; cursor:pointer;">
+                            <option value="all">All Services</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- NLP Summary Dashboard Row -->
+                <div class="stats-grid" style="margin-bottom:2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="stat-card" style="background:rgba(255,184,43,0.05); border-color:rgba(255,184,43,0.25);">
+                        <div class="stat-icon gold">⭐</div>
+                        <div class="stat-details">
+                            <h3>Average Rating</h3>
+                            <p class="stat-val" id="nlp-avg-rating">0.0</p>
+                            <span class="stat-sub" id="nlp-review-count">0 reviews</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background:rgba(46,204,113,0.05); border-color:rgba(46,204,113,0.25);">
+                        <div class="stat-icon green">😊</div>
+                        <div class="stat-details">
+                            <h3>Top Positive Highlights (Pros)</h3>
+                            <div id="nlp-top-pros" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
+                                <span style="font-size:0.75rem; color:#888;">No data</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="background:rgba(231,76,60,0.05); border-color:rgba(231,76,60,0.25);">
+                        <div class="stat-icon red">😞</div>
+                        <div class="stat-details">
+                            <h3>Areas of Improvement (Cons)</h3>
+                            <div id="nlp-top-cons" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
+                                <span style="font-size:0.75rem; color:#888;">No data</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Feed -->
+                <div id="reviews-feed-container" style="display:flex; flex-direction:column; gap:16px;">
+                    <div style="text-align:center; padding:40px; color:#888;">Loading reviews...</div>
+                </div>
+            </section>
+
             <!-- Tab Content: Services -->
             <section id="tab-services" class="tab-section">
                 <div class="tab-header-flex">
@@ -177,6 +234,7 @@
                                 <th>Date & Time</th>
                                 <th>Price (LKR)</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="appointments-table-body">
@@ -216,6 +274,35 @@
                             <div class="form-group">
                                 <label class="form-label">Website / Portfolio Link</label>
                                 <input type="url" id="setting-salon-website" class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Operating Opening Time</label>
+                                <input type="time" id="setting-operating-start" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Operating Closing Time</label>
+                                <input type="time" id="setting-operating-end" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="form-label">Salon Image / Logo</label>
+                                <div id="image-drag-drop-zone" class="drag-drop-zone" style="border: 2px dashed rgba(255, 184, 43, 0.4); border-radius: 12px; padding: 2.5rem; text-align: center; background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.3s ease; position: relative;">
+                                    <input type="file" id="salon-image-file" accept="image/*" style="display: none;">
+                                    <div id="drag-drop-placeholder">
+                                        <span style="font-size: 2.5rem; display: block; margin-bottom: 0.8rem;">📸</span>
+                                        <p style="font-weight: 500; font-size: 0.95rem; color: #ffffff;">Drag & Drop your salon photo or logo here</p>
+                                        <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.3rem;">Or click to browse files from your computer</p>
+                                    </div>
+                                    <div id="drag-drop-preview-container" style="display: none; flex-direction: column; align-items: center;">
+                                        <img id="drag-drop-preview" src="" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; margin-bottom: 0.8rem;">
+                                        <p style="font-size: 0.85rem; color: var(--gold-bright); font-weight: 600;">✓ Ready to save (Click or drop to replace)</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

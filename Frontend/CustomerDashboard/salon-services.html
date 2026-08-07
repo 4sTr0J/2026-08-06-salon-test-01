@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StylePulse - Salon Service Menu</title>
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Shared StylePulse Styles -->
+    <link rel="stylesheet" href="../index.css?v=60">
+    
+    <style>
+        .services-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: 120px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding-inline: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        .services-header {
+            margin-bottom: 3rem;
+            animation: slideUp 0.8s ease-out;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid rgba(255, 184, 43, 0.2);
+            padding-bottom: 1.5rem;
+        }
+
+        .services-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .services-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-back-salons {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 184, 43, 0.3);
+            color: #ffffff;
+            padding: 0.65rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back-salons:hover {
+            background: rgba(255, 184, 43, 0.1);
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 184, 43, 0.2);
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            animation: slideUp 1s ease-out;
+            margin-bottom: 4rem;
+        }
+
+        .service-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--gold-glow);
+            border-color: #ffcc00;
+        }
+
+        .service-name {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.6rem;
+        }
+
+        .service-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-tag {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag-duration {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .service-price-block {
+            margin-bottom: 1.5rem;
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .price-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .book-service-btn {
+            background: var(--accent-gradient);
+            color: #000000;
+            border: none;
+            padding: 0.8rem 1.4rem;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .book-service-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+        }
+
+        .empty-services {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border: 1px dashed rgba(255, 184, 43, 0.3);
+            border-radius: 16px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ambient Glow Backgrounds */
+        .auth-bg-ambient {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .bg-glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+        }
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #ffaa00 0%, transparent 70%);
+            top: -150px;
+            left: -150px;
+        }
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+            bottom: -150px;
+            right: -150px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient background glows -->
+    <div class="auth-bg-ambient">
+        <div class="bg-glow-orb orb-1"></div>
+        <div class="bg-glow-orb orb-2"></div>
+    </div>
+
+    <!-- Fixed Top Navigation Header -->
+    <header class="navbar" id="main-header" style="background: rgba(8, 6, 5, 0.95); border-bottom: 1px solid rgba(255, 184, 43, 0.3); position: fixed; width: 100%;">
+        <div class="nav-left">
+            <a href="../index.html" class="nav-logo">
+                <img src="../component/logo.png" alt="StylePulse Logo" class="logo-img">
+            </a>
+            <nav class="nav-links">
+                <a href="salons.html" class="nav-link active">EXPLORE SALONS</a>
+                <a href="dashboard.html" class="nav-link">MY DASHBOARD</a>
+            </nav>
+        </div>
+        <div class="nav-right">
+            <div style="color: var(--text-secondary); margin-right: 1.5rem; font-size: 0.9rem;" id="user-email-display"></div>
+            <button id="logout-btn" class="nav-login" style="border: none; pointer-events: auto; cursor: pointer; background: transparent; font-family: 'Poppins', sans-serif; color: #ffffff;">LOG OUT</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <div class="services-container">
+        <!-- Luxury Hero Banner Card -->
+        <div class="salon-hero-card" id="salon-hero-banner" style="background: linear-gradient(180deg, rgba(8,6,5,0.4) 0%, rgba(8,6,5,0.95) 100%), url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80') center/cover; border: 1px solid rgba(255, 184, 43, 0.25); border-radius: 20px; padding: 3rem; margin-bottom: 3rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 250px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; animation: slideUp 0.8s ease-out;">
+            <div style="z-index: 2;">
+                <h1 class="services-title" id="salon-name-title" style="font-family: 'Outfit', sans-serif; font-size: 3.2rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Salon Name</h1>
+                <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
+                    <p class="services-subtitle" id="salon-subtitle-address" style="margin: 0; font-size: 1.05rem; display: flex; align-items: center; gap: 6px; text-shadow: 0 1px 5px rgba(0,0,0,0.5);">📍 Location not listed</p>
+                    <a id="salon-link-website" href="#" target="_blank" style="display: none; align-items: center; gap: 6px; color: #ffcc00; text-decoration: none; font-size: 1rem; font-weight: 600; text-shadow: 0 1px 5px rgba(0,0,0,0.5);">🔗 Visit Website</a>
+                </div>
+            </div>
+            <a href="salons.html" class="btn-back-salons" style="position: absolute; top: 2rem; right: 2rem; background: rgba(0,0,0,0.6); text-decoration: none;">← Back to Salons</a>
+        </div>
+
+        <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; animation: slideUp 0.9s ease-out;">
+            <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 600; color: #ffffff; margin: 0;">Available Services</h2>
+            <div style="font-size: 0.9rem; color: var(--text-secondary);">Select a service below to book an appointment</div>
+        </div>
+
+        <!-- Grid of Services -->
+        <div class="services-grid" id="services-list-container">
+            <div class="empty-services">Loading available services...</div>
+        </div>
+    </div>
+
+    <!-- Alert Box Notification -->
+    <div id="alert-box" class="alert-box">
+        <div class="alert-content">
+            <span id="alert-icon" class="alert-icon"></span>
+            <span id="alert-message" class="alert-message"></span>
+        </div>
+    </div>
+    
+    <style>
+        .alert-box {
+            position: fixed; top: 20px; right: -400px;
+            background: rgba(12, 11, 8, 0.95); border-left: 4px solid;
+            padding: 16px 24px; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: right 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 9999; backdrop-filter: blur(10px);
+            display: flex; align-items: center;
+        }
+        .alert-box.show { right: 20px; }
+        .alert-box.success { border-color: #2ecc71; }
+        .alert-box.error { border-color: #e74c3c; }
+        .alert-content { display: flex; align-items: center; gap: 12px; }
+        .alert-message { font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500; color: #fff; }
+    </style>
+
+    <!-- Frontend logic to fetch and display services -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const token = localStorage.getItem("stylepulse_token");
+            const userString = localStorage.getItem("stylepulse_user");
+            let user = null;
+
+            if (userString) {
+                try { user = JSON.parse(userString); } catch (e) { user = null; }
+            }
+
+            if (!token || !user) {
+                window.location.href = "../login.html";
+                return;
+            }
+
+            // Get selected salon details from localStorage
+            const salonId = localStorage.getItem("stylepulse_selected_salon_id");
+            const salonName = localStorage.getItem("stylepulse_selected_salon_name") || "Salon Service Menu";
+            const salonAddress = localStorage.getItem("stylepulse_selected_salon_address") || "Address not listed";
+            const salonWebsite = localStorage.getItem("stylepulse_selected_salon_website");
+            const salonImage = localStorage.getItem("stylepulse_selected_salon_image");
+
+            if (!salonId) {
+                window.location.href = "salons.html";
+                return;
+            }
+
+            // Set Header details
+            document.getElementById("salon-name-title").textContent = salonName;
+            document.getElementById("salon-subtitle-address").textContent = `📍 ${salonAddress}`;
+            document.getElementById("user-email-display").textContent = user.email.toUpperCase();
+
+            // Set Hero Card background
+            const heroBanner = document.getElementById("salon-hero-banner");
+            if (heroBanner && salonImage) {
+                heroBanner.style.background = `linear-gradient(180deg, rgba(8,6,5,0.4) 0%, rgba(8,6,5,0.95) 100%), url('${salonImage}') center/cover`;
+            }
+
+            // Set Website Link
+            const webLink = document.getElementById("salon-link-website");
+            if (webLink && salonWebsite) {
+                webLink.href = salonWebsite;
+                webLink.style.display = "inline-flex";
+            }
+
+            // Logout
+            const logoutBtn = document.getElementById("logout-btn");
+            if (logoutBtn) {
+                logoutBtn.addEventListener("click", () => {
+                    localStorage.removeItem("stylepulse_token");
+                    localStorage.removeItem("stylepulse_user");
+                    window.location.href = "../login.html";
+                });
+            }
+
+            // Fetch Services from Backend
+            const container = document.getElementById("services-list-container");
+            try {
+                const res = await fetch(`http://localhost:5001/api/auth/salons/${salonId}/services`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const data = await res.json();
+                
+                if (data.success && data.services) {
+                    renderServices(data.services);
+                } else {
+                    container.innerHTML = `<div class="empty-services">Failed to load service menu.</div>`;
+                }
+            } catch (err) {
+                console.error("Services load error:", err);
+                container.innerHTML = `<div class="empty-services">Connection error. Please try again later.</div>`;
+            }
+
+            function renderServices(services) {
+                if (services.length === 0) {
+                    container.innerHTML = `<div class="empty-services">This salon hasn't added any services yet. Please check back later!</div>`;
+                    return;
+                }
+
+                container.innerHTML = services.map(s => `
+                    <div class="service-card">
+                        <div>
+                            <h3 class="service-name">${s.name}</h3>
+                            <div class="service-meta">
+                                <span class="meta-tag tag-duration">⏱ ${s.duration} Mins</span>
+                            </div>
+                            <div class="service-price-block">
+                                <div class="price-label">Price (LKR)</div>
+                                <div class="price-value">Rs. ${parseFloat(s.price).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <button class="book-service-btn" onclick="bookAppointment('${s.name}', '${s.price}')">Book Service</button>
+                    </div>
+                `).join('');
+            }
+        });
+
+        // ── FRESHA-STYLE BOOKING FLOW ─────────────────────────────────────
+        const API = "http://localhost:5001";
+        // All possible slots (9am–7pm, every 30 min)
+        const ALL_SLOTS = [
+            "09:00","09:30","10:00","10:30","11:00","11:30",
+            "12:00","12:30","13:00","13:30","14:00","14:30",
+            "15:00","15:30","16:00","16:30","17:00","17:30",
+            "18:00","18:30"
+        ];
+
+        function fmt12(t) {
+            const [h, m] = t.split(":").map(Number);
+            const ampm = h < 12 ? "AM" : "PM";
+            const h12 = h % 12 || 12;
+            return `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
+        }
+
+        function buildDateCarousel() {
+            const today = new Date();
+            const days = [];
+            for (let i = 0; i < 14; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + i);
+                days.push(d);
+            }
+            return days;
+        }
+
+        function isoDate(d) {
+            return d.toISOString().split("T")[0];
+        }
+
+        async function loadAvailableSlots(dateStr) {
+            try {
+                const salonId = localStorage.getItem("stylepulse_selected_salon_id") || "";
+                const res = await fetch(`${API}/api/appointments/available?date=${dateStr}&salonId=${salonId}`);
+                if (!res.ok) return { available: ALL_SLOTS, operating: ALL_SLOTS };
+                const data = await res.json();
+                return {
+                    available: data.availableSlots || ALL_SLOTS,
+                    operating: data.operatingSlots || data.availableSlots || ALL_SLOTS
+                };
+            } catch {
+                return { available: ALL_SLOTS, operating: ALL_SLOTS };
+            }
+        }
+
+        async function bookAppointment(serviceName, price) {
+            const salonId = localStorage.getItem("stylepulse_selected_salon_id");
+            if (!salonId) return;
+
+            // ── Build modal skeleton ──
+            const modalId = "temp-booking-modal";
+            let oldModal = document.getElementById(modalId);
+            if (oldModal) oldModal.remove();
+
+            const modal = document.createElement("div");
+            modal.id = modalId;
+            Object.assign(modal.style, {
+                position:"fixed", inset:"0", background:"rgba(0,0,0,0.88)",
+                display:"flex", alignItems:"center", justifyContent:"center",
+                zIndex:"10000", backdropFilter:"blur(10px)"
+            });
+
+            modal.innerHTML = `
+            <style>
+            #sp-book-panel{background:#13100a;border:1px solid rgba(255,184,43,.45);border-radius:20px;width:92%;max-width:480px;padding:0;overflow:hidden;font-family:'Poppins',sans-serif;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.7)}
+            #sp-book-header{background:linear-gradient(135deg,#1a1300,#261900);padding:22px 24px;border-bottom:1px solid rgba(255,184,43,.2)}
+            #sp-book-header h3{margin:0;font-size:1.4rem;color:#ffcc00}
+            #sp-book-header p{margin:4px 0 0;font-size:.85rem;color:rgba(255,200,100,.7)}
+            #sp-book-body{padding:20px 24px;max-height:70vh;overflow-y:auto}
+            .sp-section-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;color:#999;text-transform:uppercase;margin-bottom:10px}
+            /* Date carousel */
+            #sp-date-carousel{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+            #sp-date-carousel::-webkit-scrollbar{display:none}
+            .sp-date-chip{min-width:58px;padding:10px 6px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;transition:.2s;flex-shrink:0}
+            .sp-date-chip:hover{border-color:rgba(255,184,43,.5);background:rgba(255,184,43,.08)}
+            .sp-date-chip.active{border-color:#ffcc00;background:rgba(255,184,43,.15);box-shadow:0 0 12px rgba(255,184,43,.2)}
+            .sp-date-chip .dow{font-size:.65rem;color:#888;font-weight:600;text-transform:uppercase}
+            .sp-date-chip .dom{font-size:1.3rem;font-weight:700;color:#fff;line-height:1.1}
+            .sp-date-chip .mon{font-size:.65rem;color:#888}
+            /* Slot grid */
+            #sp-slots-container{margin-top:16px}
+            #sp-slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+            .sp-slot{padding:11px 4px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;font-size:.85rem;font-weight:600;transition:.2s}
+            .sp-slot:hover{border-color:rgba(255,184,43,.5);background:rgba(255,184,43,.08)}
+            .sp-slot.active{border-color:#ffcc00;background:rgba(255,184,43,.18);color:#ffcc00}
+            .sp-slot.booked{opacity:.3;cursor:not-allowed;text-decoration:line-through;pointer-events:none}
+            #sp-slots-loading{text-align:center;padding:20px;color:#888;font-size:.85rem}
+            /* Footer */
+            #sp-book-footer{display:flex;gap:10px;justify-content:flex-end;padding:16px 24px;border-top:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
+            #sp-cancel-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:#fff;padding:9px 18px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.9rem}
+            #sp-confirm-btn{background:linear-gradient(135deg,#ffc845,#e5a93b);border:none;color:#000;padding:9px 26px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.9rem;opacity:.4;pointer-events:none;transition:.2s}
+            #sp-confirm-btn.ready{opacity:1;pointer-events:all}
+            /* Error toast */
+            #sp-error-toast{display:none;background:rgba(220,40,40,.15);border:1px solid rgba(220,40,40,.4);color:#ff8080;border-radius:8px;padding:10px 14px;font-size:.82rem;margin-top:12px;text-align:left}
+            </style>
+            <div id="sp-book-panel">
+              <div id="sp-book-header">
+                <h3>📅 Book Appointment</h3>
+                <p>${serviceName} &nbsp;·&nbsp; Rs. ${parseFloat(price).toLocaleString()}</p>
+              </div>
+              <div id="sp-book-body">
+                <div class="sp-section-label">Select a Date</div>
+                <div id="sp-date-carousel"></div>
+                <div id="sp-slots-container" style="display:none">
+                  <div class="sp-section-label" style="margin-top:18px">Pick a Time</div>
+                  <div id="sp-slots-grid"></div>
+                </div>
+                <div id="sp-error-toast"></div>
+              </div>
+              <div id="sp-book-footer">
+                <button id="sp-cancel-btn">Cancel</button>
+                <button id="sp-confirm-btn">Confirm Booking →</button>
+              </div>
+            </div>`;
+
+            document.body.appendChild(modal);
+
+            // ── State ──
+            let selectedDate = null;
+            let selectedSlot = null;
+
+            // ── Build date carousel ──
+            const carousel = document.getElementById("sp-date-carousel");
+            const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+            const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+            buildDateCarousel().forEach(d => {
+                const chip = document.createElement("div");
+                chip.className = "sp-date-chip";
+                chip.dataset.iso = isoDate(d);
+                chip.innerHTML = `<div class="dow">${DAYS[d.getDay()]}</div><div class="dom">${d.getDate()}</div><div class="mon">${MONTHS[d.getMonth()]}</div>`;
+                chip.addEventListener("click", () => selectDate(chip, isoDate(d)));
+                carousel.appendChild(chip);
+            });
+
+            async function selectDate(chip, dateStr) {
+                // Deselect all
+                carousel.querySelectorAll(".sp-date-chip").forEach(c => c.classList.remove("active"));
+                chip.classList.add("active");
+                selectedDate = dateStr;
+                selectedSlot = null;
+                document.getElementById("sp-confirm-btn").classList.remove("ready");
+
+                // Show loading
+                const slotsContainer = document.getElementById("sp-slots-container");
+                const grid = document.getElementById("sp-slots-grid");
+                slotsContainer.style.display = "block";
+                grid.innerHTML = `<div id="sp-slots-loading" style="grid-column:1/-1">⏳ Loading available slots…</div>`;
+
+                const result = await loadAvailableSlots(dateStr);
+                const available = result.available;
+                const operating = result.operating;
+
+                grid.innerHTML = "";
+                if (operating.length === 0) {
+                    grid.innerHTML = `<p style="color:#888;font-size:.85rem;grid-column:1/-1">No slots configured for this day.</p>`;
+                    return;
+                }
+
+                operating.forEach(slot => {
+                    const el = document.createElement("div");
+                    const isAvailable = available.includes(slot);
+                    el.className = "sp-slot" + (isAvailable ? "" : " booked");
+                    el.textContent = fmt12(slot);
+                    el.dataset.slot = slot;
+                    if (isAvailable) {
+                        el.addEventListener("click", () => selectSlot(el, slot));
+                    }
+                    grid.appendChild(el);
+                });
+            }
+
+            function selectSlot(el, slot) {
+                document.querySelectorAll(".sp-slot").forEach(s => s.classList.remove("active"));
+                el.classList.add("active");
+                selectedSlot = slot;
+                document.getElementById("sp-confirm-btn").classList.add("ready");
+                hideError();
+            }
+
+            function showError(msg) {
+                const t = document.getElementById("sp-error-toast");
+                t.style.display = "block";
+                t.textContent = "⚠️ " + msg;
+            }
+            function hideError() {
+                document.getElementById("sp-error-toast").style.display = "none";
+            }
+
+            // ── Cancel ──
+            document.getElementById("sp-cancel-btn").addEventListener("click", () => modal.remove());
+            modal.addEventListener("click", e => { if (e.target === modal) modal.remove(); });
+
+            // ── Confirm ──
+            document.getElementById("sp-confirm-btn").addEventListener("click", async () => {
+                if (!selectedDate || !selectedSlot) return;
+
+                const btn = document.getElementById("sp-confirm-btn");
+                btn.textContent = "Booking…";
+                btn.classList.remove("ready");
+                hideError();
+
+                try {
+                    const token = localStorage.getItem("stylepulse_token");
+                    const res = await fetch(`${API}/api/auth/appointments`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            salonId,
+                            serviceName,
+                            date: selectedDate,
+                            time: selectedSlot
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (res.status === 409) {
+                        // Slot was just taken by someone else
+                        showError(data.message || "Someone just booked this slot. Please choose another time.");
+                        // Visually mark the conflicting slot as booked
+                        document.querySelectorAll(".sp-slot").forEach(s => {
+                            if (s.dataset.slot === selectedSlot) {
+                                s.classList.remove("active");
+                                s.classList.add("booked");
+                            }
+                        });
+                        selectedSlot = null;
+                        btn.textContent = "Confirm Booking →";
+                        return;
+                    }
+
+                    if (data.success) {
+                        modal.remove();
+                        const alertBox = document.getElementById("alert-box");
+                        const alertMessage = document.getElementById("alert-message");
+                        if (alertBox && alertMessage) {
+                            alertMessage.textContent = `✓ Appointment booked for ${serviceName} on ${selectedDate} at ${fmt12(selectedSlot)}!`;
+                            alertBox.className = "alert-box show success";
+                        }
+                        setTimeout(() => { window.location.href = "dashboard.html"; }, 2000);
+                    } else {
+                        showError(data.message || "Failed to book appointment. Please try again.");
+                        btn.textContent = "Confirm Booking →";
+                        btn.classList.add("ready");
+                    }
+                } catch (e) {
+                    console.error("Booking error:", e);
+                    showError("Connection error. Please check your internet and try again.");
+                    btn.textContent = "Confirm Booking →";
+                    btn.classList.add("ready");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

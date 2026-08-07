@@ -16,15 +16,30 @@ export const getSalonDetails = async (req, res) => {
         const client = supabaseAdmin || supabase;
         const ownerId = req.user.id;
 
-        const { data, error } = await client
+        let response = await client
             .from("salon_owners")
-            .select("salon_name, salon_reg_id, salon_address, salon_website, full_name, email, phone")
+            .select("salon_name, salon_reg_id, salon_address, salon_website, salon_image, full_name, email, phone, operating_start, operating_end")
             .eq("id", ownerId)
             .single();
 
-        if (error) throw error;
+        // Fallback if operating_start or operating_end or salon_image columns do not exist
+        if (response.error && response.error.code === "42703") {
+            console.log("Fallback: some operating_start/end or salon_image columns not found in DB. Querying without them.");
+            response = await client
+                .from("salon_owners")
+                .select("salon_name, salon_reg_id, salon_address, salon_website, full_name, email, phone")
+                .eq("id", ownerId)
+                .single();
+            
+            if (!response.error && response.data) {
+                response.data.operating_start = '09:00';
+                response.data.operating_end = '18:30';
+            }
+        }
 
-        return res.status(200).json({ success: true, salon: data });
+        if (response.error) throw response.error;
+
+        return res.status(200).json({ success: true, salon: response.data });
     } catch (err) {
         console.error("Error fetching salon details:", err);
         return res.status(500).json({ success: false, message: err.message });
@@ -40,20 +55,42 @@ export const updateSalonDetails = async (req, res) => {
     try {
         const client = supabaseAdmin || supabase;
         const ownerId = req.user.id;
-        const { salonName, salonAddress, salonWebsite, salonRegId } = req.body;
+        const { salonName, salonAddress, salonWebsite, salonRegId, salonImage, operatingStart, operatingEnd } = req.body;
 
-        const { data, error } = await client
+        let updatePayload = {
+            salon_name: salonName,
+            salon_address: salonAddress,
+            salon_website: salonWebsite,
+            salon_reg_id: salonRegId,
+            salon_image: salonImage,
+            operating_start: operatingStart || '09:00',
+            operating_end: operatingEnd || '18:30',
+            updated_at: new Date().toISOString()
+        };
+
+        let { data, error } = await client
             .from("salon_owners")
-            .update({
-                salon_name: salonName,
-                salon_address: salonAddress,
-                salon_website: salonWebsite,
-                salon_reg_id: salonRegId,
-                updated_at: new Date().toISOString()
-            })
+            .update(updatePayload)
             .eq("id", ownerId)
             .select()
             .single();
+
+        // Fallback if operating_start / operating_end columns do not exist
+        if (error && error.code === "42703") {
+            console.log("Fallback: operating columns not found on update. Retrying without them.");
+            delete updatePayload.operating_start;
+            delete updatePayload.operating_end;
+            
+            const retryRes = await client
+                .from("salon_owners")
+                .update(updatePayload)
+                .eq("id", ownerId)
+                .select()
+                .single();
+            
+            data = retryRes.data;
+            error = retryRes.error;
+        }
 
         if (error) throw error;
 
@@ -165,32 +202,45 @@ export const getAppointments = async (req, res) => {
             .from("appointments")
             .select(`
                 id,
-                service,
-                stylist,
-                date,
-                time,
-                price,
-                status,
-                created_at,
-                user_id
+                customer_name,
+                customer_email,
+                service_name,
+                appointment_date,
+                appointment_time,
+                booking_status,
+                created_at
             `)
             .eq("salon_id", ownerId)
-            .order("date", { ascending: true });
+            .order("appointment_date", { ascending: true });
 
         if (error) throw error;
 
         const appointmentsWithClients = await Promise.all(data.map(async (apt) => {
-            const { data: userData } = await client
-                .from("users")
-                .select("full_name, email, phone")
-                .eq("id", apt.user_id)
-                .maybeSingle();
+            // Attempt to look up additional user details like phone number from email
+            let phone = "N/A";
+            if (apt.customer_email) {
+                const { data: userData } = await client
+                    .from("users")
+                    .select("phone")
+                    .eq("email", apt.customer_email)
+                    .maybeSingle();
+                if (userData?.phone) {
+                    phone = userData.phone;
+                }
+            }
 
             return {
-                ...apt,
-                client_name: userData?.full_name || "Guest Client",
-                client_email: userData?.email || "N/A",
-                client_phone: userData?.phone || "N/A"
+                id: apt.id,
+                client_name: apt.customer_name || "Guest Client",
+                client_email: apt.customer_email || "N/A",
+                client_phone: phone,
+                service: apt.service_name || "Salon Service",
+                stylist: "Any Stylist",
+                date: apt.appointment_date,
+                time: apt.appointment_time || "N/A",
+                price: "0", // Fallback placeholder
+                status: apt.booking_status || "Confirmed",
+                created_at: apt.created_at
             };
         }));
 
@@ -200,3 +250,35 @@ export const getAppointments = async (req, res) => {
         return res.status(500).json({ success: false, message: err.message });
     }
 };
+
+// 7. Update Appointment Status
+export const updateAppointmentStatus = async (req, res) => {
+    if (!isSupabaseConfigured()) {
+        return res.status(500).json({ success: false, message: "Database not configured." });
+    }
+
+    try {
+        const client = supabaseAdmin || supabase;
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!status) {
+            return res.status(400).json({ success: false, message: "Status is required." });
+        }
+
+        const { data, error } = await client
+            .from("appointments")
+            .update({ booking_status: status, updated_at: new Date().toISOString() })
+            .eq("id", id)
+            .select()
+            .single();
+
+        if (error) throw error;
+
+        return res.status(200).json({ success: true, message: `Appointment marked as ${status} successfully.`, appointment: data });
+    } catch (err) {
+        console.error("Error updating appointment status:", err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+

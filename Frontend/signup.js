@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.innerHTML = `<span class="btn-text">CREATING ACCOUNT...</span>`;
 
             try {
-                const response = await fetch('http://localhost:5000/api/auth/register', {
+                const response = await fetch('http://localhost:5001/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         localStorage.setItem('stylepulse_user', JSON.stringify(data.user || { name: fullName, email, role: 'client' }));
                         showAlert('Client Account created successfully! Redirecting to Dashboard...', 'success', 1500);
                         setTimeout(() => {
-                            window.location.href = 'dashboard.html';
+                            window.location.href = 'CustomerDashboard/dashboard.html';
                         }, 1500);
                     }
                 } else {

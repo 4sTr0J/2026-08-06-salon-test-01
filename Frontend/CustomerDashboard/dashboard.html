@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="index.css?v=60">
+    <link rel="stylesheet" href="../index.css?v=60">
     
     <style>
         .dashboard-container {
@@ -128,9 +128,20 @@
             box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
         }
 
+        .tab-btn.active {
+            background: rgba(255, 184, 43, 0.15) !important;
+            color: #ffcc00 !important;
+            border: 1px solid rgba(255, 184, 43, 0.35) !important;
+        }
+
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes notifPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
         }
     </style>
 </head>
@@ -139,16 +150,56 @@
     <!-- Fixed Top Navigation Header -->
     <header class="navbar" id="main-header" style="background: rgba(8, 6, 5, 0.95); border-bottom: 1px solid rgba(255, 184, 43, 0.3);">
         <div class="nav-left">
-            <a href="index.html" class="nav-logo">
-                <img src="component/logo.png" alt="StylePulse Logo" class="logo-img">
+            <a href="../index.html" class="nav-logo">
+                <img src="../component/logo.png" alt="StylePulse Logo" class="logo-img">
             </a>
             <nav class="nav-links">
                 <a href="salons.html" class="nav-link">EXPLORE SALONS</a>
                 <a href="dashboard.html" class="nav-link active">DASHBOARD</a>
             </nav>
         </div>
-        <div class="nav-right">
-            <div style="color: var(--text-secondary); margin-right: 1.5rem; font-size: 0.9rem;" id="user-email-display"></div>
+        <div class="nav-right" style="display: flex; align-items: center; gap: 1rem;">
+            <div style="color: var(--text-secondary); font-size: 0.9rem;" id="user-email-display"></div>
+
+            <!-- Notification Bell -->
+            <div id="notif-bell-wrapper" style="position: relative;">
+                <button id="notif-bell-btn" title="Pending Reviews" style="
+                    background: transparent; border: none; cursor: pointer; position: relative;
+                    font-size: 1.4rem; color: rgba(255,255,255,0.7); transition: color 0.2s, transform 0.2s;
+                    padding: 6px; border-radius: 50%;
+                " onmouseover="this.style.color='#ffcc00'; this.style.transform='scale(1.15)'"
+                   onmouseout="this.style.color='rgba(255,255,255,0.7)'; this.style.transform='scale(1)'">
+                    🔔
+                    <span id="notif-badge" style="
+                        display: none; position: absolute; top: 0; right: 0;
+                        background: #e74c3c; color: #fff; font-size: 0.65rem; font-weight: 800;
+                        width: 18px; height: 18px; border-radius: 50%;
+                        display: none; align-items: center; justify-content: center;
+                        font-family: 'Poppins', sans-serif; line-height: 1;
+                        box-shadow: 0 0 6px rgba(231, 76, 60, 0.6);
+                        animation: notifPulse 2s ease-in-out infinite;
+                    ">0</span>
+                </button>
+
+                <!-- Notification Dropdown Panel -->
+                <div id="notif-dropdown" style="
+                    display: none; position: absolute; top: 44px; right: 0;
+                    width: 360px; max-height: 420px; overflow-y: auto;
+                    background: rgba(18, 17, 14, 0.98); border: 1px solid rgba(255, 184, 43, 0.35);
+                    border-radius: 14px; box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+                    backdrop-filter: blur(16px); z-index: 9999;
+                    font-family: 'Poppins', sans-serif;
+                ">
+                    <div style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 700; font-size: 0.95rem; color: #ffcc00;">🔔 Pending Reviews</span>
+                        <span id="notif-count-label" style="font-size: 0.75rem; color: rgba(255,255,255,0.45); font-weight: 600;">0 pending</span>
+                    </div>
+                    <div id="notif-items-container" style="padding: 8px 0;">
+                        <div style="text-align: center; padding: 2rem 1rem; color: rgba(255,255,255,0.35); font-size: 0.85rem; font-style: italic;">No pending reviews</div>
+                    </div>
+                </div>
+            </div>
+
             <button id="logout-btn" class="nav-login" style="border: none; cursor: pointer; background: transparent; font-family: 'Poppins', sans-serif; color: #ffffff;">LOG OUT</button>
         </div>
     </header>
@@ -160,18 +211,25 @@
         </div>
 
         <div class="dashboard-grid">
-            <!-- Upcoming Appointments Card -->
-            <div class="dashboard-card">
+            <!-- Appointments Card -->
+            <div class="dashboard-card" style="grid-column: span 2;">
                 <div class="card-header">
                     <span class="card-icon">📅</span>
-                    <h2 class="card-title">Upcoming Appointments</h2>
+                    <h2 class="card-title">Appointments</h2>
                 </div>
-                <div class="card-content">
+                <!-- Filter Tabs -->
+                <div class="appointment-tabs" style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; overflow-x: auto;">
+                    <button class="tab-btn active" data-status="Upcoming" style="background: transparent; border: none; color: #fff; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Upcoming</button>
+                    <button class="tab-btn" data-status="completed" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Completed</button>
+                    <button class="tab-btn" data-status="cancelled" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Cancelled</button>
+                    <button class="tab-btn" data-status="rescheduled" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Rescheduled</button>
+                </div>
+                <div class="card-content" id="appointments-list-container">
                     <div class="empty-state">
                         You have no upcoming appointments.
                     </div>
                 </div>
-                <a href="salons.html" class="action-btn">Book New Appointment</a>
+                <a href="salons.html" class="action-btn" style="width: max-content;">Book New Appointment</a>
             </div>
 
             <!-- Profile Overview Card -->

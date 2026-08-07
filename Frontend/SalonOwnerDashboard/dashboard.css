@@ -661,3 +661,17 @@ body.dashboard-page {
     color: rgba(255, 255, 255, 0.35);
 }
 
+/* Premium Drag & Drop Area */
+.drag-drop-zone {
+    border: 2px dashed rgba(255, 184, 43, 0.4) !important;
+    background: rgba(255, 255, 255, 0.01);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.drag-drop-zone:hover, .drag-drop-zone.dragover {
+    border-color: #ffcc00 !important;
+    background: rgba(255, 204, 102, 0.05) !important;
+    box-shadow: 0 0 20px rgba(255, 184, 43, 0.15);
+}
+
+

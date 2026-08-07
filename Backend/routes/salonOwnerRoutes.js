@@ -5,7 +5,8 @@ import {
     getServices,
     addService,
     deleteService,
-    getAppointments
+    getAppointments,
+    updateAppointmentStatus
 } from "../salonOwnerController.js";
 import authMiddleware from "../authMiddleware.js";
 
@@ -20,5 +21,6 @@ router.get("/services", getServices);
 router.post("/services", addService);
 router.delete("/services/:id", deleteService);
 router.get("/appointments", getAppointments);
+router.put("/appointments/:id/status", updateAppointmentStatus);
 
 export default router;

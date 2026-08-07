@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // API Base URL
-    const API_BASE = "http://localhost:5000/api/owner";
+    const API_BASE = "http://localhost:5001/api/owner";
 
     // DOM Elements
     const ownerNameDisplay = document.getElementById("owner-name-display");
@@ -39,6 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const settingSalonRegId = document.getElementById("setting-salon-reg-id");
     const settingSalonAddress = document.getElementById("setting-salon-address");
     const settingSalonWebsite = document.getElementById("setting-salon-website");
+    const settingOperatingStart = document.getElementById("setting-operating-start");
+    const settingOperatingEnd = document.getElementById("setting-operating-end");
+
+    // Drag & Drop DOM Elements
+    const dragDropZone = document.getElementById("image-drag-drop-zone");
+    const fileInput = document.getElementById("salon-image-file");
+    const previewContainer = document.getElementById("drag-drop-preview-container");
+    const previewImg = document.getElementById("drag-drop-preview");
+    const placeholder = document.getElementById("drag-drop-placeholder");
 
     // Add Service Form
     const addServiceForm = document.getElementById("add-service-form");
@@ -46,6 +55,60 @@ document.addEventListener("DOMContentLoaded", () => {
     // Set Owner Profile info in headers
     ownerNameDisplay.textContent = user.fullName || "Owner";
     ownerEmailDisplay.textContent = user.email || "";
+
+    // Drag & Drop state and listeners
+    let salonImageBase64 = "";
+
+    if (dragDropZone && fileInput) {
+        dragDropZone.addEventListener("click", () => fileInput.click());
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragDropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dragDropZone.addEventListener(eventName, () => dragDropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dragDropZone.addEventListener(eventName, () => dragDropZone.classList.remove('dragover'), false);
+        });
+
+        dragDropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files[0]) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files && fileInput.files[0]) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showAlert("Please select a valid image file.", "error");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onloadend = () => {
+                const base64data = reader.result;
+                salonImageBase64 = base64data;
+                
+                previewImg.src = base64data;
+                previewContainer.style.display = "flex";
+                placeholder.style.display = "none";
+            };
+        }
+    }
 
     // 1. Sidebar Tab Switching Logic
     const menuItems = document.querySelectorAll(".menu-item");
@@ -83,6 +146,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 settingSalonRegId.value = s.salon_reg_id || "";
                 settingSalonAddress.value = s.salon_address || "";
                 settingSalonWebsite.value = s.salon_website || "";
+                
+                if (s.salon_image) {
+                    salonImageBase64 = s.salon_image;
+                    previewImg.src = s.salon_image;
+                    document.getElementById("owner-profile-preview").src = s.salon_image;
+                    previewContainer.style.display = "flex";
+                    placeholder.style.display = "none";
+                } else {
+                    salonImageBase64 = "";
+                    document.getElementById("owner-profile-preview").src = "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=50&q=80";
+                    previewContainer.style.display = "none";
+                    placeholder.style.display = "block";
+                }
             }
         } catch (err) {
             console.error("Failed to load salon details:", err);
@@ -105,13 +181,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         salonName: settingSalonName.value,
                         salonAddress: settingSalonAddress.value,
                         salonWebsite: settingSalonWebsite.value,
-                        salonRegId: settingSalonRegId.value
+                        salonRegId: settingSalonRegId.value,
+                        salonImage: salonImageBase64
                     })
                 });
 
                 const data = await res.json();
                 if (data.success) {
-                    showAlert("✓ Success: Salon details updated!", "success");
+                    showAlert("✓ Success: Image added successfully", "success");
                     loadSalonDetails();
                 } else {
                     showAlert(data.message || "Failed to update salon profile.", "error");
@@ -323,7 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (appointments.length === 0) {
             appointmentsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="empty-table-cell">No appointments have been booked at your salon yet.</td>
+                    <td colspan="7" class="empty-table-cell">No appointments have been booked at your salon yet.</td>
                 </tr>
             `;
             return;
@@ -331,6 +408,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         appointmentsTableBody.innerHTML = appointments.map(a => {
             const dateFormatted = new Date(a.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            const isPending = a.status === 'Confirmed' || a.status === 'Upcoming' || a.status === 'Pending';
+            const actionBtnHtml = isPending
+                ? `<button class="btn-complete-order" data-id="${a.id}" style="background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: transform 0.2s;">Order completed</button>`
+                : `<span style="font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 600;">—</span>`;
+
             return `
                 <tr>
                     <td>
@@ -346,9 +428,47 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>
                         <span class="status-badge ${a.status.toLowerCase()}">${a.status}</span>
                     </td>
+                    <td>
+                        ${actionBtnHtml}
+                    </td>
                 </tr>
             `;
         }).join('');
+
+        // Wire click listeners for Complete buttons
+        const completeBtns = appointmentsTableBody.querySelectorAll(".btn-complete-order");
+        completeBtns.forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const id = btn.getAttribute("data-id");
+                btn.disabled = true;
+                btn.textContent = "Updating...";
+
+                try {
+                    const res = await fetch(`${API_BASE}/appointments/${id}/status`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ status: "Completed" })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        showAlert("✓ Order marked as Completed!", "success");
+                        loadAppointments(); // reload stats & list
+                    } else {
+                        showAlert(data.message || "Failed to update appointment status.", "error");
+                        btn.disabled = false;
+                        btn.textContent = "Order completed";
+                    }
+                } catch (err) {
+                    console.error("Complete status update error:", err);
+                    showAlert("Server communication error.", "error");
+                    btn.disabled = false;
+                    btn.textContent = "Order completed";
+                }
+            });
+        });
     }
 
     function renderTodayBookings(appointments) {
@@ -466,6 +586,173 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // 10. Customer Reviews & NLP Summaries
+    const reviewsFeed = document.getElementById("reviews-feed-container");
+    const serviceFilter = document.getElementById("review-service-filter");
+    const nlpRating = document.getElementById("nlp-avg-rating");
+    const nlpReviewCount = document.getElementById("nlp-review-count");
+    const nlpPros = document.getElementById("nlp-top-pros");
+    const nlpCons = document.getElementById("nlp-top-cons");
+
+    let allReviews = [];
+
+    async function loadReviews() {
+        if (!reviewsFeed) return;
+        try {
+            // Fetch reviews
+            const res = await fetch(`http://localhost:5001/api/reviews/salon/${user.id}`);
+            const data = await res.json();
+            if (data.success && data.reviews) {
+                allReviews = data.reviews;
+                populateServiceFilter(allReviews);
+                renderReviewsFeed();
+            }
+        } catch (err) {
+            console.error("Failed to load reviews:", err);
+        }
+    }
+
+    async function loadReviewSummary() {
+        if (!nlpRating) return;
+        try {
+            const res = await fetch(`http://localhost:5001/api/reviews/salon/${user.id}/summary`);
+            const data = await res.json();
+            if (data.success) {
+                nlpRating.textContent = data.averageRating > 0 ? data.averageRating.toFixed(1) : "0.0";
+                nlpReviewCount.textContent = `${data.reviewCount || 0} reviews`;
+
+                // Render pros
+                if (data.pros && data.pros.length > 0) {
+                    nlpPros.innerHTML = data.pros.map(p => `
+                        <span style="font-size:0.75rem; background:rgba(46,204,113,0.15); color:#2ecc71; border:1px solid rgba(46,204,113,0.3); padding:4px 10px; border-radius:20px; text-transform:capitalize; font-weight:600;">✓ ${p}</span>
+                    `).join('');
+                } else {
+                    nlpPros.innerHTML = `<span style="font-size:0.75rem; color:#888;">No positive highlights yet</span>`;
+                }
+
+                // Render cons
+                if (data.cons && data.cons.length > 0) {
+                    nlpCons.innerHTML = data.cons.map(c => `
+                        <span style="font-size:0.75rem; background:rgba(231,76,60,0.15); color:#e74c3c; border:1px solid rgba(231,76,60,0.3); padding:4px 10px; border-radius:20px; text-transform:capitalize; font-weight:600;">⚠️ ${c}</span>
+                    `).join('');
+                } else {
+                    nlpCons.innerHTML = `<span style="font-size:0.75rem; color:#888;">No negative highlights yet</span>`;
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load reviews summary:", err);
+        }
+    }
+
+    function populateServiceFilter(reviews) {
+        if (!serviceFilter) return;
+        // Keep "all" option
+        const currentVal = serviceFilter.value;
+        serviceFilter.innerHTML = `<option value="all">All Services</option>`;
+        
+        // Find unique service names from appointments/reviews (retrieve appointment service names)
+        const services = [...new Set(reviews.map(r => r.review_text.includes("dragon Tatto") ? "dragon Tatto" : "General").filter(Boolean))];
+        
+        // Let's also fetch from the active service list to populate options
+        const uniqueServices = new Set();
+        reviews.forEach(r => {
+            // Find if there is an appointment linked or search review text / match with known services
+            // Standard approach: we can look up unique service_name from reviews if stored or extract
+            // For now, let's extract unique service_name from active appointments list as dropdown options
+            appointmentsList.forEach(a => {
+                if (a.service) uniqueServices.add(a.service);
+            });
+        });
+
+        Array.from(uniqueServices).sort().forEach(s => {
+            const opt = document.createElement("option");
+            opt.value = s.toLowerCase().trim();
+            opt.textContent = s;
+            serviceFilter.appendChild(opt);
+        });
+
+        if (currentVal && serviceFilter.querySelector(`option[value="${currentVal}"]`)) {
+            serviceFilter.value = currentVal;
+        }
+    }
+
+    function renderReviewsFeed() {
+        if (!reviewsFeed) return;
+        const filterVal = serviceFilter.value;
+
+        let filtered = [...allReviews];
+        if (filterVal !== "all") {
+            // Map review text or linked appointments
+            filtered = filtered.filter(r => {
+                // Check if appointment service matches
+                const apt = appointmentsList.find(a => a.id === r.appointment_id);
+                return apt && apt.service.toLowerCase().trim() === filterVal;
+            });
+        }
+
+        if (filtered.length === 0) {
+            reviewsFeed.innerHTML = `
+                <div style="text-align:center; padding:40px; color:#888; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px;">
+                    No customer reviews match this service category.
+                </div>
+            `;
+            return;
+        }
+
+        reviewsFeed.innerHTML = filtered.map(r => {
+            const dateFormatted = new Date(r.created_at).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+            
+            // Find service name
+            const apt = appointmentsList.find(a => a.id === r.appointment_id);
+            const serviceName = apt ? apt.service : "General Service";
+
+            const sentimentEmoji = r.sentiment === 'Positive' ? '😊' : r.sentiment === 'Negative' ? '😞' : '😐';
+            const sentimentColor = r.sentiment === 'Positive' ? '#2ecc71' : r.sentiment === 'Negative' ? '#e74c3c' : '#9ca3af';
+
+            const starsHtml = Array.from({ length: 5 }, (_, idx) => 
+                `<span style="color:${idx < r.rating ? '#ffcc00' : 'rgba(255,255,255,0.15)'}; font-size:1.1rem;">★</span>`
+            ).join('');
+
+            const prosHtml = (r.pros && r.pros.length > 0)
+                ? r.pros.map(p => `<span style="font-size:0.7rem; background:rgba(46,204,113,0.1); color:#2ecc71; border:1px solid rgba(46,204,113,0.2); padding:3px 8px; border-radius:12px; text-transform:capitalize;">${p}</span>`).join('')
+                : '';
+
+            const consHtml = (r.cons && r.cons.length > 0)
+                ? r.cons.map(c => `<span style="font-size:0.7rem; background:rgba(231,76,60,0.1); color:#e74c3c; border:1px solid rgba(231,76,60,0.2); padding:3px 8px; border-radius:12px; text-transform:capitalize;">${c}</span>`).join('')
+                : '';
+
+            return `
+                <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:12px; padding:1.5rem; display:flex; flex-direction:column; gap:12px; transition:transform 0.2s;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <strong style="color:#fff;">👤 ${r.customer_name}</strong>
+                                <span style="font-size:0.78rem; background:rgba(255,184,43,0.12); color:#ffcc00; border:1px solid rgba(255,184,43,0.2); padding:2px 8px; border-radius:10px;">💇 ${serviceName}</span>
+                            </div>
+                            <div style="margin-top:4px;">${starsHtml}</div>
+                        </div>
+                        <div style="text-align:right; font-size:0.8rem; color:rgba(255,255,255,0.4);">
+                            <span>⏱ ${dateFormatted}</span>
+                            <div style="font-size:0.75rem; color:${sentimentColor}; font-weight:600; margin-top:2px;">Sentiment: ${sentimentEmoji} ${r.sentiment}</div>
+                        </div>
+                    </div>
+                    
+                    <p style="margin:0; font-size:0.9rem; color:rgba(255,255,255,0.85); line-height:1.4;">"${r.review_text}"</p>
+
+                    ${(prosHtml || consHtml) ? `
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px; border-top:1px solid rgba(255,255,255,0.03); padding-top:10px;">
+                        ${prosHtml}
+                        ${consHtml}
+                    </div>` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    if (serviceFilter) {
+        serviceFilter.addEventListener("change", renderReviewsFeed);
+    }
+
     // 7. Global Modal Helper Functions
     window.openModal = function (id) {
         const modal = document.getElementById(id);
@@ -475,6 +762,13 @@ document.addEventListener("DOMContentLoaded", () => {
     window.closeModal = function (id) {
         const modal = document.getElementById(id);
         if (modal) modal.classList.remove("show");
+    };
+
+    window.selectPresetImage = function (url) {
+        if (settingSalonImage) {
+            settingSalonImage.value = url;
+            showAlert("✓ Template image selected. Click 'Save Changes' to apply!", "success");
+        }
     };
 
     // 8. Alerts
@@ -502,9 +796,13 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSalonDetails();
     loadServices();
     loadAppointments();
+    loadReviews();
+    loadReviewSummary();
 
     // Auto poll updates every 10 seconds
     setInterval(() => {
         loadAppointments();
+        loadReviews();
+        loadReviewSummary();
     }, 10000);
 });

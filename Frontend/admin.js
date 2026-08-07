@@ -85,6 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // 6. Registration Date Sort Change
+    const sortRegistered = document.getElementById('sort-registered');
+    if (sortRegistered) {
+        sortRegistered.addEventListener('change', () => {
+            renderTable();
+        });
+    }
+
     // Real-time synchronization across browser tabs
     window.addEventListener('storage', (e) => {
         if (e.key === 'stylepulse_pending_owners') {
@@ -138,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load & Render Dashboard Data
     async function loadAndRenderDashboard() {
         try {
-            const response = await fetch('http://localhost:5000/api/admin/owners');
+            const response = await fetch('http://localhost:5001/api/admin/owners');
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
@@ -179,6 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 (o.email && o.email.toLowerCase().includes(searchQuery)) ||
                 (o.phone && o.phone.toLowerCase().includes(searchQuery))
             );
+        }
+
+        // Apply Sorting by Registration Date
+        const sortSelect = document.getElementById('sort-registered');
+        if (sortSelect) {
+            const sortVal = sortSelect.value;
+            owners.sort((a, b) => {
+                const dateA = new Date(a.created_at || 0);
+                const dateB = new Date(b.created_at || 0);
+                return sortVal === 'oldest' ? dateA - dateB : dateB - dateA;
+            });
         }
 
         if (owners.length === 0) {
@@ -228,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button type="button" class="action-btn approve" data-action="approve" data-id="${o.id}">✓ APPROVE OWNER</button>
                 <button type="button" class="action-btn reject" data-action="reject" data-id="${o.id}">✕ REJECT</button>
             ` : `
-                <button type="button" class="action-btn reject" data-action="revoke" data-id="${o.id}">✓ APPROVED</button>
+                <button type="button" class="action-btn reject" data-action="revoke" data-id="${o.id}">✕ REMOVE SALON</button>
             `}
                                 </div>
                 </td>
@@ -239,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Action Handler: Approve Owner
     async function handleApproveOwner(id) {
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/owners/${id}/approve`, {
+            const res = await fetch(`http://localhost:5001/api/admin/owners/${id}/approve`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -255,8 +274,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Action Handler: Reject or Revoke Owner
-    function handleRejectOwner(id) {
-        showAdminAlert(`✕ REVOKED: Access removed for ${id} (Mocked).`, 'error');
+    async function handleRejectOwner(id) {
+        if (!confirm("Are you sure you want to completely remove this salon owner registration and revoke their access?")) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`http://localhost:5001/api/admin/owners/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (res.ok) {
+                loadAndRenderDashboard();
+                showAdminAlert(`✕ REMOVED: Salon Owner account and profile deleted successfully.`, 'error');
+            } else {
+                showAdminAlert(`✕ FAILED: Could not remove owner.`, 'error');
+            }
+        } catch(e) {
+            showAdminAlert(`✕ ERROR: Could not connect to backend.`, 'error');
+        }
     }
 
     // Global Expose for Inline Fallbacks
