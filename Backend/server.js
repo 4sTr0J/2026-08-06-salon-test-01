@@ -7,6 +7,8 @@ import salonOwnerRoutes from "./routes/salonOwnerRoutes.js";
 import appointmentRoutes from "./routes/appointmentRoutes.js";
 import aiRoutes from "./AI Agent/src/routes/ai.routes.js";
 import reviewRoutes from "./salon_reviews/reviewRoutes.js";
+import cancellationPolicyRoutes from "./appointment_cancellation/cancellationPolicyRoutes.js";
+import appointmentCancelRoutes from "./appointment_cancellation/appointmentCancelRoutes.js";
 import { startReminderScheduler } from "./Appointments and notification/jobs/reminderScheduler.js";
 
 dotenv.config();
@@ -41,6 +43,8 @@ app.use("/api/owner", salonOwnerRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/cancellation-policy", cancellationPolicyRoutes);
+app.use("/api/appointments", appointmentCancelRoutes);
 
 const PORT = process.env.PORT || 5001;
 

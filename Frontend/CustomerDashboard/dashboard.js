@@ -202,11 +202,17 @@ document.addEventListener('DOMContentLoaded', () => {
         appointmentsContainer.innerHTML = filtered.map(a => {
             const dateFormatted = new Date(a.appointment_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
             const isCompleted = (a.booking_status || "").toLowerCase() === "completed";
+            const isUpcoming = (a.booking_status || "").toLowerCase() === "upcoming" || (a.booking_status || "").toLowerCase() === "confirmed";
+            
             const reviewButtonHtml = isCompleted 
                 ? (a.isReviewed 
                     ? `<span style="margin-top: 8px; font-size: 0.8rem; font-weight: 700; color: #2ecc71;">✓ Reviewed</span>`
                     : `<button onclick="openReviewModal('${a.salon_id}', '${a.id}', '${a.service_name.replace(/'/g, "\\'")}', '${a.salon_name ? a.salon_name.replace(/'/g, "\\'") : 'StylePulse Salon'}')" style="margin-top: 8px; background: linear-gradient(135deg, #ffc845, #e5a93b); border: none; color: #000; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">⭐ Rate &amp; Review</button>`
                   )
+                : '';
+
+            const cancelButtonHtml = isUpcoming
+                ? `<button onclick="window.handleCancelAppointment('${a.id}')" style="margin-top: 8px; margin-left: 8px; background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.5); color: #e74c3c; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.background='rgba(231,76,60,0.2)'" onmouseout="this.style.background='rgba(231,76,60,0.1)'">❌ Cancel</button>`
                 : '';
 
             return `
@@ -219,12 +225,53 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
                         <span style="font-size: 0.9rem; font-weight: 600; color: #fff; display: block;">⏱ ${dateFormatted} at ${a.appointment_time}</span>
                         <span style="display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-top: 6px; background: rgba(255,184,43,0.15); color: #ffcc00; border: 1px solid rgba(255,184,43,0.3);">${a.booking_status}</span>
-                        ${reviewButtonHtml}
+                        <div>
+                            ${reviewButtonHtml}
+                            ${cancelButtonHtml}
+                        </div>
                     </div>
                 </div>
             `;
         }).join('');
     }
+
+    // Cancellation logic
+    window.handleCancelAppointment = async function(appointmentId) {
+        if (!confirm("Are you sure you want to cancel this appointment?")) {
+            return;
+        }
+        
+        try {
+            const res = await fetch(`http://localhost:5001/api/appointments/${appointmentId}/cancel`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                const refund = data.data.refundPercentage;
+                const hours = data.data.hoursUntilAppointment;
+                
+                let message = `Appointment cancelled successfully.`;
+                if (refund > 0) {
+                    message += ` You will receive a ${refund}% refund since you cancelled ${hours} hours in advance.`;
+                } else {
+                    message += ` Unfortunately, no refund is applicable due to the salon's cancellation policy.`;
+                }
+                
+                showAlert(message, "success", 4000);
+                loadCustomerAppointments(); // reload the appointments to update UI
+            } else {
+                showAlert(data.message || "Failed to cancel appointment", "error");
+            }
+        } catch (err) {
+            console.error("Cancel Error:", err);
+            showAlert("An error occurred while cancelling.", "error");
+        }
+    };
 
     // Floating Review Modal script injection helper
     window.openReviewModal = function(salonId, appointmentId, serviceName, salonName) {

@@ -289,6 +289,20 @@
                         </div>
 
                         <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Cancellation Policy</label>
+                                <select id="setting-cancellation-policy" class="form-input" required>
+                                    <option value="flexible">Flexible (100% refund > 24h)</option>
+                                    <option value="moderate">Moderate (50% refund > 48h)</option>
+                                    <option value="limited">Limited (0% refund > 72h)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <!-- Empty column for layout balance -->
+                            </div>
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group" style="flex: 1;">
                                 <label class="form-label">Salon Image / Logo</label>
                                 <div id="image-drag-drop-zone" class="drag-drop-zone" style="border: 2px dashed rgba(255, 184, 43, 0.4); border-radius: 12px; padding: 2.5rem; text-align: center; background: rgba(255,255,255,0.02); cursor: pointer; transition: all 0.3s ease; position: relative;">

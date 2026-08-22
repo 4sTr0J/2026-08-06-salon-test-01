@@ -6,7 +6,7 @@ services:
       context: ./Backend
       dockerfile: Dockerfile
     ports:
-      - "5000:5000"
+      - "5001:5001"
     environment:
       - SUPABASE_URL=https://hejfeengifgbvissozrx.supabase.co
       - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlamZlZW5naWZnYnZpc3NvenJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MDA2ODIsImV4cCI6MjA5OTI3NjY4Mn0.kNRPbfeM5oknTF6dDQJ77bmsmdfOfOlr0a8np0Xzgqc

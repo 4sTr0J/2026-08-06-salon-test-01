@@ -196,5 +196,14 @@
     "password": "$2b$10$q5i5UiJ6rhId7oD3D8JukeOuL/5eFEamv8KcMU5pX/ipScJFPewKG",
     "role": "customer",
     "createdAt": "2026-08-07T17:16:11.654Z"
+  },
+  {
+    "id": "0d6b256d-11e8-42a5-ab42-fa8c0648f496",
+    "email": "ediri@gmail.com",
+    "fullName": "ediweera sarathchandra",
+    "phone": "07675894550",
+    "password": "$2b$10$XLu6eVfSuUIW7ye3ZeBF6u/TBmzuEyUKlaffo38o.PjKctZZl1qwG",
+    "role": "customer",
+    "createdAt": "2026-08-22T12:35:21.613Z"
   }
 ]

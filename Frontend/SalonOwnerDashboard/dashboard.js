@@ -130,6 +130,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // 2.5 Fetch Cancellation Policy
+    async function loadCancellationPolicy() {
+        try {
+            const res = await fetch(`http://localhost:5001/api/cancellation-policy/active?salon_id=${user.id}`);
+            const data = await res.json();
+            if (data.policy) {
+                document.getElementById('setting-cancellation-policy').value = data.policy.policy_type;
+            } else {
+                document.getElementById('setting-cancellation-policy').value = 'flexible';
+            }
+        } catch (err) {
+            console.error("Failed to load policy:", err);
+            document.getElementById('setting-cancellation-policy').value = 'flexible';
+        }
+    }
+
     // 2. Fetch Salon Info
     async function loadSalonDetails() {
         try {
@@ -159,6 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     previewContainer.style.display = "none";
                     placeholder.style.display = "block";
                 }
+                
+                loadCancellationPolicy();
             }
         } catch (err) {
             console.error("Failed to load salon details:", err);
@@ -188,7 +206,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const data = await res.json();
                 if (data.success) {
-                    showAlert("✓ Success: Image added successfully", "success");
+                    // Update cancellation policy as well
+                    const selectedPolicy = document.getElementById('setting-cancellation-policy').value;
+                    await fetch("http://localhost:5001/api/cancellation-policy", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            salon_id: user.id,
+                            policy_type: selectedPolicy
+                        })
+                    });
+                    
+                    showAlert("✓ Success: Settings updated successfully", "success");
                     loadSalonDetails();
                 } else {
                     showAlert(data.message || "Failed to update salon profile.", "error");
