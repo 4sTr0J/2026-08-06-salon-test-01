@@ -9,6 +9,7 @@ import aiRoutes from "./AI Agent/src/routes/ai.routes.js";
 import reviewRoutes from "./salon_reviews/reviewRoutes.js";
 import cancellationPolicyRoutes from "./appointment_cancellation/cancellationPolicyRoutes.js";
 import appointmentCancelRoutes from "./appointment_cancellation/appointmentCancelRoutes.js";
+import loyaltyRoutes from "./routes/loyaltyRoutes.js";
 import { startReminderScheduler } from "./Appointments and notification/jobs/reminderScheduler.js";
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.get("/", (req, res) => {
     res.send("Salon Booking API is running");
 });
+
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/owner", salonOwnerRoutes);
@@ -45,6 +47,7 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/cancellation-policy", cancellationPolicyRoutes);
 app.use("/api/appointments", appointmentCancelRoutes);
+app.use("/api/loyalty", loyaltyRoutes);
 
 const PORT = process.env.PORT || 5001;
 

@@ -226,8 +226,9 @@
                 <img src="../component/logo.png" alt="StylePulse Logo" class="logo-img">
             </a>
             <nav class="nav-links">
-                <a href="salons.html" class="nav-link active">EXPLORE SALONS</a>
+                <a href="salons.html" class="nav-link">EXPLORE SALONS</a>
                 <a href="dashboard.html" class="nav-link">MY DASHBOARD</a>
+                <a href="rewards.html" class="nav-link" style="color: #ffcc00; font-weight: 700;">MY REWARDS</a>
             </nav>
         </div>
         <div class="nav-right">
@@ -600,7 +601,8 @@
                             salonId,
                             serviceName,
                             date: selectedDate,
-                            time: selectedSlot
+                            time: selectedSlot,
+                            price: price
                         })
                     });
 
@@ -626,10 +628,10 @@
                         const alertBox = document.getElementById("alert-box");
                         const alertMessage = document.getElementById("alert-message");
                         if (alertBox && alertMessage) {
-                            alertMessage.textContent = `✓ Appointment booked for ${serviceName} on ${selectedDate} at ${fmt12(selectedSlot)}!`;
+                            alertMessage.textContent = data.message || `✓ Appointment booked for ${serviceName} on ${selectedDate} at ${fmt12(selectedSlot)}!`;
                             alertBox.className = "alert-box show success";
                         }
-                        setTimeout(() => { window.location.href = "dashboard.html"; }, 2000);
+                        setTimeout(() => { window.location.href = "dashboard.html"; }, 3000);
                     } else {
                         showError(data.message || "Failed to book appointment. Please try again.");
                         btn.textContent = "Confirm Booking →";

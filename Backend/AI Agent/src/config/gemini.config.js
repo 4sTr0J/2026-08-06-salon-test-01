@@ -11,4 +11,4 @@ if (!GEMINI_API_KEY) {
 export const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
 // Default Gemini model to use
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';

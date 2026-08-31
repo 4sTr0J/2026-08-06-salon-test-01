@@ -1,4 +1,5 @@
 import supabase, { supabaseAdmin } from "./config/supabase.js";
+import { awardAppointmentPointsHelper } from "./controllers/loyaltyController.js";
 
 // Helper to check Supabase config
 const isSupabaseConfigured = () => {
@@ -274,6 +275,44 @@ export const updateAppointmentStatus = async (req, res) => {
             .single();
 
         if (error) throw error;
+
+        // Reward logic trigger: Once the salon owner confirms/completes the appointment
+        if (status === 'Completed' && data) {
+            try {
+                // 1. Get user details
+                const { data: userData } = await client
+                    .from("users")
+                    .select("id, full_name, email")
+                    .eq("email", data.customer_email)
+                    .single();
+
+                const customerId = userData ? userData.id : null;
+                const customerData = customerId ? { id: customerId, full_name: userData.full_name, email: userData.email } : null;
+
+                if (customerData) {
+                    // 2. Get service price
+                    const { data: serviceData } = await client
+                        .from("salon_owner_services")
+                        .select("price")
+                        .eq("owner_id", data.salon_id)
+                        .eq("name", data.service_name)
+                        .single();
+
+                    const price = serviceData ? Number(serviceData.price) : 0;
+
+                    // 3. Apply exact points logic
+                    let earnedPoints = 500;
+                    if (price >= 5000) earnedPoints = 10000;
+                    else if (price >= 2500) earnedPoints = 5000;
+                    else earnedPoints = 500;
+
+                    // 4. Award points
+                    awardAppointmentPointsHelper(customerData, earnedPoints, data.id);
+                }
+            } catch (pointErr) {
+                console.error("Could not award points on completion:", pointErr.message);
+            }
+        }
 
         return res.status(200).json({ success: true, message: `Appointment marked as ${status} successfully.`, appointment: data });
     } catch (err) {

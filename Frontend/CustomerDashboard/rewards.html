@@ -207,42 +207,67 @@
 
     <div class="dashboard-container">
         <div class="dashboard-header">
-            <h1 class="dashboard-title">Welcome back, <span id="user-name-display">...</span>.</h1>
-            <p class="dashboard-subtitle">Here is an overview of your StylePulse account.</p>
+            <h1 class="dashboard-title">My Rewards</h1>
+            <p class="dashboard-subtitle">Manage your Style Points and exclusive perks.</p>
         </div>
 
         <div class="dashboard-grid">
-            <!-- Appointments Card -->
-            <div class="dashboard-card" style="grid-column: span 2;">
+            <!-- Points Overview Card -->
+            <div class="dashboard-card" style="grid-column: span 1;">
                 <div class="card-header">
-                    <span class="card-icon">📅</span>
-                    <h2 class="card-title">Appointments</h2>
+                    <span class="card-icon">💎</span>
+                    <h2 class="card-title">Points Balance</h2>
                 </div>
-                <!-- Filter Tabs -->
-                <div class="appointment-tabs" style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; overflow-x: auto;">
-                    <button class="tab-btn active" data-status="Upcoming" style="background: transparent; border: none; color: #fff; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Upcoming</button>
-                    <button class="tab-btn" data-status="completed" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Completed</button>
-                    <button class="tab-btn" data-status="cancelled" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Cancelled</button>
-                    <button class="tab-btn" data-status="rescheduled" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Rescheduled</button>
+                <div class="card-content" style="text-align: center;">
+                    <div style="font-size: 3rem; font-weight: 700; color: #ffcc00;" id="points-balance">--</div>
+                    <p style="margin-top: 10px;">Available Points</p>
                 </div>
-                <div class="card-content" id="appointments-list-container">
-                    <div class="empty-state">
-                        You have no upcoming appointments.
-                    </div>
-                </div>
-                <a href="salons.html" class="action-btn" style="width: max-content;">Book New Appointment</a>
             </div>
 
-            <!-- Profile Overview Card -->
-            <div class="dashboard-card">
+            <!-- Tier Status Card -->
+            <div class="dashboard-card" style="grid-column: span 1;">
                 <div class="card-header">
-                    <span class="card-icon">👤</span>
-                    <h2 class="card-title">Profile Overview</h2>
+                    <span class="card-icon">👑</span>
+                    <h2 class="card-title">Current Tier</h2>
+                </div>
+                <div class="card-content" style="text-align: center;">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: #fff;" id="current-tier">--</div>
+                    <p style="margin-top: 10px;">Lifetime Points: <span id="lifetime-points">--</span></p>
+                </div>
+            </div>
+            
+            <!-- Vouchers Card -->
+            <div class="dashboard-card" style="grid-column: span 2;">
+                <div class="card-header">
+                    <span class="card-icon">🎟️</span>
+                    <h2 class="card-title">My Vouchers</h2>
+                </div>
+                <div class="card-content" id="vouchers-list">
+                    <div class="empty-state">No vouchers available. Redeem Style Points to get vouchers!</div>
+                </div>
+            </div>
+
+            <!-- Available Rewards Catalog -->
+            <div class="dashboard-card" style="grid-column: span 2;">
+                <div class="card-header">
+                    <span class="card-icon">🎁</span>
+                    <h2 class="card-title">Redeem Rewards</h2>
                 </div>
                 <div class="card-content">
-                    <p><strong>Name:</strong> <span id="profile-name">...</span></p>
-                    <p style="margin-top: 0.5rem;"><strong>Email:</strong> <span id="profile-email">...</span></p>
-                    <p style="margin-top: 0.5rem;"><strong>Role:</strong> <span id="profile-role" style="text-transform: capitalize;">...</span></p>
+                    <div id="rewards-catalog" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="empty-state" style="grid-column: span 2;">Loading rewards...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="dashboard-card" style="grid-column: span 2;">
+                <div class="card-header">
+                    <span class="card-icon">📜</span>
+                    <h2 class="card-title">History</h2>
+                </div>
+                <div class="card-content" id="history-list">
+                    <div class="empty-state">No transaction history.</div>
                 </div>
             </div>
         </div>
@@ -273,7 +298,7 @@
         .alert-message { font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500; color: #fff; }
     </style>
 
-    <script src="dashboard.js"></script>
+    <script src="rewards.js"></script>
     <script src="../chatWidget.js"></script>
 </body>
 </html>

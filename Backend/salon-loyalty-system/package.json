@@ -1,0 +1,21 @@
+{
+  "name": "salon-loyalty-system",
+  "version": "1.0.0",
+  "description": "This is a production-ready, standalone Salon Loyalty & Rewards System built with Node.js, Express, React, Vite, Tailwind CSS, and Supabase.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}

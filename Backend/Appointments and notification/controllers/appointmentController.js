@@ -1,5 +1,6 @@
 import * as appointmentService from '../services/appointmentService.js';
 import { sendConfirmationEmail } from '../services/emailService.js';
+import { awardAppointmentPointsHelper } from '../../controllers/loyaltyController.js';
 
 // All salon operating slots (9am – 6:30pm, every 30 min)
 const ALL_SLOTS = [
@@ -156,8 +157,8 @@ export const handleCreateAppointment = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Appointment booked successfully. Automatic 1-hour reminder scheduled.',
-      appointment: appointment // Local frontend expects key "appointment"
+      message: 'Appointment Confirmed!',
+      appointment: appointment
     });
 
   } catch (error) {
