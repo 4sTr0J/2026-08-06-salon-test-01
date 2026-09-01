@@ -5,26 +5,23 @@ services:
     build:
       context: ./Backend
       dockerfile: Dockerfile
+    container_name: stylepulse-backend
     ports:
       - "5001:5001"
     env_file:
       - .env
     environment:
-      - SUPABASE_URL=https://hejfeengifgbvissozrx.supabase.co
-      - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlamZlZW5naWZnYnZpc3NvenJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MDA2ODIsImV4cCI6MjA5OTI3NjY4Mn0.kNRPbfeM5oknTF6dDQJ77bmsmdfOfOlr0a8np0Xzgqc
-      - SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlamZlZW5naWZnYnZpc3NvenJ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzcwMDY4MiwiZXhwIjoyMDk5Mjc2NjgyfQ.qzyslLP94XUP74QoemkJKPqpK4nIvO5VWMZ-oHC89to
-      - VITE_SUPABASE_URL=https://hejfeengifgbvissozrx.supabase.co
-      - VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlamZlZW5naWZnYnZpc3NvenJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MDA2ODIsImV4cCI6MjA5OTI3NjY4Mn0.kNRPbfeM5oknTF6dDQJ77bmsmdfOfOlr0a8np0Xzgqc
-    restart: always
+      - NODE_ENV=production
+      - PORT=5001
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./Frontend
       dockerfile: Dockerfile
+    container_name: stylepulse-frontend
     ports:
       - "3000:3000"
-    env_file:
-      - .env
     depends_on:
       - backend
-    restart: always
+    restart: unless-stopped
