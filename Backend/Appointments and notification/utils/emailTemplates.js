@@ -47,8 +47,8 @@ export const generateReminderEmailHTML = ({
           <p style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Please present this code upon arrival</p>
         </div>
         ` : ''}
-        <p style="font-size: 13px; color: #b45309; background-color: #fef3c7; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
-          📌 Please arrive 10 minutes early to ensure full service time.
+        <p style="font-size: 13px; color: #b45309; background-color: #fef3c7; padding: 12px; border-radius: 6px; margin-bottom: 20px; line-height: 1.4;">
+          🛡️ <strong>StylePulse Buffer Guarantee:</strong> A 30-minute buffer is reserved after your service. If you are running late, you can inform the salon via your dashboard, and your full session will still be covered.
         </p>
         <p style="font-size: 14px; margin: 0;">Thank you for choosing StylePulse!</p>
       </div>

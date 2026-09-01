@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+
+// Existing route integrations
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import salonOwnerRoutes from "./routes/salonOwnerRoutes.js";
@@ -10,6 +12,12 @@ import reviewRoutes from "./salon_reviews/reviewRoutes.js";
 import cancellationPolicyRoutes from "./appointment_cancellation/cancellationPolicyRoutes.js";
 import appointmentCancelRoutes from "./appointment_cancellation/appointmentCancelRoutes.js";
 import loyaltyRoutes from "./routes/loyaltyRoutes.js";
+
+// Modular Domain Routes
+import customerDomainRoutes from "./Customer profile management/customerRoutes.js";
+import salonDashboardDomainRoutes from "./salon profile and dashbboard/salonDashboardRoutes.js";
+import salonServicesDomainRoutes from "./salon services/serviceRoutes.js";
+
 import { startReminderScheduler } from "./Appointments and notification/jobs/reminderScheduler.js";
 
 dotenv.config();
@@ -39,6 +47,13 @@ app.get("/", (req, res) => {
     res.send("Salon Booking API is running");
 });
 
+// Domain Modular Routes
+app.use("/api/customer", customerDomainRoutes);
+app.use("/api/salon-dashboard", salonDashboardDomainRoutes);
+app.use("/api/salon-services", salonServicesDomainRoutes);
+
+// Compatibility Routes
+app.use("/api/salons", salonServicesDomainRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/owner", salonOwnerRoutes);

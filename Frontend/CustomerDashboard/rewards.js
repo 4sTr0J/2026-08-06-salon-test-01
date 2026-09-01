@@ -63,7 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Loyalty API Base URL
     const LOYALTY_API = 'http://localhost:5001/api/loyalty';
-    const customerId = user.id;
+    const customerId = user.id || user.email;
+    const userEmail = user.email || '';
 
     async function loadAccountData() {
         try {
@@ -78,22 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('points-balance').textContent = data.account.available_points;
                 document.getElementById('current-tier').textContent = data.account.current_tier;
                 document.getElementById('lifetime-points').textContent = data.account.lifetime_points;
-            }
-
-            // Vouchers
-            const vouchersList = document.getElementById('vouchers-list');
-            if (data.vouchers && data.vouchers.length > 0) {
-                vouchersList.innerHTML = data.vouchers.map(v => `
-                    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 600; color: #fff;">Code: ${v.voucher_code}</div>
-                            <div style="font-size: 0.85rem; color: #aaa;">Redeemed on: ${new Date(v.redeemed_at).toLocaleDateString()}</div>
-                        </div>
-                        <span style="background: ${v.status === 'ACTIVE' ? '#2ecc71' : '#e74c3c'}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;">
-                            ${v.status}
-                        </span>
-                    </div>
-                `).join('');
             }
 
             // History
@@ -116,55 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function loadRewards() {
-        try {
-            const res = await fetch(`${LOYALTY_API}/rewards`);
-            if (!res.ok) throw new Error("Failed to load rewards");
-            const data = await res.json();
-            
-            const rewardsCatalog = document.getElementById('rewards-catalog');
-            if (data.rewards && data.rewards.length > 0) {
-                rewardsCatalog.innerHTML = data.rewards.map(r => `
-                    <div style="background: rgba(255,204,0,0.1); border: 1px solid rgba(255,204,0,0.3); padding: 20px; border-radius: 12px; display: flex; flex-direction: column;">
-                        <h3 style="color: #ffcc00; margin-bottom: 8px;">${r.title}</h3>
-                        <p style="color: #ddd; font-size: 0.9rem; flex-grow: 1;">${r.description}</p>
-                        <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: bold; color: #fff;">${r.points_cost} Style Points</span>
-                            <button onclick="redeemReward('${r.id}')" style="background: #ffcc00; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">Redeem</button>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                rewardsCatalog.innerHTML = `<div class="empty-state">No rewards available.</div>`;
-            }
-        } catch (err) {
-            console.error("Error loading rewards:", err);
-        }
-    }
-
-    window.redeemReward = async (rewardId) => {
-        if (!confirm("Are you sure you want to redeem this reward?")) return;
-        
-        try {
-            const res = await fetch(`${LOYALTY_API}/redeem`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customerId, rewardId })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                showAlert(`Success! Your voucher code is: ${data.voucherCode}`, 'success', 5000);
-                loadAccountData(); // Reload UI
-            } else {
-                showAlert(`Error: ${data.error || 'Could not redeem'}`, 'error');
-            }
-        } catch (err) {
-            showAlert('Failed to redeem reward.', 'error');
-        }
-    };
-
     // Initial load
     loadAccountData();
-    loadRewards();
 });

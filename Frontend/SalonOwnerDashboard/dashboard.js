@@ -158,10 +158,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 salonNameTitle.textContent = s.salon_name || "Premium Luxury Salon";
                 
                 // Populate Settings Form
-                settingSalonName.value = s.salon_name || "";
-                settingSalonRegId.value = s.salon_reg_id || "";
-                settingSalonAddress.value = s.salon_address || "";
-                settingSalonWebsite.value = s.salon_website || "";
+                if (settingSalonName) settingSalonName.value = s.salon_name || "";
+                if (settingSalonRegId) settingSalonRegId.value = s.salon_reg_id || "";
+                if (settingSalonAddress) settingSalonAddress.value = s.salon_address || "";
+                if (settingSalonWebsite) settingSalonWebsite.value = s.salon_website || "";
+                if (settingOperatingStart) settingOperatingStart.value = s.operating_start || "09:00";
+                if (settingOperatingEnd) settingOperatingEnd.value = s.operating_end || "18:30";
                 
                 if (s.salon_image) {
                     salonImageBase64 = s.salon_image;
@@ -200,6 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         salonAddress: settingSalonAddress.value,
                         salonWebsite: settingSalonWebsite.value,
                         salonRegId: settingSalonRegId.value,
+                        operatingStart: settingOperatingStart ? settingOperatingStart.value : '09:00',
+                        operatingEnd: settingOperatingEnd ? settingOperatingEnd.value : '18:30',
                         salonImage: salonImageBase64
                     })
                 });
@@ -265,6 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
         servicesTableBody.innerHTML = services.map(s => `
             <tr>
                 <td><strong>${s.name}</strong></td>
+                <td><span style="background: rgba(255, 204, 0, 0.15); color: #ffcc00; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">${s.category || 'General'}</span></td>
                 <td>⏱ ${s.duration} Mins</td>
                 <td><strong>Rs. ${parseFloat(s.price).toLocaleString()}</strong></td>
                 <td>
@@ -308,22 +313,24 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Add Service form found and listener binding active.");
         
         const submitService = async () => {
+            const categoryEl = document.getElementById("service-category");
             const nameEl = document.getElementById("service-name");
             const durationEl = document.getElementById("service-duration");
             const priceEl = document.getElementById("service-price");
 
-            if (!nameEl || !durationEl || !priceEl) {
+            if (!categoryEl || !nameEl || !durationEl || !priceEl) {
                 console.error("Form input elements not found!");
                 return;
             }
 
+            const category = categoryEl.value;
             const name = nameEl.value.trim();
             const duration = durationEl.value;
             const price = priceEl.value;
 
-            console.log("Submitting service details:", { name, duration, price });
+            console.log("Submitting service details:", { category, name, duration, price });
 
-            if (!name || !duration || !price) {
+            if (!category || !name || !duration || !price) {
                 showAlert("Please fill in all fields.", "error");
                 return;
             }
@@ -335,7 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
-                    body: JSON.stringify({ name, duration, price })
+                    body: JSON.stringify({ category, name, duration, price })
                 });
 
                 const data = await res.json();
@@ -389,6 +396,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let appointmentsList = [];
 
+    // === Owner Late Notifications Bell Logic ===
+    const ownerNotifBtn = document.getElementById("owner-notif-btn");
+    const ownerNotifDropdown = document.getElementById("owner-notif-dropdown");
+    const ownerNotifBadge = document.getElementById("owner-notif-badge");
+    const ownerNotifCountLabel = document.getElementById("owner-notif-count-label");
+    const ownerNotifItems = document.getElementById("owner-notif-items");
+
+    if (ownerNotifBtn && ownerNotifDropdown) {
+        ownerNotifBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isVisible = ownerNotifDropdown.style.display === "block";
+            ownerNotifDropdown.style.display = isVisible ? "none" : "block";
+        });
+
+        document.addEventListener("click", (e) => {
+            if (!ownerNotifDropdown.contains(e.target) && e.target !== ownerNotifBtn) {
+                ownerNotifDropdown.style.display = "none";
+            }
+        });
+    }
+
+    function populateOwnerNotifications(appointments) {
+        const lateAppointments = appointments.filter(a => a.late_notification);
+
+        if (ownerNotifBadge) {
+            if (lateAppointments.length > 0) {
+                ownerNotifBadge.style.display = "flex";
+                ownerNotifBadge.textContent = lateAppointments.length;
+            } else {
+                ownerNotifBadge.style.display = "none";
+            }
+        }
+
+        if (ownerNotifCountLabel) {
+            ownerNotifCountLabel.textContent = `${lateAppointments.length} late alert${lateAppointments.length === 1 ? '' : 's'}`;
+        }
+
+        if (ownerNotifItems) {
+            if (lateAppointments.length === 0) {
+                ownerNotifItems.innerHTML = `<div style="text-align: center; padding: 2rem 1rem; color: rgba(255,255,255,0.4); font-size: 0.85rem; font-style: italic;">🎉 No customer delays reported</div>`;
+                return;
+            }
+
+            ownerNotifItems.innerHTML = lateAppointments.map(a => {
+                const late = a.late_notification;
+                return `
+                    <div style="padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; gap: 12px; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,184,43,0.08)'" onmouseout="this.style.background='transparent'">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,184,43,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">⏳</div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-size: 0.88rem; font-weight: 700; color: #fff;">${a.client_name} <span style="font-size: 0.75rem; color: #ffcc00; font-weight: 800;">(+${late.delay_minutes}m late)</span></div>
+                            <div style="font-size: 0.78rem; color: rgba(255,255,255,0.7); margin-top: 2px;">💇 ${a.service} · Scheduled for ${a.time}</div>
+                            ${late.note ? `<div style="font-size: 0.75rem; color: #ddd; font-style: italic; margin-top: 4px; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px;">💬 "${late.note}"</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
     async function loadAppointments() {
         try {
             const res = await fetch(`${API_BASE}/appointments`, {
@@ -396,11 +462,48 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             const data = await res.json();
             if (data.success && data.appointments) {
-                appointmentsList = data.appointments;
+                // Sort appointments:
+                // 1. Actionable/Upcoming (Confirmed, Pending, Upcoming) at the TOP, sorted by closest date & time
+                // 2. Completed / Cancelled below, sorted from most recent to oldest
+                const now = new Date();
+
+                const getApptTimestamp = (a) => {
+                    if (!a.date) return 0;
+                    const timeStr = a.time && a.time !== 'N/A' ? a.time : '00:00';
+                    return new Date(`${a.date}T${timeStr}:00`).getTime();
+                };
+
+                const isUpcomingStatus = (st) => {
+                    const s = (st || '').toLowerCase();
+                    return s !== 'completed' && s !== 'cancelled';
+                };
+
+                const sortedAppointments = [...data.appointments].sort((a, b) => {
+                    const aUpcoming = isUpcomingStatus(a.status);
+                    const bUpcoming = isUpcomingStatus(b.status);
+
+                    // If one is upcoming and the other is not, upcoming comes first
+                    if (aUpcoming && !bUpcoming) return -1;
+                    if (!aUpcoming && bUpcoming) return 1;
+
+                    const aTime = getApptTimestamp(a);
+                    const bTime = getApptTimestamp(b);
+
+                    if (aUpcoming && bUpcoming) {
+                        // For upcoming appointments: show closest / most immediate first
+                        return aTime - bTime;
+                    } else {
+                        // For past/completed appointments: show newest completed first
+                        return bTime - aTime;
+                    }
+                });
+
+                appointmentsList = sortedAppointments;
                 calculateStats(appointmentsList);
                 renderAppointmentsTable(appointmentsList);
                 renderTodayBookings(appointmentsList);
                 renderAnalyticsChart(appointmentsList);
+                populateOwnerNotifications(appointmentsList);
             }
         } catch (err) {
             console.error("Failed to load appointments:", err);
@@ -412,17 +515,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const todayStr = new Date().toDateString();
         
         // Today's appointments count
-        const todayAppointments = appointments.filter(a => new Date(a.date).toDateString() === todayStr);
+        const todayAppointments = appointments.filter(a => a.date && new Date(a.date).toDateString() === todayStr);
         statTodayAppointments.textContent = todayAppointments.length;
 
         // Unique clients
-        const uniqueClients = new Set(appointments.map(a => a.user_id));
+        const uniqueClients = new Set(appointments.map(a => a.client_email || a.client_name || a.user_id).filter(Boolean));
         statTotalClients.textContent = uniqueClients.size;
 
-        // Estimated revenue from all confirmed/completed appointments
+        // Estimated revenue ONLY from orders completed by the salon owner
+        const isCompletedStatus = (st) => (st || '').toLowerCase() === 'completed';
+
         const revenue = appointments
-            .filter(a => a.status === 'Confirmed' || a.status === 'completed')
-            .reduce((sum, a) => sum + parseFloat(a.price || 0), 0);
+            .filter(a => isCompletedStatus(a.status))
+            .reduce((sum, a) => sum + (parseFloat(a.price) || 0), 0);
         statRevenue.textContent = `Rs. ${revenue.toLocaleString()}`;
     }
 
@@ -439,10 +544,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
         appointmentsTableBody.innerHTML = appointments.map(a => {
             const dateFormatted = new Date(a.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-            const isPending = a.status === 'Confirmed' || a.status === 'Upcoming' || a.status === 'Pending';
-            const actionBtnHtml = isPending
-                ? `<button class="btn-complete-order" data-id="${a.id}" style="background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: transform 0.2s;">Order completed</button>`
-                : `<span style="font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 600;">—</span>`;
+            const statusLower = (a.status || '').toLowerCase();
+            const isCompleted = statusLower === 'completed';
+            const isCancelled = statusLower === 'cancelled';
+            const isRescheduled = a.is_rescheduled || statusLower === 'rescheduled';
+            const canComplete = !isCompleted && !isCancelled;
+
+            let actionBtnHtml = `<span style="font-size: 0.8rem; color: rgba(255,255,255,0.4); font-weight: 600;">—</span>`;
+            if (canComplete) {
+                actionBtnHtml = `<button class="btn-complete-order" data-id="${a.id}" style="background: linear-gradient(135deg, #2ecc71, #27ae60); border: none; color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: transform 0.2s; box-shadow: 0 4px 12px rgba(46,204,113,0.3);">Order completed</button>`;
+            } else if (isCompleted) {
+                actionBtnHtml = `<span style="font-size: 0.82rem; color: #2ecc71; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">✓ Completed</span>`;
+            }
+
+            const lateAlertHtml = a.late_notification ? `
+                <div style="margin-top: 6px; background: rgba(255, 184, 43, 0.12); border: 1px solid rgba(255, 184, 43, 0.4); border-radius: 6px; padding: 4px 8px; font-size: 0.75rem; color: #ffcc00; display: inline-flex; align-items: center; gap: 4px;">
+                    <span>⚠️ <strong>Running ${a.late_notification.delay_minutes}m Late</strong></span>
+                    ${a.late_notification.note ? `<span style="color: #ddd;">("${a.late_notification.note}")</span>` : ''}
+                </div>
+            ` : '';
+
+            const rescheduleNoticeHtml = (isRescheduled && a.reschedule_info) ? `
+                <div style="margin-top: 4px; background: rgba(52, 152, 219, 0.12); border: 1px solid rgba(52, 152, 219, 0.35); border-radius: 6px; padding: 3px 6px; font-size: 0.72rem; color: #3498db; font-weight: 600;">
+                    🔄 Customer Rescheduled (from ${a.reschedule_info.previous_date} ${a.reschedule_info.previous_time})
+                </div>
+            ` : '';
+
+            const statusClass = isCompleted ? 'completed' : isCancelled ? 'cancelled' : isRescheduled ? 'rescheduled' : 'confirmed';
+            const statusDisplay = isCompleted ? 'COMPLETED' : isCancelled ? 'CANCELLED' : isRescheduled ? 'RESCHEDULED' : (a.status || 'CONFIRMED').toUpperCase();
+
+            const basePriceNum = parseFloat(a.base_price || a.price || 0);
+            const reschedFeeNum = parseFloat(a.reschedule_fee || 0);
+            const totalPriceNum = parseFloat(a.price || 0);
+
+            const priceCellHtml = reschedFeeNum > 0 ? `
+                <div>
+                    <strong style="color: #ffcc00; font-size: 0.95rem;">Rs. ${totalPriceNum.toLocaleString()}</strong>
+                    <div style="font-size: 0.72rem; color: #3498db; margin-top: 2px;">
+                        (Rs. ${basePriceNum.toLocaleString()} + <span style="font-weight:700;">Rs. ${reschedFeeNum.toLocaleString()} Reschedule Fee</span> pay at salon)
+                    </div>
+                </div>
+            ` : `<strong>Rs. ${totalPriceNum.toLocaleString()}</strong>`;
 
             return `
                 <tr>
@@ -450,14 +592,18 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="contact-cell">
                             <strong>👤 ${a.client_name}</strong>
                             <span style="font-size:0.75rem; color:rgba(255,255,255,0.5);">📞 ${a.client_phone}</span>
+                            ${lateAlertHtml}
                         </div>
                     </td>
                     <td>${a.service}</td>
                     <td>💇 ${a.stylist}</td>
-                    <td>📅 ${dateFormatted} at <strong>${a.time}</strong></td>
-                    <td><strong>Rs. ${parseFloat(a.price || 0).toLocaleString()}</strong></td>
                     <td>
-                        <span class="status-badge ${a.status.toLowerCase()}">${a.status}</span>
+                        <div>📅 ${dateFormatted} at <strong>${a.time}</strong></div>
+                        ${rescheduleNoticeHtml}
+                    </td>
+                    <td>${priceCellHtml}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusDisplay}</span>
                     </td>
                     <td>
                         ${actionBtnHtml}
@@ -514,18 +660,27 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        todayBookingsList.innerHTML = todayApps.map(a => `
-            <div class="booking-item-mini">
-                <div class="booking-client-info">
-                    <h4>👤 ${a.client_name}</h4>
-                    <p>💇 Service: ${a.service} (with ${a.stylist})</p>
+        todayBookingsList.innerHTML = todayApps.map(a => {
+            const lateAlertHtml = a.late_notification ? `
+                <div style="margin-top: 4px; background: rgba(255, 184, 43, 0.15); border: 1px solid rgba(255, 184, 43, 0.5); border-radius: 4px; padding: 2px 6px; font-size: 0.72rem; color: #ffcc00; font-weight: 600;">
+                    ⚠️ Running ${a.late_notification.delay_minutes}m Late ${a.late_notification.note ? `("${a.late_notification.note}")` : ''}
                 </div>
-                <div class="booking-time-status">
-                    <span class="booking-time-tag">⏱ ${a.time}</span>
-                    <div style="font-size:0.7rem; margin-top:0.2rem;" class="status-badge ${a.status.toLowerCase()}">${a.status}</div>
+            ` : '';
+
+            return `
+                <div class="booking-item-mini" style="${a.late_notification ? 'border-left: 3px solid #ffcc00;' : ''}">
+                    <div class="booking-client-info">
+                        <h4>👤 ${a.client_name}</h4>
+                        <p>💇 Service: ${a.service} (with ${a.stylist})</p>
+                        ${lateAlertHtml}
+                    </div>
+                    <div class="booking-time-status">
+                        <span class="booking-time-tag">⏱ ${a.time}</span>
+                        <div style="font-size:0.7rem; margin-top:0.2rem;" class="status-badge ${a.status.toLowerCase()}">${a.status}</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
 
     // 6. Analytics Chart (Chart.js)
@@ -548,10 +703,11 @@ document.addEventListener("DOMContentLoaded", () => {
             
             labels.push(dateLabel);
 
-            const dayApps = appointments.filter(a => new Date(a.date).toDateString() === dateStr);
+            const dayApps = appointments.filter(a => a.date && new Date(a.date).toDateString() === dateStr);
+            const isCompletedStatus = (st) => (st || '').toLowerCase() === 'completed';
             const dayRevenue = dayApps
-                .filter(a => a.status === 'Confirmed' || a.status === 'completed')
-                .reduce((sum, a) => sum + parseFloat(a.price || 0), 0);
+                .filter(a => isCompletedStatus(a.status))
+                .reduce((sum, a) => sum + (parseFloat(a.price) || 0), 0);
 
             revenueData.push(dayRevenue);
             bookingCountData.push(dayApps.length);
@@ -567,7 +723,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Estimated Revenue ($)',
+                        label: 'Estimated Revenue (Rs.)',
                         data: revenueData,
                         backgroundColor: 'rgba(255, 184, 43, 0.65)',
                         borderColor: '#ffcc00',

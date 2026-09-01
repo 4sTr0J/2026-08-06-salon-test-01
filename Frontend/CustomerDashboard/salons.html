@@ -703,26 +703,45 @@
             const container = document.getElementById("salons-list-container");
             const searchBar = document.getElementById("search-bar");
             const categoryItems = document.querySelectorAll(".category-item");
+            const sortSelect = document.getElementById("sp-sort-select");
 
             let allSalons = [];
             let currentFilterCategory = "all";
             let currentSearchQuery = "";
 
+            // Sort query listener
+            if (sortSelect) {
+                sortSelect.addEventListener("change", () => {
+                    applyFilterAndSearch();
+                });
+            }
+
             // Fetch salons (services are pre-loaded in the response by the backend)
             try {
-                const res = await fetch("http://localhost:5001/api/auth/salons", {
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
+                const headers = token ? { "Authorization": `Bearer ${token}` } : {};
+                const res = await fetch("http://localhost:5001/api/auth/salons", { headers });
                 const data = await res.json();
                 
                 if (data.success && data.salons) {
                     allSalons = data.salons;
                     applyFilterAndSearch();
                 } else {
-                    container.innerHTML = `<div class="empty-results">Failed to load salons list.</div>`;
+                    container.innerHTML = `<div class="empty-results">No registered salons found.</div>`;
                 }
             } catch (err) {
                 console.error("Salons load error:", err);
+                // Fallback attempt without auth header
+                try {
+                    const res = await fetch("http://localhost:5001/api/auth/salons");
+                    const data = await res.json();
+                    if (data.success && data.salons) {
+                        allSalons = data.salons;
+                        applyFilterAndSearch();
+                        return;
+                    }
+                } catch (fallbackErr) {
+                    console.error("Fallback load failed:", fallbackErr);
+                }
                 container.innerHTML = `<div class="empty-results">Server connection error. Please try again.</div>`;
             }
 
@@ -734,12 +753,6 @@
                     currentFilterCategory = item.getAttribute("data-category");
                     applyFilterAndSearch();
                 });
-            });
-
-            // Sort query listener
-            const sortSelect = document.getElementById("sp-sort-select");
-            sortSelect.addEventListener("change", () => {
-                applyFilterAndSearch();
             });
 
             // Search query listener
@@ -754,8 +767,9 @@
                 // 1. Filter by category
                 if (currentFilterCategory !== "all") {
                     filtered = filtered.filter(salon => {
-                        return salon.services.some(service => 
-                            service.name.toLowerCase().includes(currentFilterCategory.toLowerCase())
+                        return (salon.services || []).some(service => 
+                            (service.name || '').toLowerCase().includes(currentFilterCategory.toLowerCase()) ||
+                            (service.category || '').toLowerCase().includes(currentFilterCategory.toLowerCase())
                         );
                     });
                 }
@@ -763,34 +777,44 @@
                 // 2. Filter by search query (name, address, or service name)
                 if (currentSearchQuery) {
                     filtered = filtered.filter(salon => {
-                        const matchesName = salon.salon_name.toLowerCase().includes(currentSearchQuery);
+                        const matchesName = (salon.salon_name || '').toLowerCase().includes(currentSearchQuery);
                         const matchesAddress = (salon.salon_address || '').toLowerCase().includes(currentSearchQuery);
-                        const matchesService = salon.services.some(service => 
-                            service.name.toLowerCase().includes(currentSearchQuery)
+                        const matchesService = (salon.services || []).some(service => 
+                            (service.name || '').toLowerCase().includes(currentSearchQuery)
                         );
                         return matchesName || matchesAddress || matchesService;
                     });
                 }
 
-                // 3. Sort according to selected sort type
-                const sortType = sortSelect.value;
-                if (sortType === "rating") {
-                    // Bayesian weighted rating: WR = (v/(v+m)) * R + (m/(v+m)) * C
-                    // R = salon's raw avg rating, v = number of reviews
-                    // C = global mean rating (assumed 3.0), m = minimum reviews to trust (3)
-                    const C = 3.0; // global mean rating
-                    const m = 3;   // minimum reviews needed before trusting raw average
-                    const weightedRating = (s) => {
-                        const R = s.averageRating || 0;
-                        const v = s.reviewCount || 0;
-                        if (v === 0) return 0;
-                        return (v / (v + m)) * R + (m / (v + m)) * C;
-                    };
-                    filtered.sort((a, b) => weightedRating(b) - weightedRating(a));
+                // 3. Sort according to selected sort type (Default = Top Rated & Best Services)
+                const sortType = sortSelect ? sortSelect.value : "default";
+                
+                // Comprehensive Salon Quality & Popularity Score:
+                // Factors in:
+                // 1. Total review volume (proven track record vs single test review)
+                // 2. Completed orders count
+                // 3. Average rating & NLP sentiment
+                // 4. Variety of active services offered
+                const qualityScore = (s) => {
+                    const R = s.averageRating || 0;
+                    const v = s.reviewCount || 0;
+                    const completed = s.completedOrders || 0;
+                    const totalBookings = s.totalBookings || 0;
+                    const sent = s.averageSentiment || 0;
+                    const serviceCount = (s.services && s.services.length) || 0;
+                    
+                    // Proven volume weight + completed orders + average rating + sentiment
+                    return (completed * 4) + (v * 3) + (totalBookings * 1.5) + (R * 2) + (sent * 2) + (serviceCount * 0.5);
+                };
+
+                if (sortType === "default") {
+                    filtered.sort((a, b) => qualityScore(b) - qualityScore(a));
+                } else if (sortType === "rating") {
+                    filtered.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0) || (b.reviewCount || 0) - (a.reviewCount || 0));
                 } else if (sortType === "sentiment") {
-                    filtered.sort((a, b) => (b.averageSentiment || 0) - (a.averageSentiment || 0));
+                    filtered.sort((a, b) => (b.averageSentiment || 0) - (a.averageSentiment || 0) || (b.reviewCount || 0) - (a.reviewCount || 0));
                 } else if (sortType === "reviews") {
-                    filtered.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
+                    filtered.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0) || (b.completedOrders || 0) - (a.completedOrders || 0));
                 }
 
                 renderSalons(filtered);
@@ -808,23 +832,48 @@
                         ? s.services.map(ser => ser.name).slice(0, 3).join(", ") 
                         : "Luxury Styling & Treatments";
                     
-                    const reviewsLabel = s.reviewCount !== undefined ? ` &nbsp;·&nbsp; ${s.reviewCount} review(s)` : '';
+                    const completedBadge = s.completedOrders && s.completedOrders > 0 
+                        ? `<span style="font-size:0.72rem; background:rgba(46,204,113,0.15); color:#27ae60; font-weight:700; padding:2px 8px; border-radius:12px; margin-left:auto;">✓ ${s.completedOrders} completed</span>` 
+                        : '';
+                    const reviewsLabel = s.reviewCount !== undefined ? `${s.reviewCount} review(s)` : '';
                     const sentimentLabel = s.averageSentiment !== undefined && s.reviewCount > 0 
-                        ? ` &nbsp;·&nbsp; Sentiment: ${s.averageSentiment > 0 ? '😊' : s.averageSentiment < 0 ? '😞' : '😐'}`
+                        ? ` · ${s.averageSentiment > 0 ? '😊' : s.averageSentiment < 0 ? '😞' : '😐'}`
                         : '';
 
+                    const curatedPlaceholders = [
+                        "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=500&q=80",
+                        "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=500&q=80",
+                        "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=500&q=80",
+                        "https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&w=500&q=80",
+                        "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=500&q=80"
+                    ];
+                    // Pick a deterministic curated fallback based on salon ID string
+                    const hash = (s.id || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+                    const defaultFallback = curatedPlaceholders[hash % curatedPlaceholders.length];
+
+                    let displayImg = defaultFallback;
+                    if (s.salon_image && typeof s.salon_image === 'string' && s.salon_image.trim()) {
+                        const imgTrim = s.salon_image.trim();
+                        if (imgTrim.startsWith('data:image') || imgTrim.startsWith('http://') || imgTrim.startsWith('https://')) {
+                            displayImg = imgTrim;
+                        }
+                    }
+
                     return `
-                        <div class="modern-salon-card" onclick="selectSalon('${s.id}', \`${s.salon_name.replace(/'/g, "\\'")}\`, \`${(s.salon_address || '').replace(/'/g, "\\'")}\`, \`${(s.salon_website || '')}\`, \`${s.salon_image || ''}\`)">
+                        <div class="modern-salon-card" onclick="selectSalon('${s.id}', \`${(s.salon_name || 'Salon').replace(/'/g, "\\'")}\`, \`${(s.salon_address || '').replace(/'/g, "\\'")}\`, \`${(s.salon_website || '')}\`, \`${displayImg.startsWith('data:') ? 'custom-uploaded' : displayImg}\`)">
                             <div class="salon-image-wrapper">
-                                <img class="salon-img" src="${s.salon_image || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=500&q=80'}" alt="${s.salon_name}">
+                                <img class="salon-img" src="${displayImg}" alt="${s.salon_name || 'Salon'}" onerror="this.src='${defaultFallback}'">
                                 <div class="salon-rating-tag">★ ${rating}</div>
                             </div>
                             <div class="salon-info-body">
-                                <h3 class="salon-title-text">${s.salon_name}</h3>
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                                    <h3 class="salon-title-text" style="margin:0;">${s.salon_name || 'Luxury Salon'}</h3>
+                                    ${completedBadge}
+                                </div>
                                 <div class="salon-services-list">${servicesText}</div>
-                                <div class="salon-addr-text" style="display:flex; align-items:center; flex-wrap:wrap;">
+                                <div class="salon-addr-text" style="display:flex; align-items:center; flex-wrap:wrap; justify-content:space-between;">
                                     <span>📍 ${s.salon_address || 'Colombo, Sri Lanka'}</span>
-                                    <span style="font-size:0.75rem; color:var(--text-muted); margin-top:2px; width:100%">${reviewsLabel}${sentimentLabel}</span>
+                                    <span style="font-size:0.75rem; color:var(--text-muted);">${reviewsLabel}${sentimentLabel}</span>
                                 </div>
                             </div>
                             <button class="select-salon-action-btn">Select Salon</button>
@@ -841,14 +890,72 @@
             localStorage.setItem("stylepulse_selected_salon_website", website || "");
             localStorage.setItem("stylepulse_selected_salon_image", image || "");
             
-            const alertBox = document.getElementById("alert-box");
-            const alertMessage = document.getElementById("alert-message");
-            alertMessage.textContent = `Selected ${name}! Opening service menu...`;
-            alertBox.className = "alert-box show success";
+            // Premium Centered Loading Overlay
+            const overlay = document.createElement('div');
+            overlay.id = "premium-salon-overlay";
+            overlay.style.cssText = `
+                position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75);
+                display: flex; align-items: center; justify-content: center;
+                z-index: 100000; backdrop-filter: blur(12px);
+                animation: fadeInOverlay 0.3s ease-out;
+            `;
+
+            overlay.innerHTML = `
+                <div style="
+                    background: linear-gradient(145deg, #151411, #0d0c09);
+                    border: 1px solid rgba(255, 184, 43, 0.45);
+                    box-shadow: 0 25px 70px rgba(0,0,0,0.8), 0 0 30px rgba(255, 184, 43, 0.15);
+                    border-radius: 24px;
+                    padding: 3rem 2.5rem;
+                    width: 90%;
+                    max-width: 420px;
+                    text-align: center;
+                    color: #fff;
+                    font-family: 'Poppins', sans-serif;
+                    transform: scale(0.95);
+                    animation: popUpOverlay 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                ">
+                    <!-- Premium Spinner -->
+                    <div style="position: relative; width: 64px; height: 64px; margin: 0 auto 1.5rem;">
+                        <svg class="premium-spinner" viewBox="0 0 50 50" style="width: 100%; height: 100%; animation: spin 2s linear infinite;">
+                            <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255, 204, 0, 0.2)" stroke-width="4"></circle>
+                            <circle cx="25" cy="25" r="20" fill="none" stroke="#ffcc00" stroke-width="4" stroke-dasharray="1 150" stroke-dashoffset="0" stroke-linecap="round" style="animation: spinPulse 1.5s ease-in-out infinite;"></circle>
+                        </svg>
+                    </div>
+
+                    <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: #fff; margin: 0 0 0.5rem; font-weight: 700;">
+                        Connecting to ${name}...
+                    </h2>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin: 0;">
+                        Retrieving luxury service menu and availability.
+                    </p>
+                </div>
+            `;
+
+            // Inject keyframes animation if not present
+            if (!document.getElementById("overlay-anim-style")) {
+                const style = document.createElement("style");
+                style.id = "overlay-anim-style";
+                style.textContent = `
+                    @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+                    @keyframes popUpOverlay { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+                    @keyframes spin { 100% { transform: rotate(360deg); } }
+                    @keyframes spinPulse { 0% { stroke-dasharray: 1 150; stroke-dashoffset: 0; } 50% { stroke-dasharray: 90 150; stroke-dashoffset: -35; } 100% { stroke-dasharray: 90 150; stroke-dashoffset: -124; } }
+                `;
+                document.head.appendChild(style);
+            }
+
+            document.body.appendChild(overlay);
+            
+            // Cleanup overlay on pagehide so it doesn't persist if the user navigates back (Bfcache)
+            window.addEventListener('pagehide', () => {
+                const existing = document.getElementById('premium-salon-overlay');
+                if (existing) existing.remove();
+            }, { once: true });
             
             setTimeout(() => {
                 window.location.href = "salon-services.html";
-            }, 1500);
+            }, 1800);
         }
     </script>
     <script src="../chatWidget.js"></script>

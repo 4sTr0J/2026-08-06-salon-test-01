@@ -11,9 +11,9 @@ export const db = supabaseAdmin || supabase;
 export const getBookedSlotsForDate = async (salonId, date) => {
   let query = db
     .from('appointments')
-    .select('appointment_time, service_name')
+    .select('id, appointment_time, service_name, booking_status')
     .eq('appointment_date', date)
-    .in('booking_status', ['Confirmed', 'Upcoming']);
+    .neq('booking_status', 'Cancelled');
 
   if (salonId) {
     query = query.eq('salon_id', salonId);
@@ -59,7 +59,8 @@ export const createAppointment = async (payload) => {
   const reqDuration = durationMap[service_name.toLowerCase().trim()] || 30;
   const reqEnd = reqStart + reqDuration;
 
-  // Verify if any existing booking overlaps with this interval
+  // Verify if any existing booking overlaps with this interval (including 30 min buffer)
+  const BUFFER_MINUTES = 30;
   for (const apt of bookedAppointments) {
     const aptTime = apt.appointment_time;
     const aptService = apt.service_name ? apt.service_name.toLowerCase().trim() : '';
@@ -67,10 +68,11 @@ export const createAppointment = async (payload) => {
 
     const [aptH, aptM] = aptTime.split(':').map(Number);
     const aptStart = aptH * 60 + aptM;
-    const aptEnd = aptStart + aptDuration;
+    const aptEndWithBuffer = aptStart + aptDuration + BUFFER_MINUTES;
 
-    // Check for overlap: [reqStart, reqEnd) intersects with [aptStart, aptEnd)
-    if (reqStart < aptEnd && aptStart < reqEnd) {
+    // Check for overlap: [reqStart, reqEnd + BUFFER_MINUTES) intersects with [aptStart, aptEnd + BUFFER_MINUTES)
+    const reqEndWithBuffer = reqEnd + BUFFER_MINUTES;
+    if (reqStart < aptEndWithBuffer && aptStart < reqEndWithBuffer) {
       throw new Error('someone just booked the slot you are trying to book');
     }
   }

@@ -1,0 +1,2106 @@
+[
+  {
+    "id": 1,
+    "review_text": "Outstanding service! The stylist was meticulous, gentle, and the salon ambiance is pristine and luxurious. Would definitely book Hair Cut & Blow Dry again!",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.75,
+    "pros": [
+      "meticulous stylist",
+      "gentle handling",
+      "pristine ambiance",
+      "luxurious experience"
+    ],
+    "cons": []
+  },
+  {
+    "id": 2,
+    "review_text": "Hands down the best treatment I have ever had. The results exceeded all my expectations. Five stars for the exceptional team.",
+    "service_name": "Balayage Hair Color",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.76,
+    "pros": [
+      "exceeded expectations",
+      "top quality results",
+      "skilled therapist"
+    ],
+    "cons": []
+  },
+  {
+    "id": 3,
+    "review_text": "Very welcoming team and peaceful environment. Left feeling completely rejuvenated and refreshed. Would definitely book Keratin Smoothing Treatment again!",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.77,
+    "pros": [
+      "welcoming team",
+      "peaceful environment",
+      "rejuvenating"
+    ],
+    "cons": []
+  },
+  {
+    "id": 4,
+    "review_text": "Impressed with their attention to detail. Tools were sanitized right in front of me. Five stars for the exceptional team.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.78,
+    "pros": [
+      "sanitized tools",
+      "attention to detail",
+      "high hygiene standards"
+    ],
+    "cons": []
+  },
+  {
+    "id": 5,
+    "review_text": "Flawless styling and long-lasting finish. Worth every single penny spent. Would definitely book Gel Manicure & Nail Art again!",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.79,
+    "pros": [
+      "flawless finish",
+      "long lasting",
+      "great value"
+    ],
+    "cons": []
+  },
+  {
+    "id": 6,
+    "review_text": "Super friendly staff who offered great consultations and customized the service to my skin type. Five stars for the exceptional team.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.8,
+    "pros": [
+      "friendly staff",
+      "personalized consultation",
+      "customized treatment"
+    ],
+    "cons": []
+  },
+  {
+    "id": 7,
+    "review_text": "Punctual, professional, and courteous. They finished right on time without rushing. Would definitely book Hydra Facial Treatment again!",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.81,
+    "pros": [
+      "punctual",
+      "professional",
+      "no rushing"
+    ],
+    "cons": []
+  },
+  {
+    "id": 8,
+    "review_text": "The atmosphere is top tier with complimentary coffee, calming music, and cozy seating. Five stars for the exceptional team.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.82,
+    "pros": [
+      "complimentary refreshments",
+      "calming music",
+      "cozy seating"
+    ],
+    "cons": []
+  },
+  {
+    "id": 9,
+    "review_text": "My hair feels healthier and glossier than ever before. Highly recommended salon! Would definitely book Beard Grooming & Shave again!",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.83,
+    "pros": [
+      "glossy hair",
+      "healthy hair texture",
+      "highly recommended"
+    ],
+    "cons": []
+  },
+  {
+    "id": 10,
+    "review_text": "Masterful work! Exactly matched the photo reference I brought from Instagram. Five stars for the exceptional team.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.84,
+    "pros": [
+      "matched photo reference",
+      "artistic precision",
+      "masterful work"
+    ],
+    "cons": []
+  },
+  {
+    "id": 11,
+    "review_text": "Top tier precision and cleanliness. My stylist took the time to understand my routine. Would definitely book Full Body Waxing again!",
+    "service_name": "Full Body Waxing",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.85,
+    "pros": [
+      "personalized styling",
+      "clean equipment",
+      "attentive staff"
+    ],
+    "cons": []
+  },
+  {
+    "id": 12,
+    "review_text": "Such a relaxing and pampering session. Left feeling energized and confident. Five stars for the exceptional team.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.86,
+    "pros": [
+      "pampering session",
+      "confidence boost",
+      "skilled treatment"
+    ],
+    "cons": []
+  },
+  {
+    "id": 13,
+    "review_text": "Premium products used throughout. No chemical smell and long lasting results. Would definitely book Hair Extensions again!",
+    "service_name": "Hair Extensions",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.87,
+    "pros": [
+      "premium products",
+      "no harsh smell",
+      "durable styling"
+    ],
+    "cons": []
+  },
+  {
+    "id": 14,
+    "review_text": "Amazing scalp massage and blow dry. My hair has so much bounce and volume now. Five stars for the exceptional team.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.88,
+    "pros": [
+      "relaxing scalp massage",
+      "voluminous hair",
+      "great blowout"
+    ],
+    "cons": []
+  },
+  {
+    "id": 15,
+    "review_text": "Exceptional hospitality and modern techniques. Will definitely be a regular client here. Would definitely book Aromatherapy Sauna again!",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.89,
+    "pros": [
+      "exceptional hospitality",
+      "modern styling",
+      "repeat client"
+    ],
+    "cons": []
+  },
+  {
+    "id": 16,
+    "review_text": "Outstanding service! The stylist was meticulous, gentle, and the salon ambiance is pristine and luxurious. Five stars for the exceptional team.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.9,
+    "pros": [
+      "meticulous stylist",
+      "gentle handling",
+      "pristine ambiance",
+      "luxurious experience"
+    ],
+    "cons": []
+  },
+  {
+    "id": 17,
+    "review_text": "Hands down the best treatment I have ever had. The results exceeded all my expectations. Would definitely book Balayage Hair Color again!",
+    "service_name": "Balayage Hair Color",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.91,
+    "pros": [
+      "exceeded expectations",
+      "top quality results",
+      "skilled therapist"
+    ],
+    "cons": []
+  },
+  {
+    "id": 18,
+    "review_text": "Very welcoming team and peaceful environment. Left feeling completely rejuvenated and refreshed. Five stars for the exceptional team.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.92,
+    "pros": [
+      "welcoming team",
+      "peaceful environment",
+      "rejuvenating"
+    ],
+    "cons": []
+  },
+  {
+    "id": 19,
+    "review_text": "Impressed with their attention to detail. Tools were sanitized right in front of me. Would definitely book Bridal Hair & Makeup again!",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.93,
+    "pros": [
+      "sanitized tools",
+      "attention to detail",
+      "high hygiene standards"
+    ],
+    "cons": []
+  },
+  {
+    "id": 20,
+    "review_text": "Flawless styling and long-lasting finish. Worth every single penny spent. Five stars for the exceptional team.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.94,
+    "pros": [
+      "flawless finish",
+      "long lasting",
+      "great value"
+    ],
+    "cons": []
+  },
+  {
+    "id": 21,
+    "review_text": "Super friendly staff who offered great consultations and customized the service to my skin type. Would definitely book Deluxe Spa Pedicure again!",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.95,
+    "pros": [
+      "friendly staff",
+      "personalized consultation",
+      "customized treatment"
+    ],
+    "cons": []
+  },
+  {
+    "id": 22,
+    "review_text": "Punctual, professional, and courteous. They finished right on time without rushing. Five stars for the exceptional team.",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.96,
+    "pros": [
+      "punctual",
+      "professional",
+      "no rushing"
+    ],
+    "cons": []
+  },
+  {
+    "id": 23,
+    "review_text": "The atmosphere is top tier with complimentary coffee, calming music, and cozy seating. Would definitely book Deep Tissue Body Massage again!",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.97,
+    "pros": [
+      "complimentary refreshments",
+      "calming music",
+      "cozy seating"
+    ],
+    "cons": []
+  },
+  {
+    "id": 24,
+    "review_text": "My hair feels healthier and glossier than ever before. Highly recommended salon! Five stars for the exceptional team.",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.98,
+    "pros": [
+      "glossy hair",
+      "healthy hair texture",
+      "highly recommended"
+    ],
+    "cons": []
+  },
+  {
+    "id": 25,
+    "review_text": "Masterful work! Exactly matched the photo reference I brought from Instagram. Would definitely book Eyebrow Threading & Tinting again!",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.99,
+    "pros": [
+      "matched photo reference",
+      "artistic precision",
+      "masterful work"
+    ],
+    "cons": []
+  },
+  {
+    "id": 26,
+    "review_text": "Top tier precision and cleanliness. My stylist took the time to understand my routine. Five stars for the exceptional team.",
+    "service_name": "Full Body Waxing",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.75,
+    "pros": [
+      "personalized styling",
+      "clean equipment",
+      "attentive staff"
+    ],
+    "cons": []
+  },
+  {
+    "id": 27,
+    "review_text": "Such a relaxing and pampering session. Left feeling energized and confident. Would definitely book Scalp Care Therapy again!",
+    "service_name": "Scalp Care Therapy",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.76,
+    "pros": [
+      "pampering session",
+      "confidence boost",
+      "skilled treatment"
+    ],
+    "cons": []
+  },
+  {
+    "id": 28,
+    "review_text": "Premium products used throughout. No chemical smell and long lasting results. Five stars for the exceptional team.",
+    "service_name": "Hair Extensions",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.77,
+    "pros": [
+      "premium products",
+      "no harsh smell",
+      "durable styling"
+    ],
+    "cons": []
+  },
+  {
+    "id": 29,
+    "review_text": "Amazing scalp massage and blow dry. My hair has so much bounce and volume now. Would definitely book Skin Rejuvenation Peel again!",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.78,
+    "pros": [
+      "relaxing scalp massage",
+      "voluminous hair",
+      "great blowout"
+    ],
+    "cons": []
+  },
+  {
+    "id": 30,
+    "review_text": "Exceptional hospitality and modern techniques. Will definitely be a regular client here. Five stars for the exceptional team.",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.79,
+    "pros": [
+      "exceptional hospitality",
+      "modern styling",
+      "repeat client"
+    ],
+    "cons": []
+  },
+  {
+    "id": 31,
+    "review_text": "Outstanding service! The stylist was meticulous, gentle, and the salon ambiance is pristine and luxurious. Would definitely book Hair Cut & Blow Dry again!",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.8,
+    "pros": [
+      "meticulous stylist",
+      "gentle handling",
+      "pristine ambiance",
+      "luxurious experience"
+    ],
+    "cons": []
+  },
+  {
+    "id": 32,
+    "review_text": "Hands down the best treatment I have ever had. The results exceeded all my expectations. Five stars for the exceptional team.",
+    "service_name": "Balayage Hair Color",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.81,
+    "pros": [
+      "exceeded expectations",
+      "top quality results",
+      "skilled therapist"
+    ],
+    "cons": []
+  },
+  {
+    "id": 33,
+    "review_text": "Very welcoming team and peaceful environment. Left feeling completely rejuvenated and refreshed. Would definitely book Keratin Smoothing Treatment again!",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.82,
+    "pros": [
+      "welcoming team",
+      "peaceful environment",
+      "rejuvenating"
+    ],
+    "cons": []
+  },
+  {
+    "id": 34,
+    "review_text": "Impressed with their attention to detail. Tools were sanitized right in front of me. Five stars for the exceptional team.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.83,
+    "pros": [
+      "sanitized tools",
+      "attention to detail",
+      "high hygiene standards"
+    ],
+    "cons": []
+  },
+  {
+    "id": 35,
+    "review_text": "Flawless styling and long-lasting finish. Worth every single penny spent. Would definitely book Gel Manicure & Nail Art again!",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.84,
+    "pros": [
+      "flawless finish",
+      "long lasting",
+      "great value"
+    ],
+    "cons": []
+  },
+  {
+    "id": 36,
+    "review_text": "Super friendly staff who offered great consultations and customized the service to my skin type. Five stars for the exceptional team.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.85,
+    "pros": [
+      "friendly staff",
+      "personalized consultation",
+      "customized treatment"
+    ],
+    "cons": []
+  },
+  {
+    "id": 37,
+    "review_text": "Punctual, professional, and courteous. They finished right on time without rushing. Would definitely book Hydra Facial Treatment again!",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.86,
+    "pros": [
+      "punctual",
+      "professional",
+      "no rushing"
+    ],
+    "cons": []
+  },
+  {
+    "id": 38,
+    "review_text": "The atmosphere is top tier with complimentary coffee, calming music, and cozy seating. Five stars for the exceptional team.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.87,
+    "pros": [
+      "complimentary refreshments",
+      "calming music",
+      "cozy seating"
+    ],
+    "cons": []
+  },
+  {
+    "id": 39,
+    "review_text": "My hair feels healthier and glossier than ever before. Highly recommended salon! Would definitely book Beard Grooming & Shave again!",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.88,
+    "pros": [
+      "glossy hair",
+      "healthy hair texture",
+      "highly recommended"
+    ],
+    "cons": []
+  },
+  {
+    "id": 40,
+    "review_text": "Masterful work! Exactly matched the photo reference I brought from Instagram. Five stars for the exceptional team.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.89,
+    "pros": [
+      "matched photo reference",
+      "artistic precision",
+      "masterful work"
+    ],
+    "cons": []
+  },
+  {
+    "id": 41,
+    "review_text": "Top tier precision and cleanliness. My stylist took the time to understand my routine. Would definitely book Full Body Waxing again!",
+    "service_name": "Full Body Waxing",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.9,
+    "pros": [
+      "personalized styling",
+      "clean equipment",
+      "attentive staff"
+    ],
+    "cons": []
+  },
+  {
+    "id": 42,
+    "review_text": "Such a relaxing and pampering session. Left feeling energized and confident. Five stars for the exceptional team.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.91,
+    "pros": [
+      "pampering session",
+      "confidence boost",
+      "skilled treatment"
+    ],
+    "cons": []
+  },
+  {
+    "id": 43,
+    "review_text": "Premium products used throughout. No chemical smell and long lasting results. Would definitely book Hair Extensions again!",
+    "service_name": "Hair Extensions",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.92,
+    "pros": [
+      "premium products",
+      "no harsh smell",
+      "durable styling"
+    ],
+    "cons": []
+  },
+  {
+    "id": 44,
+    "review_text": "Amazing scalp massage and blow dry. My hair has so much bounce and volume now. Five stars for the exceptional team.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.93,
+    "pros": [
+      "relaxing scalp massage",
+      "voluminous hair",
+      "great blowout"
+    ],
+    "cons": []
+  },
+  {
+    "id": 45,
+    "review_text": "Exceptional hospitality and modern techniques. Will definitely be a regular client here. Would definitely book Aromatherapy Sauna again!",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.94,
+    "pros": [
+      "exceptional hospitality",
+      "modern styling",
+      "repeat client"
+    ],
+    "cons": []
+  },
+  {
+    "id": 46,
+    "review_text": "Outstanding service! The stylist was meticulous, gentle, and the salon ambiance is pristine and luxurious. Five stars for the exceptional team.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 4,
+    "sentiment": "Positive",
+    "sentiment_score": 0.95,
+    "pros": [
+      "meticulous stylist",
+      "gentle handling",
+      "pristine ambiance",
+      "luxurious experience"
+    ],
+    "cons": []
+  },
+  {
+    "id": 47,
+    "review_text": "Hands down the best treatment I have ever had. The results exceeded all my expectations. Would definitely book Balayage Hair Color again!",
+    "service_name": "Balayage Hair Color",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.96,
+    "pros": [
+      "exceeded expectations",
+      "top quality results",
+      "skilled therapist"
+    ],
+    "cons": []
+  },
+  {
+    "id": 48,
+    "review_text": "Very welcoming team and peaceful environment. Left feeling completely rejuvenated and refreshed. Five stars for the exceptional team.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.97,
+    "pros": [
+      "welcoming team",
+      "peaceful environment",
+      "rejuvenating"
+    ],
+    "cons": []
+  },
+  {
+    "id": 49,
+    "review_text": "Impressed with their attention to detail. Tools were sanitized right in front of me. Would definitely book Bridal Hair & Makeup again!",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.98,
+    "pros": [
+      "sanitized tools",
+      "attention to detail",
+      "high hygiene standards"
+    ],
+    "cons": []
+  },
+  {
+    "id": 50,
+    "review_text": "Flawless styling and long-lasting finish. Worth every single penny spent. Five stars for the exceptional team.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 5,
+    "sentiment": "Positive",
+    "sentiment_score": 0.99,
+    "pros": [
+      "flawless finish",
+      "long lasting",
+      "great value"
+    ],
+    "cons": []
+  },
+  {
+    "id": 51,
+    "review_text": "Service was acceptable and did the job. Nothing particularly special or memorable, but fair. Adequate for Hair Cut & Blow Dry.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.08,
+    "pros": [
+      "did the job"
+    ],
+    "cons": [
+      "unremarkable experience"
+    ]
+  },
+  {
+    "id": 52,
+    "review_text": "Decent results overall, though the appointment started about 15 minutes later than scheduled. Might consider them again if nearby.",
+    "service_name": "Balayage Hair Color",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.07,
+    "pros": [
+      "decent results"
+    ],
+    "cons": [
+      "15 minute wait time"
+    ]
+  },
+  {
+    "id": 53,
+    "review_text": "Average experience. The staff was polite, but the waiting lounge was somewhat congested. Adequate for Keratin Smoothing Treatment.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.06,
+    "pros": [
+      "polite staff"
+    ],
+    "cons": [
+      "congested waiting area"
+    ]
+  },
+  {
+    "id": 54,
+    "review_text": "The treatment felt okay, but I expected a bit more detailed explanation from the specialist. Might consider them again if nearby.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.05,
+    "pros": [
+      "adequate treatment"
+    ],
+    "cons": [
+      "lacked detailed explanation"
+    ]
+  },
+  {
+    "id": 55,
+    "review_text": "Standard quality for the price paid. Neither disappointed nor overly impressed. Adequate for Gel Manicure & Nail Art.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.04,
+    "pros": [
+      "fair price"
+    ],
+    "cons": [
+      "standard quality"
+    ]
+  },
+  {
+    "id": 56,
+    "review_text": "Finished the session quickly which was convenient, though it felt slightly mechanical. Might consider them again if nearby.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.03,
+    "pros": [
+      "quick session"
+    ],
+    "cons": [
+      "felt mechanical"
+    ]
+  },
+  {
+    "id": 57,
+    "review_text": "The result was fine, but the room temperature was slightly warmer than comfortable. Adequate for Hydra Facial Treatment.",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.02,
+    "pros": [
+      "acceptable result"
+    ],
+    "cons": [
+      "warm room temperature"
+    ]
+  },
+  {
+    "id": 58,
+    "review_text": "Regular salon visit. Basic products used, but customer service was cordial. Might consider them again if nearby.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.01,
+    "pros": [
+      "cordial customer service"
+    ],
+    "cons": [
+      "basic product selection"
+    ]
+  },
+  {
+    "id": 59,
+    "review_text": "Okay service. Color tone turned out slightly darker than expected, but still acceptable. Adequate for Beard Grooming & Shave.",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0,
+    "pros": [
+      "acceptable shade"
+    ],
+    "cons": [
+      "slightly darker than requested"
+    ]
+  },
+  {
+    "id": 60,
+    "review_text": "Clean place and decent staff. Music was a bit modern and upbeat rather than relaxing. Might consider them again if nearby.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.01,
+    "pros": [
+      "clean salon"
+    ],
+    "cons": [
+      "music not relaxing"
+    ]
+  },
+  {
+    "id": 61,
+    "review_text": "Adequate haircut for daily routine. Took slightly longer due to shift changes. Adequate for Full Body Waxing.",
+    "service_name": "Full Body Waxing",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.02,
+    "pros": [
+      "adequate haircut"
+    ],
+    "cons": [
+      "slight delay due to shift changes"
+    ]
+  },
+  {
+    "id": 62,
+    "review_text": "Moderate polish selection for nails. Quick turnaround for a busy afternoon. Might consider them again if nearby.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.03,
+    "pros": [
+      "quick turnaround"
+    ],
+    "cons": [
+      "moderate polish choices"
+    ]
+  },
+  {
+    "id": 63,
+    "review_text": "Reasonable price point. Service was standard and met the basic expectations. Adequate for Hair Extensions.",
+    "service_name": "Hair Extensions",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.04,
+    "pros": [
+      "reasonable price"
+    ],
+    "cons": [
+      "standard service"
+    ]
+  },
+  {
+    "id": 64,
+    "review_text": "Session was fine, but stylist was somewhat quiet and did not offer styling advice. Might consider them again if nearby.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.05,
+    "pros": [
+      "straightforward session"
+    ],
+    "cons": [
+      "lacked proactive advice"
+    ]
+  },
+  {
+    "id": 65,
+    "review_text": "Normal experience. Facilities are clean, but parking outside was limited. Adequate for Aromatherapy Sauna.",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.06,
+    "pros": [
+      "clean facilities"
+    ],
+    "cons": [
+      "limited parking"
+    ]
+  },
+  {
+    "id": 66,
+    "review_text": "Service was acceptable and did the job. Nothing particularly special or memorable, but fair. Might consider them again if nearby.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.07,
+    "pros": [
+      "did the job"
+    ],
+    "cons": [
+      "unremarkable experience"
+    ]
+  },
+  {
+    "id": 67,
+    "review_text": "Decent results overall, though the appointment started about 15 minutes later than scheduled. Adequate for Balayage Hair Color.",
+    "service_name": "Balayage Hair Color",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.08,
+    "pros": [
+      "decent results"
+    ],
+    "cons": [
+      "15 minute wait time"
+    ]
+  },
+  {
+    "id": 68,
+    "review_text": "Average experience. The staff was polite, but the waiting lounge was somewhat congested. Might consider them again if nearby.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.08,
+    "pros": [
+      "polite staff"
+    ],
+    "cons": [
+      "congested waiting area"
+    ]
+  },
+  {
+    "id": 69,
+    "review_text": "The treatment felt okay, but I expected a bit more detailed explanation from the specialist. Adequate for Bridal Hair & Makeup.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.07,
+    "pros": [
+      "adequate treatment"
+    ],
+    "cons": [
+      "lacked detailed explanation"
+    ]
+  },
+  {
+    "id": 70,
+    "review_text": "Standard quality for the price paid. Neither disappointed nor overly impressed. Might consider them again if nearby.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.06,
+    "pros": [
+      "fair price"
+    ],
+    "cons": [
+      "standard quality"
+    ]
+  },
+  {
+    "id": 71,
+    "review_text": "Finished the session quickly which was convenient, though it felt slightly mechanical. Adequate for Deluxe Spa Pedicure.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.05,
+    "pros": [
+      "quick session"
+    ],
+    "cons": [
+      "felt mechanical"
+    ]
+  },
+  {
+    "id": 72,
+    "review_text": "The result was fine, but the room temperature was slightly warmer than comfortable. Might consider them again if nearby.",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.04,
+    "pros": [
+      "acceptable result"
+    ],
+    "cons": [
+      "warm room temperature"
+    ]
+  },
+  {
+    "id": 73,
+    "review_text": "Regular salon visit. Basic products used, but customer service was cordial. Adequate for Deep Tissue Body Massage.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.03,
+    "pros": [
+      "cordial customer service"
+    ],
+    "cons": [
+      "basic product selection"
+    ]
+  },
+  {
+    "id": 74,
+    "review_text": "Okay service. Color tone turned out slightly darker than expected, but still acceptable. Might consider them again if nearby.",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.02,
+    "pros": [
+      "acceptable shade"
+    ],
+    "cons": [
+      "slightly darker than requested"
+    ]
+  },
+  {
+    "id": 75,
+    "review_text": "Clean place and decent staff. Music was a bit modern and upbeat rather than relaxing. Adequate for Eyebrow Threading & Tinting.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.01,
+    "pros": [
+      "clean salon"
+    ],
+    "cons": [
+      "music not relaxing"
+    ]
+  },
+  {
+    "id": 76,
+    "review_text": "Adequate haircut for daily routine. Took slightly longer due to shift changes. Might consider them again if nearby.",
+    "service_name": "Full Body Waxing",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0,
+    "pros": [
+      "adequate haircut"
+    ],
+    "cons": [
+      "slight delay due to shift changes"
+    ]
+  },
+  {
+    "id": 77,
+    "review_text": "Moderate polish selection for nails. Quick turnaround for a busy afternoon. Adequate for Scalp Care Therapy.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.01,
+    "pros": [
+      "quick turnaround"
+    ],
+    "cons": [
+      "moderate polish choices"
+    ]
+  },
+  {
+    "id": 78,
+    "review_text": "Reasonable price point. Service was standard and met the basic expectations. Might consider them again if nearby.",
+    "service_name": "Hair Extensions",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.02,
+    "pros": [
+      "reasonable price"
+    ],
+    "cons": [
+      "standard service"
+    ]
+  },
+  {
+    "id": 79,
+    "review_text": "Session was fine, but stylist was somewhat quiet and did not offer styling advice. Adequate for Skin Rejuvenation Peel.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.03,
+    "pros": [
+      "straightforward session"
+    ],
+    "cons": [
+      "lacked proactive advice"
+    ]
+  },
+  {
+    "id": 80,
+    "review_text": "Normal experience. Facilities are clean, but parking outside was limited. Might consider them again if nearby.",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.04,
+    "pros": [
+      "clean facilities"
+    ],
+    "cons": [
+      "limited parking"
+    ]
+  },
+  {
+    "id": 81,
+    "review_text": "Service was acceptable and did the job. Nothing particularly special or memorable, but fair. Adequate for Hair Cut & Blow Dry.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.05,
+    "pros": [
+      "did the job"
+    ],
+    "cons": [
+      "unremarkable experience"
+    ]
+  },
+  {
+    "id": 82,
+    "review_text": "Decent results overall, though the appointment started about 15 minutes later than scheduled. Might consider them again if nearby.",
+    "service_name": "Balayage Hair Color",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.06,
+    "pros": [
+      "decent results"
+    ],
+    "cons": [
+      "15 minute wait time"
+    ]
+  },
+  {
+    "id": 83,
+    "review_text": "Average experience. The staff was polite, but the waiting lounge was somewhat congested. Adequate for Keratin Smoothing Treatment.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.07,
+    "pros": [
+      "polite staff"
+    ],
+    "cons": [
+      "congested waiting area"
+    ]
+  },
+  {
+    "id": 84,
+    "review_text": "The treatment felt okay, but I expected a bit more detailed explanation from the specialist. Might consider them again if nearby.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.08,
+    "pros": [
+      "adequate treatment"
+    ],
+    "cons": [
+      "lacked detailed explanation"
+    ]
+  },
+  {
+    "id": 85,
+    "review_text": "Standard quality for the price paid. Neither disappointed nor overly impressed. Adequate for Gel Manicure & Nail Art.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.08,
+    "pros": [
+      "fair price"
+    ],
+    "cons": [
+      "standard quality"
+    ]
+  },
+  {
+    "id": 86,
+    "review_text": "Finished the session quickly which was convenient, though it felt slightly mechanical. Might consider them again if nearby.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.07,
+    "pros": [
+      "quick session"
+    ],
+    "cons": [
+      "felt mechanical"
+    ]
+  },
+  {
+    "id": 87,
+    "review_text": "The result was fine, but the room temperature was slightly warmer than comfortable. Adequate for Hydra Facial Treatment.",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.06,
+    "pros": [
+      "acceptable result"
+    ],
+    "cons": [
+      "warm room temperature"
+    ]
+  },
+  {
+    "id": 88,
+    "review_text": "Regular salon visit. Basic products used, but customer service was cordial. Might consider them again if nearby.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.05,
+    "pros": [
+      "cordial customer service"
+    ],
+    "cons": [
+      "basic product selection"
+    ]
+  },
+  {
+    "id": 89,
+    "review_text": "Okay service. Color tone turned out slightly darker than expected, but still acceptable. Adequate for Beard Grooming & Shave.",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.04,
+    "pros": [
+      "acceptable shade"
+    ],
+    "cons": [
+      "slightly darker than requested"
+    ]
+  },
+  {
+    "id": 90,
+    "review_text": "Clean place and decent staff. Music was a bit modern and upbeat rather than relaxing. Might consider them again if nearby.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.03,
+    "pros": [
+      "clean salon"
+    ],
+    "cons": [
+      "music not relaxing"
+    ]
+  },
+  {
+    "id": 91,
+    "review_text": "Adequate haircut for daily routine. Took slightly longer due to shift changes. Adequate for Full Body Waxing.",
+    "service_name": "Full Body Waxing",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.02,
+    "pros": [
+      "adequate haircut"
+    ],
+    "cons": [
+      "slight delay due to shift changes"
+    ]
+  },
+  {
+    "id": 92,
+    "review_text": "Moderate polish selection for nails. Quick turnaround for a busy afternoon. Might consider them again if nearby.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": -0.01,
+    "pros": [
+      "quick turnaround"
+    ],
+    "cons": [
+      "moderate polish choices"
+    ]
+  },
+  {
+    "id": 93,
+    "review_text": "Reasonable price point. Service was standard and met the basic expectations. Adequate for Hair Extensions.",
+    "service_name": "Hair Extensions",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0,
+    "pros": [
+      "reasonable price"
+    ],
+    "cons": [
+      "standard service"
+    ]
+  },
+  {
+    "id": 94,
+    "review_text": "Session was fine, but stylist was somewhat quiet and did not offer styling advice. Might consider them again if nearby.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.01,
+    "pros": [
+      "straightforward session"
+    ],
+    "cons": [
+      "lacked proactive advice"
+    ]
+  },
+  {
+    "id": 95,
+    "review_text": "Normal experience. Facilities are clean, but parking outside was limited. Adequate for Aromatherapy Sauna.",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.02,
+    "pros": [
+      "clean facilities"
+    ],
+    "cons": [
+      "limited parking"
+    ]
+  },
+  {
+    "id": 96,
+    "review_text": "Service was acceptable and did the job. Nothing particularly special or memorable, but fair. Might consider them again if nearby.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.03,
+    "pros": [
+      "did the job"
+    ],
+    "cons": [
+      "unremarkable experience"
+    ]
+  },
+  {
+    "id": 97,
+    "review_text": "Decent results overall, though the appointment started about 15 minutes later than scheduled. Adequate for Balayage Hair Color.",
+    "service_name": "Balayage Hair Color",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.04,
+    "pros": [
+      "decent results"
+    ],
+    "cons": [
+      "15 minute wait time"
+    ]
+  },
+  {
+    "id": 98,
+    "review_text": "Average experience. The staff was polite, but the waiting lounge was somewhat congested. Might consider them again if nearby.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.05,
+    "pros": [
+      "polite staff"
+    ],
+    "cons": [
+      "congested waiting area"
+    ]
+  },
+  {
+    "id": 99,
+    "review_text": "The treatment felt okay, but I expected a bit more detailed explanation from the specialist. Adequate for Bridal Hair & Makeup.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.06,
+    "pros": [
+      "adequate treatment"
+    ],
+    "cons": [
+      "lacked detailed explanation"
+    ]
+  },
+  {
+    "id": 100,
+    "review_text": "Standard quality for the price paid. Neither disappointed nor overly impressed. Might consider them again if nearby.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 3,
+    "sentiment": "Neutral",
+    "sentiment_score": 0.07,
+    "pros": [
+      "fair price"
+    ],
+    "cons": [
+      "standard quality"
+    ]
+  },
+  {
+    "id": 101,
+    "review_text": "Terrible experience. Had to wait over 45 minutes despite having a confirmed booking, and staff did not care. Extremely dissatisfied with Hair Cut & Blow Dry.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.95,
+    "pros": [],
+    "cons": [
+      "45 minute delay",
+      "uncaring staff",
+      "poor time management"
+    ]
+  },
+  {
+    "id": 102,
+    "review_text": "Ruined my hair completely! Cut it way shorter than agreed and left uneven patches on the back. Total waste of time and money.",
+    "service_name": "Balayage Hair Color",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.94,
+    "pros": [],
+    "cons": [
+      "uneven haircut",
+      "cut too short",
+      "damaged styling"
+    ]
+  },
+  {
+    "id": 103,
+    "review_text": "The chemical solution burned my skin and caused severe redness and irritation. Extremely dissatisfied with Keratin Smoothing Treatment.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.93,
+    "pros": [],
+    "cons": [
+      "chemical burn",
+      "skin irritation",
+      "safety violation"
+    ]
+  },
+  {
+    "id": 104,
+    "review_text": "Extremely rude customer service. Receptionist rolled her eyes and refused to answer my questions. Total waste of time and money.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.92,
+    "pros": [],
+    "cons": [
+      "rude receptionist",
+      "bad attitude",
+      "unhelpful staff"
+    ]
+  },
+  {
+    "id": 105,
+    "review_text": "Overpriced and poor quality. The styling fell apart within two hours of leaving the salon. Extremely dissatisfied with Gel Manicure & Nail Art.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.91,
+    "pros": [],
+    "cons": [
+      "overpriced",
+      "styling fell apart quickly",
+      "poor quality"
+    ]
+  },
+  {
+    "id": 106,
+    "review_text": "Unsanitary conditions! Found hair on the brushes and the styling chair was sticky. Total waste of time and money.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.9,
+    "pros": [],
+    "cons": [
+      "unsanitary equipment",
+      "unclean chairs",
+      "hygiene concerns"
+    ]
+  },
+  {
+    "id": 107,
+    "review_text": "They charged me extra hidden fees at checkout that were never mentioned during booking. Extremely dissatisfied with Hydra Facial Treatment.",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.89,
+    "pros": [],
+    "cons": [
+      "hidden fees",
+      "unexpected charges",
+      "unclear billing"
+    ]
+  },
+  {
+    "id": 108,
+    "review_text": "The technician was completely distracted, constantly texting on her phone during my treatment. Total waste of time and money.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.88,
+    "pros": [],
+    "cons": [
+      "distracted technician",
+      "texting on phone",
+      "unprofessional"
+    ]
+  },
+  {
+    "id": 109,
+    "review_text": "Arrived on time only to be told they double-booked my appointment and asked me to reschedule. Extremely dissatisfied with Beard Grooming & Shave.",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.87,
+    "pros": [],
+    "cons": [
+      "double booking",
+      "cancelled on arrival",
+      "unreliable"
+    ]
+  },
+  {
+    "id": 110,
+    "review_text": "Product used gave me an allergic breakout on my scalp. Won’t ever return here. Total waste of time and money.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.86,
+    "pros": [],
+    "cons": [
+      "allergic reaction",
+      "poor product quality",
+      "scalp breakout"
+    ]
+  },
+  {
+    "id": 111,
+    "review_text": "Rushed through my appointment and skipped several steps mentioned in the package description. Extremely dissatisfied with Full Body Waxing.",
+    "service_name": "Full Body Waxing",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.85,
+    "pros": [],
+    "cons": [
+      "rushed service",
+      "skipped steps",
+      "misleading description"
+    ]
+  },
+  {
+    "id": 112,
+    "review_text": "Bleach was left on far too long, causing extreme hair breakage and split ends. Total waste of time and money.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.84,
+    "pros": [],
+    "cons": [
+      "overprocessed hair",
+      "hair breakage",
+      "technician negligence"
+    ]
+  },
+  {
+    "id": 113,
+    "review_text": "Nail technician cut multiple cuticles causing bleeding and failed to sanitize properly. Extremely dissatisfied with Hair Extensions.",
+    "service_name": "Hair Extensions",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.83,
+    "pros": [],
+    "cons": [
+      "cut cuticles",
+      "bleeding",
+      "poor hygiene"
+    ]
+  },
+  {
+    "id": 114,
+    "review_text": "Wax was boiling hot and left burns on my arms. Incompetent staff. Total waste of time and money.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.82,
+    "pros": [],
+    "cons": [
+      "burns from hot wax",
+      "incompetent staff",
+      "painful session"
+    ]
+  },
+  {
+    "id": 115,
+    "review_text": "Total lack of cleanliness and communication. Zero customer care. Extremely dissatisfied with Aromatherapy Sauna.",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.81,
+    "pros": [],
+    "cons": [
+      "dirty salon",
+      "poor communication",
+      "lack of customer care"
+    ]
+  },
+  {
+    "id": 116,
+    "review_text": "Terrible experience. Had to wait over 45 minutes despite having a confirmed booking, and staff did not care. Total waste of time and money.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.8,
+    "pros": [],
+    "cons": [
+      "45 minute delay",
+      "uncaring staff",
+      "poor time management"
+    ]
+  },
+  {
+    "id": 117,
+    "review_text": "Ruined my hair completely! Cut it way shorter than agreed and left uneven patches on the back. Extremely dissatisfied with Balayage Hair Color.",
+    "service_name": "Balayage Hair Color",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.79,
+    "pros": [],
+    "cons": [
+      "uneven haircut",
+      "cut too short",
+      "damaged styling"
+    ]
+  },
+  {
+    "id": 118,
+    "review_text": "The chemical solution burned my skin and caused severe redness and irritation. Total waste of time and money.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.78,
+    "pros": [],
+    "cons": [
+      "chemical burn",
+      "skin irritation",
+      "safety violation"
+    ]
+  },
+  {
+    "id": 119,
+    "review_text": "Extremely rude customer service. Receptionist rolled her eyes and refused to answer my questions. Extremely dissatisfied with Bridal Hair & Makeup.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.77,
+    "pros": [],
+    "cons": [
+      "rude receptionist",
+      "bad attitude",
+      "unhelpful staff"
+    ]
+  },
+  {
+    "id": 120,
+    "review_text": "Overpriced and poor quality. The styling fell apart within two hours of leaving the salon. Total waste of time and money.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.76,
+    "pros": [],
+    "cons": [
+      "overpriced",
+      "styling fell apart quickly",
+      "poor quality"
+    ]
+  },
+  {
+    "id": 121,
+    "review_text": "Unsanitary conditions! Found hair on the brushes and the styling chair was sticky. Extremely dissatisfied with Deluxe Spa Pedicure.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.75,
+    "pros": [],
+    "cons": [
+      "unsanitary equipment",
+      "unclean chairs",
+      "hygiene concerns"
+    ]
+  },
+  {
+    "id": 122,
+    "review_text": "They charged me extra hidden fees at checkout that were never mentioned during booking. Total waste of time and money.",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.74,
+    "pros": [],
+    "cons": [
+      "hidden fees",
+      "unexpected charges",
+      "unclear billing"
+    ]
+  },
+  {
+    "id": 123,
+    "review_text": "The technician was completely distracted, constantly texting on her phone during my treatment. Extremely dissatisfied with Deep Tissue Body Massage.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.73,
+    "pros": [],
+    "cons": [
+      "distracted technician",
+      "texting on phone",
+      "unprofessional"
+    ]
+  },
+  {
+    "id": 124,
+    "review_text": "Arrived on time only to be told they double-booked my appointment and asked me to reschedule. Total waste of time and money.",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.72,
+    "pros": [],
+    "cons": [
+      "double booking",
+      "cancelled on arrival",
+      "unreliable"
+    ]
+  },
+  {
+    "id": 125,
+    "review_text": "Product used gave me an allergic breakout on my scalp. Won’t ever return here. Extremely dissatisfied with Eyebrow Threading & Tinting.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.71,
+    "pros": [],
+    "cons": [
+      "allergic reaction",
+      "poor product quality",
+      "scalp breakout"
+    ]
+  },
+  {
+    "id": 126,
+    "review_text": "Rushed through my appointment and skipped several steps mentioned in the package description. Total waste of time and money.",
+    "service_name": "Full Body Waxing",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.7,
+    "pros": [],
+    "cons": [
+      "rushed service",
+      "skipped steps",
+      "misleading description"
+    ]
+  },
+  {
+    "id": 127,
+    "review_text": "Bleach was left on far too long, causing extreme hair breakage and split ends. Extremely dissatisfied with Scalp Care Therapy.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.95,
+    "pros": [],
+    "cons": [
+      "overprocessed hair",
+      "hair breakage",
+      "technician negligence"
+    ]
+  },
+  {
+    "id": 128,
+    "review_text": "Nail technician cut multiple cuticles causing bleeding and failed to sanitize properly. Total waste of time and money.",
+    "service_name": "Hair Extensions",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.94,
+    "pros": [],
+    "cons": [
+      "cut cuticles",
+      "bleeding",
+      "poor hygiene"
+    ]
+  },
+  {
+    "id": 129,
+    "review_text": "Wax was boiling hot and left burns on my arms. Incompetent staff. Extremely dissatisfied with Skin Rejuvenation Peel.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.93,
+    "pros": [],
+    "cons": [
+      "burns from hot wax",
+      "incompetent staff",
+      "painful session"
+    ]
+  },
+  {
+    "id": 130,
+    "review_text": "Total lack of cleanliness and communication. Zero customer care. Total waste of time and money.",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.92,
+    "pros": [],
+    "cons": [
+      "dirty salon",
+      "poor communication",
+      "lack of customer care"
+    ]
+  },
+  {
+    "id": 131,
+    "review_text": "Terrible experience. Had to wait over 45 minutes despite having a confirmed booking, and staff did not care. Extremely dissatisfied with Hair Cut & Blow Dry.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.91,
+    "pros": [],
+    "cons": [
+      "45 minute delay",
+      "uncaring staff",
+      "poor time management"
+    ]
+  },
+  {
+    "id": 132,
+    "review_text": "Ruined my hair completely! Cut it way shorter than agreed and left uneven patches on the back. Total waste of time and money.",
+    "service_name": "Balayage Hair Color",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.9,
+    "pros": [],
+    "cons": [
+      "uneven haircut",
+      "cut too short",
+      "damaged styling"
+    ]
+  },
+  {
+    "id": 133,
+    "review_text": "The chemical solution burned my skin and caused severe redness and irritation. Extremely dissatisfied with Keratin Smoothing Treatment.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.89,
+    "pros": [],
+    "cons": [
+      "chemical burn",
+      "skin irritation",
+      "safety violation"
+    ]
+  },
+  {
+    "id": 134,
+    "review_text": "Extremely rude customer service. Receptionist rolled her eyes and refused to answer my questions. Total waste of time and money.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.88,
+    "pros": [],
+    "cons": [
+      "rude receptionist",
+      "bad attitude",
+      "unhelpful staff"
+    ]
+  },
+  {
+    "id": 135,
+    "review_text": "Overpriced and poor quality. The styling fell apart within two hours of leaving the salon. Extremely dissatisfied with Gel Manicure & Nail Art.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.87,
+    "pros": [],
+    "cons": [
+      "overpriced",
+      "styling fell apart quickly",
+      "poor quality"
+    ]
+  },
+  {
+    "id": 136,
+    "review_text": "Unsanitary conditions! Found hair on the brushes and the styling chair was sticky. Total waste of time and money.",
+    "service_name": "Deluxe Spa Pedicure",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.86,
+    "pros": [],
+    "cons": [
+      "unsanitary equipment",
+      "unclean chairs",
+      "hygiene concerns"
+    ]
+  },
+  {
+    "id": 137,
+    "review_text": "They charged me extra hidden fees at checkout that were never mentioned during booking. Extremely dissatisfied with Hydra Facial Treatment.",
+    "service_name": "Hydra Facial Treatment",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.85,
+    "pros": [],
+    "cons": [
+      "hidden fees",
+      "unexpected charges",
+      "unclear billing"
+    ]
+  },
+  {
+    "id": 138,
+    "review_text": "The technician was completely distracted, constantly texting on her phone during my treatment. Total waste of time and money.",
+    "service_name": "Deep Tissue Body Massage",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.84,
+    "pros": [],
+    "cons": [
+      "distracted technician",
+      "texting on phone",
+      "unprofessional"
+    ]
+  },
+  {
+    "id": 139,
+    "review_text": "Arrived on time only to be told they double-booked my appointment and asked me to reschedule. Extremely dissatisfied with Beard Grooming & Shave.",
+    "service_name": "Beard Grooming & Shave",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.83,
+    "pros": [],
+    "cons": [
+      "double booking",
+      "cancelled on arrival",
+      "unreliable"
+    ]
+  },
+  {
+    "id": 140,
+    "review_text": "Product used gave me an allergic breakout on my scalp. Won’t ever return here. Total waste of time and money.",
+    "service_name": "Eyebrow Threading & Tinting",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.82,
+    "pros": [],
+    "cons": [
+      "allergic reaction",
+      "poor product quality",
+      "scalp breakout"
+    ]
+  },
+  {
+    "id": 141,
+    "review_text": "Rushed through my appointment and skipped several steps mentioned in the package description. Extremely dissatisfied with Full Body Waxing.",
+    "service_name": "Full Body Waxing",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.81,
+    "pros": [],
+    "cons": [
+      "rushed service",
+      "skipped steps",
+      "misleading description"
+    ]
+  },
+  {
+    "id": 142,
+    "review_text": "Bleach was left on far too long, causing extreme hair breakage and split ends. Total waste of time and money.",
+    "service_name": "Scalp Care Therapy",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.8,
+    "pros": [],
+    "cons": [
+      "overprocessed hair",
+      "hair breakage",
+      "technician negligence"
+    ]
+  },
+  {
+    "id": 143,
+    "review_text": "Nail technician cut multiple cuticles causing bleeding and failed to sanitize properly. Extremely dissatisfied with Hair Extensions.",
+    "service_name": "Hair Extensions",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.79,
+    "pros": [],
+    "cons": [
+      "cut cuticles",
+      "bleeding",
+      "poor hygiene"
+    ]
+  },
+  {
+    "id": 144,
+    "review_text": "Wax was boiling hot and left burns on my arms. Incompetent staff. Total waste of time and money.",
+    "service_name": "Skin Rejuvenation Peel",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.78,
+    "pros": [],
+    "cons": [
+      "burns from hot wax",
+      "incompetent staff",
+      "painful session"
+    ]
+  },
+  {
+    "id": 145,
+    "review_text": "Total lack of cleanliness and communication. Zero customer care. Extremely dissatisfied with Aromatherapy Sauna.",
+    "service_name": "Aromatherapy Sauna",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.77,
+    "pros": [],
+    "cons": [
+      "dirty salon",
+      "poor communication",
+      "lack of customer care"
+    ]
+  },
+  {
+    "id": 146,
+    "review_text": "Terrible experience. Had to wait over 45 minutes despite having a confirmed booking, and staff did not care. Total waste of time and money.",
+    "service_name": "Hair Cut & Blow Dry",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.76,
+    "pros": [],
+    "cons": [
+      "45 minute delay",
+      "uncaring staff",
+      "poor time management"
+    ]
+  },
+  {
+    "id": 147,
+    "review_text": "Ruined my hair completely! Cut it way shorter than agreed and left uneven patches on the back. Extremely dissatisfied with Balayage Hair Color.",
+    "service_name": "Balayage Hair Color",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.75,
+    "pros": [],
+    "cons": [
+      "uneven haircut",
+      "cut too short",
+      "damaged styling"
+    ]
+  },
+  {
+    "id": 148,
+    "review_text": "The chemical solution burned my skin and caused severe redness and irritation. Total waste of time and money.",
+    "service_name": "Keratin Smoothing Treatment",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.74,
+    "pros": [],
+    "cons": [
+      "chemical burn",
+      "skin irritation",
+      "safety violation"
+    ]
+  },
+  {
+    "id": 149,
+    "review_text": "Extremely rude customer service. Receptionist rolled her eyes and refused to answer my questions. Extremely dissatisfied with Bridal Hair & Makeup.",
+    "service_name": "Bridal Hair & Makeup",
+    "rating": 2,
+    "sentiment": "Negative",
+    "sentiment_score": -0.73,
+    "pros": [],
+    "cons": [
+      "rude receptionist",
+      "bad attitude",
+      "unhelpful staff"
+    ]
+  },
+  {
+    "id": 150,
+    "review_text": "Overpriced and poor quality. The styling fell apart within two hours of leaving the salon. Total waste of time and money.",
+    "service_name": "Gel Manicure & Nail Art",
+    "rating": 1,
+    "sentiment": "Negative",
+    "sentiment_score": -0.72,
+    "pros": [],
+    "cons": [
+      "overpriced",
+      "styling fell apart quickly",
+      "poor quality"
+    ]
+  }
+]

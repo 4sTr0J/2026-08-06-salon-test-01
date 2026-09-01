@@ -70,7 +70,46 @@
                     <h1 class="welcome-text">Salon Control, <span class="highlight-gold" id="owner-name-display">Owner</span></h1>
                     <p class="salon-name-display" id="salon-name-title">✨ Luxury Salon Branch</p>
                 </div>
-                <div class="header-profile">
+                <div class="header-profile" style="display: flex; align-items: center; gap: 1.5rem;">
+                    <!-- Late Alerts Notification Bell -->
+                    <div id="owner-notif-wrapper" style="position: relative;">
+                        <button id="owner-notif-btn" title="Late Arrival Alerts" style="
+                            background: rgba(255,184,43,0.1); border: 1px solid rgba(255,184,43,0.3);
+                            cursor: pointer; position: relative; font-size: 1.3rem; color: #ffcc00;
+                            width: 44px; height: 44px; border-radius: 50%; display: flex;
+                            align-items: center; justify-content: center; transition: all 0.3s;
+                        " onmouseover="this.style.background='rgba(255,184,43,0.2)'; this.style.transform='scale(1.08)'"
+                           onmouseout="this.style.background='rgba(255,184,43,0.1)'; this.style.transform='scale(1)'">
+                            🔔
+                            <span id="owner-notif-badge" style="
+                                display: none; position: absolute; top: -4px; right: -4px;
+                                background: #e74c3c; color: #fff; font-size: 0.65rem; font-weight: 800;
+                                width: 20px; height: 20px; border-radius: 50%;
+                                display: none; align-items: center; justify-content: center;
+                                font-family: 'Poppins', sans-serif; line-height: 1;
+                                box-shadow: 0 0 8px rgba(231, 76, 60, 0.8);
+                            ">0</span>
+                        </button>
+
+                        <!-- Notification Dropdown Panel -->
+                        <div id="owner-notif-dropdown" style="
+                            display: none; position: absolute; top: 52px; right: 0;
+                            width: 380px; max-height: 440px; overflow-y: auto;
+                            background: rgba(18, 17, 14, 0.98); border: 1px solid rgba(255, 184, 43, 0.4);
+                            border-radius: 16px; box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+                            backdrop-filter: blur(20px); z-index: 9999;
+                            font-family: 'Poppins', sans-serif;
+                        ">
+                            <div style="padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-weight: 700; font-size: 0.95rem; color: #ffcc00;">⏳ Customer Late Alerts</span>
+                                <span id="owner-notif-count-label" style="font-size: 0.75rem; color: rgba(255,255,255,0.5); font-weight: 600;">0 alerts</span>
+                            </div>
+                            <div id="owner-notif-items" style="padding: 8px 0;">
+                                <div style="text-align: center; padding: 2rem 1rem; color: rgba(255,255,255,0.4); font-size: 0.85rem; font-style: italic;">No customer delays reported</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="profile-info" style="display: flex; flex-direction: column; align-items: flex-end;">
                         <div class="profile-avatar-container" style="margin-bottom: 0.5rem;">
                             <img id="owner-profile-preview" src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=50&q=80" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #ffcc00; box-shadow: 0 0 10px rgba(255, 184, 43, 0.4);" alt="Salon Logo">
@@ -113,7 +152,7 @@
                         <div class="stat-icon green">💵</div>
                         <div class="stat-details">
                             <h3>Estimated Revenue</h3>
-                            <p class="stat-val" id="stat-revenue">$0</p>
+                            <p class="stat-val" id="stat-revenue">Rs. 0</p>
                             <span class="stat-sub">Estimated earnings</span>
                         </div>
                     </div>
@@ -203,6 +242,7 @@
                         <thead>
                             <tr>
                                 <th>Service Name</th>
+                                <th>Category</th>
                                 <th>Duration</th>
                                 <th>Price (LKR)</th>
                                 <th>Actions</th>
@@ -338,6 +378,21 @@
                 <button class="modal-close" onclick="closeModal('add-service-modal')">✕</button>
             </div>
             <form id="add-service-form" class="modal-form">
+                <div class="form-group">
+                    <label class="form-label">Service Category</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🏷️</span>
+                        <select id="service-category" class="form-input" style="appearance: auto; background-color: transparent;" required>
+                            <option value="" disabled selected>Select a category</option>
+                            <option value="Haircuts">Haircuts</option>
+                            <option value="Make Up">Make Up</option>
+                            <option value="Shaving">Shaving</option>
+                            <option value="Massage">Massage</option>
+                            <option value="Nail Care">Nail Care</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label class="form-label">Service Name</label>
                     <div class="input-wrapper">

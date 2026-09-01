@@ -1,6 +1,6 @@
-import supabase, { supabaseAdmin } from "./config/supabase.js";
+import supabase, { supabaseAdmin } from "../database/supabase.js";
 
-// Check if Supabase is actually configured
+// Check if Supabase is configured
 const isSupabaseConfigured = () => {
     const url = process.env.SUPABASE_URL || '';
     return url && url !== 'https://placeholder.supabase.co' && url.includes('.supabase.co');
@@ -83,8 +83,6 @@ export const deleteOwner = async (req, res) => {
     }
 
     try {
-        // Cascade delete will clean up services and reviews if foreign keys are configured,
-        // but we explicitly delete from salon_owners table first.
         const { error: dbError } = await supabaseAdmin
             .from("salon_owners")
             .delete()
@@ -92,10 +90,8 @@ export const deleteOwner = async (req, res) => {
 
         if (dbError) throw dbError;
 
-        // Also delete from auth.users to completely revoke login credentials!
         const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id);
         
-        // Note: if deleteUser fails because user doesn't exist in auth anymore, we can ignore it
         if (authError && !authError.message.includes("User not found")) {
             console.warn("Auth user deletion warning:", authError.message);
         }

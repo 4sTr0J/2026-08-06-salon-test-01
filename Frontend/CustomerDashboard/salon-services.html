@@ -14,21 +14,31 @@
     <link rel="stylesheet" href="../index.css?v=60">
     
     <style>
-        .services-container {
+        html,
+        body {
+            height: auto !important;
+            min-height: 100vh !important;
+            overflow-y: auto !important;
+            background: #080605 !important;
+        }
+
+        .services-page-wrapper {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding-top: 120px;
+            padding-top: 110px;
             max-width: 1200px;
             margin: 0 auto;
             width: 100%;
             padding-inline: 2rem;
+            padding-bottom: 4rem;
             z-index: 10;
             position: relative;
+            box-sizing: border-box;
         }
 
         .services-header {
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
             animation: slideUp 0.8s ease-out;
             display: flex;
             justify-content: space-between;
@@ -68,20 +78,22 @@
             box-shadow: 0 0 10px rgba(255, 184, 43, 0.2);
         }
 
-        /* Services Grid */
+        /* Services Grid - Multi-column row-wise layout */
         .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+            gap: 1.5rem !important;
+            width: 100% !important;
             animation: slideUp 1s ease-out;
             margin-bottom: 4rem;
+            box-sizing: border-box;
         }
 
         .service-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 18px;
-            padding: 2rem;
+            padding: 1.75rem;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
@@ -89,7 +101,9 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 200px;
+            min-height: 220px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .service-card:hover {
@@ -100,10 +114,11 @@
 
         .service-name {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.45rem;
+            font-size: 1.35rem;
             font-weight: 600;
             color: #ffffff;
             margin-bottom: 0.6rem;
+            text-transform: capitalize;
         }
 
         .service-meta {
@@ -238,9 +253,9 @@
     </header>
 
     <!-- Main Content Area -->
-    <div class="services-container">
+    <div class="services-page-wrapper">
         <!-- Luxury Hero Banner Card -->
-        <div class="salon-hero-card" id="salon-hero-banner" style="background: linear-gradient(180deg, rgba(8,6,5,0.4) 0%, rgba(8,6,5,0.95) 100%), url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80') center/cover; border: 1px solid rgba(255, 184, 43, 0.25); border-radius: 20px; padding: 3rem; margin-bottom: 3rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 250px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; animation: slideUp 0.8s ease-out;">
+        <div class="salon-hero-card" id="salon-hero-banner" style="background: linear-gradient(180deg, rgba(8,6,5,0.4) 0%, rgba(8,6,5,0.95) 100%), url('https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1200&q=80') center/cover; border: 1px solid rgba(255, 184, 43, 0.25); border-radius: 20px; padding: 3rem; margin-bottom: 3rem; display: flex; flex-direction: column; justify-content: flex-end; min-height: 250px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; overflow: hidden; animation: slideUp 0.8s ease-out; width: 100%; box-sizing: border-box;">
             <div style="z-index: 2;">
                 <h1 class="services-title" id="salon-name-title" style="font-family: 'Outfit', sans-serif; font-size: 3.2rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Salon Name</h1>
                 <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
@@ -251,12 +266,12 @@
             <a href="salons.html" class="btn-back-salons" style="position: absolute; top: 2rem; right: 2rem; background: rgba(0,0,0,0.6); text-decoration: none;">← Back to Salons</a>
         </div>
 
-        <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; animation: slideUp 0.9s ease-out;">
+        <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; animation: slideUp 0.9s ease-out; width: 100%;">
             <h2 style="font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 600; color: #ffffff; margin: 0;">Available Services</h2>
             <div style="font-size: 0.9rem; color: var(--text-secondary);">Select a service below to book an appointment</div>
         </div>
 
-        <!-- Grid of Services -->
+        <!-- Grid of Services (Row-Wise Layout) -->
         <div class="services-grid" id="services-list-container">
             <div class="empty-services">Loading available services...</div>
         </div>
@@ -367,21 +382,29 @@
                     return;
                 }
 
-                container.innerHTML = services.map(s => `
-                    <div class="service-card">
-                        <div>
-                            <h3 class="service-name">${s.name}</h3>
-                            <div class="service-meta">
-                                <span class="meta-tag tag-duration">⏱ ${s.duration} Mins</span>
+                container.innerHTML = services.map(s => {
+                    const categoryTag = (s.category && s.category !== 'General')
+                        ? `<span class="meta-tag" style="background: rgba(255, 204, 0, 0.12); color: #ffcc00; border: 1px solid rgba(255, 204, 0, 0.3);">🏷️ ${s.category}</span>`
+                        : '';
+                    const safeName = (s.name || '').replace(/'/g, "\\'");
+
+                    return `
+                        <div class="service-card">
+                            <div>
+                                <h3 class="service-name">${s.name}</h3>
+                                <div class="service-meta">
+                                    <span class="meta-tag tag-duration">⏱ ${s.duration} Mins</span>
+                                    ${categoryTag}
+                                </div>
+                                <div class="service-price-block">
+                                    <div class="price-label">Price (LKR)</div>
+                                    <div class="price-value">Rs. ${parseFloat(s.price).toLocaleString()}</div>
+                                </div>
                             </div>
-                            <div class="service-price-block">
-                                <div class="price-label">Price (LKR)</div>
-                                <div class="price-value">Rs. ${parseFloat(s.price).toLocaleString()}</div>
-                            </div>
+                            <button class="book-service-btn" onclick="bookAppointment('${safeName}', '${s.price}')">Book Service</button>
                         </div>
-                        <button class="book-service-btn" onclick="bookAppointment('${s.name}', '${s.price}')">Book Service</button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         });
 
@@ -449,35 +472,37 @@
                 zIndex:"10000", backdropFilter:"blur(10px)"
             });
 
+            const basePrice = parseFloat(price) || 0;
+
             modal.innerHTML = `
             <style>
             #sp-book-panel{background:#13100a;border:1px solid rgba(255,184,43,.45);border-radius:20px;width:92%;max-width:480px;padding:0;overflow:hidden;font-family:'Poppins',sans-serif;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.7)}
-            #sp-book-header{background:linear-gradient(135deg,#1a1300,#261900);padding:22px 24px;border-bottom:1px solid rgba(255,184,43,.2)}
-            #sp-book-header h3{margin:0;font-size:1.4rem;color:#ffcc00}
+            #sp-book-header{background:linear-gradient(135deg,#1a1300,#261900);padding:20px 24px;border-bottom:1px solid rgba(255,184,43,.2)}
+            #sp-book-header h3{margin:0;font-size:1.35rem;color:#ffcc00}
             #sp-book-header p{margin:4px 0 0;font-size:.85rem;color:rgba(255,200,100,.7)}
-            #sp-book-body{padding:20px 24px;max-height:70vh;overflow-y:auto}
-            .sp-section-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;color:#999;text-transform:uppercase;margin-bottom:10px}
+            #sp-book-body{padding:18px 24px;max-height:72vh;overflow-y:auto}
+            .sp-section-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;color:#999;text-transform:uppercase;margin-bottom:8px}
             /* Date carousel */
             #sp-date-carousel{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
             #sp-date-carousel::-webkit-scrollbar{display:none}
-            .sp-date-chip{min-width:58px;padding:10px 6px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;transition:.2s;flex-shrink:0}
+            .sp-date-chip{min-width:56px;padding:9px 6px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;transition:.2s;flex-shrink:0}
             .sp-date-chip:hover{border-color:rgba(255,184,43,.5);background:rgba(255,184,43,.08)}
             .sp-date-chip.active{border-color:#ffcc00;background:rgba(255,184,43,.15);box-shadow:0 0 12px rgba(255,184,43,.2)}
             .sp-date-chip .dow{font-size:.65rem;color:#888;font-weight:600;text-transform:uppercase}
-            .sp-date-chip .dom{font-size:1.3rem;font-weight:700;color:#fff;line-height:1.1}
+            .sp-date-chip .dom{font-size:1.25rem;font-weight:700;color:#fff;line-height:1.1}
             .sp-date-chip .mon{font-size:.65rem;color:#888}
             /* Slot grid */
-            #sp-slots-container{margin-top:16px}
+            #sp-slots-container{margin-top:14px}
             #sp-slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-            .sp-slot{padding:11px 4px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;font-size:.85rem;font-weight:600;transition:.2s}
+            .sp-slot{padding:10px 4px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);cursor:pointer;text-align:center;font-size:.82rem;font-weight:600;transition:.2s}
             .sp-slot:hover{border-color:rgba(255,184,43,.5);background:rgba(255,184,43,.08)}
             .sp-slot.active{border-color:#ffcc00;background:rgba(255,184,43,.18);color:#ffcc00}
             .sp-slot.booked{opacity:.3;cursor:not-allowed;text-decoration:line-through;pointer-events:none}
-            #sp-slots-loading{text-align:center;padding:20px;color:#888;font-size:.85rem}
+            #sp-slots-loading{text-align:center;padding:16px;color:#888;font-size:.85rem}
             /* Footer */
-            #sp-book-footer{display:flex;gap:10px;justify-content:flex-end;padding:16px 24px;border-top:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
-            #sp-cancel-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:#fff;padding:9px 18px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.9rem}
-            #sp-confirm-btn{background:linear-gradient(135deg,#ffc845,#e5a93b);border:none;color:#000;padding:9px 26px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.9rem;opacity:.4;pointer-events:none;transition:.2s}
+            #sp-book-footer{display:flex;gap:10px;justify-content:flex-end;padding:14px 24px;border-top:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
+            #sp-cancel-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:#fff;padding:9px 16px;border-radius:10px;cursor:pointer;font-weight:600;font-size:.88rem}
+            #sp-confirm-btn{background:linear-gradient(135deg,#ffc845,#e5a93b);border:none;color:#000;padding:9px 22px;border-radius:10px;cursor:pointer;font-weight:700;font-size:.88rem;opacity:.4;pointer-events:none;transition:.2s}
             #sp-confirm-btn.ready{opacity:1;pointer-events:all}
             /* Error toast */
             #sp-error-toast{display:none;background:rgba(220,40,40,.15);border:1px solid rgba(220,40,40,.4);color:#ff8080;border-radius:8px;padding:10px 14px;font-size:.82rem;margin-top:12px;text-align:left}
@@ -485,20 +510,28 @@
             <div id="sp-book-panel">
               <div id="sp-book-header">
                 <h3>📅 Book Appointment</h3>
-                <p>${serviceName} &nbsp;·&nbsp; Rs. ${parseFloat(price).toLocaleString()}</p>
+                <p>${serviceName} &nbsp;·&nbsp; Rs. ${basePrice.toLocaleString()}</p>
               </div>
               <div id="sp-book-body">
-                <div class="sp-section-label">Select a Date</div>
+                <div style="background: rgba(255, 184, 43, 0.08); border: 1px solid rgba(255, 184, 43, 0.25); border-radius: 10px; padding: 8px 12px; font-size: 0.78rem; color: #ffcc00; margin-bottom: 14px; line-height: 1.35;">
+                  🛡️ <strong>StylePulse Buffer Guarantee:</strong> Each booking includes a dedicated <strong>30-minute buffer period</strong> after your service.
+                </div>
+                <div class="sp-section-label">1. Select a Date</div>
                 <div id="sp-date-carousel"></div>
                 <div id="sp-slots-container" style="display:none">
-                  <div class="sp-section-label" style="margin-top:18px">Pick a Time</div>
+                  <div class="sp-section-label" style="margin-top:14px">2. Pick a Time</div>
                   <div id="sp-slots-grid"></div>
                 </div>
+
+                <div style="margin-top: 18px; padding: 12px 14px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,184,43,0.3); border-radius: 10px; font-size: 0.8rem; color: #ccc;">
+                  💳 <strong>Payment Notice:</strong> Full payment via Card is required. You can redeem your Style Points for discounts on the next payment page.
+                </div>
+
                 <div id="sp-error-toast"></div>
               </div>
               <div id="sp-book-footer">
                 <button id="sp-cancel-btn">Cancel</button>
-                <button id="sp-confirm-btn">Confirm Booking →</button>
+                <button id="sp-confirm-btn">Proceed to Payment →</button>
               </div>
             </div>`;
 
@@ -523,14 +556,12 @@
             });
 
             async function selectDate(chip, dateStr) {
-                // Deselect all
                 carousel.querySelectorAll(".sp-date-chip").forEach(c => c.classList.remove("active"));
                 chip.classList.add("active");
                 selectedDate = dateStr;
                 selectedSlot = null;
                 document.getElementById("sp-confirm-btn").classList.remove("ready");
 
-                // Show loading
                 const slotsContainer = document.getElementById("sp-slots-container");
                 const grid = document.getElementById("sp-slots-grid");
                 slotsContainer.style.display = "block";
@@ -546,14 +577,28 @@
                     return;
                 }
 
+                const now = new Date();
+                const localYear = now.getFullYear();
+                const localMonth = String(now.getMonth() + 1).padStart(2, '0');
+                const localDay = String(now.getDate()).padStart(2, '0');
+                const todayIso = `${localYear}-${localMonth}-${localDay}`;
+                const currentMinutesNow = now.getHours() * 60 + now.getMinutes();
+
                 operating.forEach(slot => {
+                    const [sh, sm] = slot.split(":").map(Number);
+                    const slotMinutes = sh * 60 + sm;
+
+                    const isPast = (dateStr < todayIso) || (dateStr === todayIso && slotMinutes <= currentMinutesNow);
+                    const isAvailable = available.includes(slot) && !isPast;
+
                     const el = document.createElement("div");
-                    const isAvailable = available.includes(slot);
                     el.className = "sp-slot" + (isAvailable ? "" : " booked");
                     el.textContent = fmt12(slot);
                     el.dataset.slot = slot;
                     if (isAvailable) {
                         el.addEventListener("click", () => selectSlot(el, slot));
+                    } else if (isPast) {
+                        el.title = "Time has passed";
                     }
                     grid.appendChild(el);
                 });
@@ -580,69 +625,41 @@
             document.getElementById("sp-cancel-btn").addEventListener("click", () => modal.remove());
             modal.addEventListener("click", e => { if (e.target === modal) modal.remove(); });
 
-            // ── Confirm ──
-            document.getElementById("sp-confirm-btn").addEventListener("click", async () => {
-                if (!selectedDate || !selectedSlot) return;
-
-                const btn = document.getElementById("sp-confirm-btn");
-                btn.textContent = "Booking…";
-                btn.classList.remove("ready");
-                hideError();
-
-                try {
-                    const token = localStorage.getItem("stylepulse_token");
-                    const res = await fetch(`${API}/api/auth/appointments`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            salonId,
-                            serviceName,
-                            date: selectedDate,
-                            time: selectedSlot,
-                            price: price
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (res.status === 409) {
-                        // Slot was just taken by someone else
-                        showError(data.message || "Someone just booked this slot. Please choose another time.");
-                        // Visually mark the conflicting slot as booked
-                        document.querySelectorAll(".sp-slot").forEach(s => {
-                            if (s.dataset.slot === selectedSlot) {
-                                s.classList.remove("active");
-                                s.classList.add("booked");
-                            }
-                        });
-                        selectedSlot = null;
-                        btn.textContent = "Confirm Booking →";
-                        return;
-                    }
-
-                    if (data.success) {
-                        modal.remove();
-                        const alertBox = document.getElementById("alert-box");
-                        const alertMessage = document.getElementById("alert-message");
-                        if (alertBox && alertMessage) {
-                            alertMessage.textContent = data.message || `✓ Appointment booked for ${serviceName} on ${selectedDate} at ${fmt12(selectedSlot)}!`;
-                            alertBox.className = "alert-box show success";
-                        }
-                        setTimeout(() => { window.location.href = "dashboard.html"; }, 3000);
-                    } else {
-                        showError(data.message || "Failed to book appointment. Please try again.");
-                        btn.textContent = "Confirm Booking →";
-                        btn.classList.add("ready");
-                    }
-                } catch (e) {
-                    console.error("Booking error:", e);
-                    showError("Connection error. Please check your internet and try again.");
-                    btn.textContent = "Confirm Booking →";
-                    btn.classList.add("ready");
+            // ── Proceed to Payment ──
+            const confirmBtn = document.getElementById("sp-confirm-btn");
+            confirmBtn.addEventListener("click", (e) => {
+                e.preventDefault();
+                if (!selectedDate) {
+                    showError("Please pick a date first.");
+                    return;
                 }
+                if (!selectedSlot) {
+                    showError("Please pick a time slot first.");
+                    return;
+                }
+
+                const token = localStorage.getItem("stylepulse_token");
+                if (!token) {
+                    window.location.href = "../login.html";
+                    return;
+                }
+
+                const currentSalonName = localStorage.getItem("stylepulse_selected_salon_name") || "Exclusive Salon";
+
+                // Save selected appointment details to sessionStorage
+                const pendingBooking = {
+                    salonId: salonId,
+                    salonName: currentSalonName,
+                    serviceName: serviceName,
+                    date: selectedDate,
+                    time: selectedSlot,
+                    price: price
+                };
+                sessionStorage.setItem("pending_booking", JSON.stringify(pendingBooking));
+                console.log("Redirecting with booking details:", pendingBooking);
+
+                // Redirect to dedicated payment checkout page
+                window.location.href = "payment.html";
             });
         }
     </script>

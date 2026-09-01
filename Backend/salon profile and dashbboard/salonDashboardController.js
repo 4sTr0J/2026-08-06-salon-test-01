@@ -1,5 +1,5 @@
-import supabase, { supabaseAdmin } from "./config/supabase.js";
-import { awardAppointmentPointsHelper } from "./controllers/loyaltyController.js";
+import supabase, { supabaseAdmin } from "../config/supabase.js";
+import { awardAppointmentPointsHelper } from "../controllers/loyaltyController.js";
 
 // Helper to check Supabase config
 const isSupabaseConfigured = () => {
@@ -7,8 +7,8 @@ const isSupabaseConfigured = () => {
     return url && url !== 'https://placeholder.supabase.co' && url.includes('.supabase.co');
 };
 
-// 1. Get Salon Details
-export const getSalonDetails = async (req, res) => {
+// 1. Get Salon Profile Details
+export const getSalonProfile = async (req, res) => {
     if (!isSupabaseConfigured()) {
         return res.status(500).json({ success: false, message: "Database not configured." });
     }
@@ -47,8 +47,8 @@ export const getSalonDetails = async (req, res) => {
     }
 };
 
-// 2. Update Salon Details
-export const updateSalonDetails = async (req, res) => {
+// 2. Update Salon Profile Details
+export const updateSalonProfile = async (req, res) => {
     if (!isSupabaseConfigured()) {
         return res.status(500).json({ success: false, message: "Database not configured." });
     }
@@ -102,95 +102,8 @@ export const updateSalonDetails = async (req, res) => {
     }
 };
 
-// 3. Get Services
-export const getServices = async (req, res) => {
-    if (!isSupabaseConfigured()) {
-        return res.status(500).json({ success: false, message: "Database not configured." });
-    }
-
-    try {
-        const client = supabaseAdmin || supabase;
-        const ownerId = req.user.id;
-
-        const { data, error } = await client
-            .from("salon_owner_services")
-            .select("*")
-            .eq("owner_id", ownerId)
-            .order("created_at", { ascending: false });
-
-        if (error) throw error;
-
-        return res.status(200).json({ success: true, services: data });
-    } catch (err) {
-        console.error("Error fetching services:", err);
-        return res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-// 4. Add Service
-export const addService = async (req, res) => {
-    if (!isSupabaseConfigured()) {
-        return res.status(500).json({ success: false, message: "Database not configured." });
-    }
-
-    try {
-        const client = supabaseAdmin || supabase;
-        const ownerId = req.user.id;
-        const { name, price, duration } = req.body;
-
-        if (!name || !price || !duration) {
-            return res.status(400).json({ success: false, message: "Name, price, and duration are required." });
-        }
-
-        const { data, error } = await client
-            .from("salon_owner_services")
-            .insert({
-                owner_id: ownerId,
-                name,
-                price: parseFloat(price),
-                duration: parseInt(duration),
-                category: "General"
-            })
-            .select()
-            .single();
-
-        if (error) throw error;
-
-        return res.status(201).json({ success: true, message: "Service added successfully.", service: data });
-    } catch (err) {
-        console.error("Error adding service:", err);
-        return res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-// 5. Delete Service
-export const deleteService = async (req, res) => {
-    if (!isSupabaseConfigured()) {
-        return res.status(500).json({ success: false, message: "Database not configured." });
-    }
-
-    try {
-        const client = supabaseAdmin || supabase;
-        const ownerId = req.user.id;
-        const { id } = req.params;
-
-        const { error } = await client
-            .from("salon_owner_services")
-            .delete()
-            .eq("id", id)
-            .eq("owner_id", ownerId);
-
-        if (error) throw error;
-
-        return res.status(200).json({ success: true, message: "Service deleted successfully." });
-    } catch (err) {
-        console.error("Error deleting service:", err);
-        return res.status(500).json({ success: false, message: err.message });
-    }
-};
-
-// 6. Get Appointments
-export const getAppointments = async (req, res) => {
+// 3. Get Salon Appointments / Booking Schedule for Dashboard
+export const getSalonAppointments = async (req, res) => {
     if (!isSupabaseConfigured()) {
         return res.status(500).json({ success: false, message: "Database not configured." });
     }
@@ -219,7 +132,7 @@ export const getAppointments = async (req, res) => {
         // Fetch late arrival notifications and reschedules for this salon
         let lateAlertsMap = {};
         try {
-            const { getSalonLateNotifications } = await import("./Appointments and notification/controllers/appointmentController.js");
+            const { getSalonLateNotifications } = await import("../Appointments and notification/controllers/appointmentController.js");
             const lateAlerts = getSalonLateNotifications(ownerId);
             lateAlerts.forEach(alert => {
                 lateAlertsMap[alert.appointment_id] = alert;
@@ -230,7 +143,7 @@ export const getAppointments = async (req, res) => {
 
         const reschedulesMap = {};
         try {
-            const { default: loyaltyDb } = await import("./database/loyaltyDb.js");
+            const { default: loyaltyDb } = await import("../database/loyaltyDb.js");
             // Group and sum all reschedule fees for each appointment
             const reschedules = loyaltyDb.prepare(`
                 SELECT appointment_id, 
@@ -252,7 +165,7 @@ export const getAppointments = async (req, res) => {
                 };
             });
         } catch (dbErr) {
-            console.warn("Could not load reschedule info for salon owner:", dbErr.message);
+            console.warn("Could not load reschedule info for salon owner dashboard:", dbErr.message);
         }
 
         // Fetch services map for pricing
@@ -267,7 +180,6 @@ export const getAppointments = async (req, res) => {
         });
 
         const appointmentsWithClients = await Promise.all(data.map(async (apt) => {
-            // Attempt to look up additional user details like phone number from email
             let phone = "N/A";
             if (apt.customer_email) {
                 const { data: userData } = await client
@@ -282,49 +194,7 @@ export const getAppointments = async (req, res) => {
 
             const lateInfo = lateAlertsMap[apt.id] || null;
             const rescheduleInfo = reschedulesMap[apt.id] || null;
-            
-            // Intelligent service pricing resolution
-            const rawServiceName = (apt.service_name || '').toLowerCase().trim();
-            let baseServicePrice = 0;
-
-            if (rawServiceName && servicePriceMap[rawServiceName] !== undefined) {
-                baseServicePrice = servicePriceMap[rawServiceName];
-            } else if (rawServiceName) {
-                // Check if multiple comma-separated services were selected
-                const serviceParts = rawServiceName.split(',').map(s => s.trim()).filter(Boolean);
-                let matchedSum = 0;
-                let foundMatch = false;
-
-                serviceParts.forEach(part => {
-                    if (servicePriceMap[part] !== undefined) {
-                        matchedSum += servicePriceMap[part];
-                        foundMatch = true;
-                    } else {
-                        // Partial substring match
-                        const matchKey = Object.keys(servicePriceMap).find(k => k.includes(part) || part.includes(k));
-                        if (matchKey) {
-                            matchedSum += servicePriceMap[matchKey];
-                            foundMatch = true;
-                        }
-                    }
-                });
-
-                if (foundMatch && matchedSum > 0) {
-                    baseServicePrice = matchedSum;
-                } else {
-                    // Check partial match on full string
-                    const matchKey = Object.keys(servicePriceMap).find(k => k.includes(rawServiceName) || rawServiceName.includes(k));
-                    if (matchKey) {
-                        baseServicePrice = servicePriceMap[matchKey];
-                    } else {
-                        // Standard salon service default fallback
-                        baseServicePrice = 3500;
-                    }
-                }
-            } else {
-                baseServicePrice = 3000;
-            }
-
+            const baseServicePrice = servicePriceMap[(apt.service_name || '').toLowerCase().trim()] || 0;
             const rescheduleFee = rescheduleInfo ? (Number(rescheduleInfo.fee_charged) || 0) : 0;
             const totalPrice = baseServicePrice + rescheduleFee;
 
@@ -355,8 +225,8 @@ export const getAppointments = async (req, res) => {
     }
 };
 
-// 7. Update Appointment Status
-export const updateAppointmentStatus = async (req, res) => {
+// 4. Update Appointment Status from Dashboard
+export const updateSalonAppointmentStatus = async (req, res) => {
     if (!isSupabaseConfigured()) {
         return res.status(500).json({ success: false, message: "Database not configured." });
     }
@@ -379,38 +249,50 @@ export const updateAppointmentStatus = async (req, res) => {
 
         if (error) throw error;
 
-        // Reward logic trigger: Once the salon owner confirms/completes the appointment
+        // Reward logic trigger: Once the salon owner completes the appointment
         if (status === 'Completed' && data) {
             try {
-                // 1. Get user details
+                let customerData = null;
+
+                // 1. Try finding in users table
                 const { data: userData } = await client
                     .from("users")
                     .select("id, full_name, email")
                     .eq("email", data.customer_email)
-                    .single();
+                    .maybeSingle();
 
-                const customerId = userData ? userData.id : null;
-                const customerData = customerId ? { id: customerId, full_name: userData.full_name, email: userData.email } : null;
+                if (userData) {
+                    customerData = { id: userData.id, full_name: userData.full_name, email: userData.email };
+                } else {
+                    // Fallback to customer_name / customer_email directly from appointment
+                    customerData = {
+                        id: data.customer_email, // identifier fallback
+                        full_name: data.customer_name || 'Customer',
+                        email: data.customer_email
+                    };
+                }
 
                 if (customerData) {
-                    // 2. Get service price
                     const { data: serviceData } = await client
                         .from("salon_owner_services")
                         .select("price")
                         .eq("owner_id", data.salon_id)
                         .eq("name", data.service_name)
-                        .single();
+                        .maybeSingle();
 
                     const price = serviceData ? Number(serviceData.price) : 0;
 
-                    // 3. Apply exact points logic
+                    // Point distribution rule:
+                    // Base: 500 Style Points
+                    // >= Rs. 2,500: 5,000 Style Points
+                    // >= Rs. 5,000: 10,000 Style Points
                     let earnedPoints = 500;
                     if (price >= 5000) earnedPoints = 10000;
                     else if (price >= 2500) earnedPoints = 5000;
                     else earnedPoints = 500;
 
-                    // 4. Award points
-                    awardAppointmentPointsHelper(customerData, earnedPoints, data.id);
+                    const rewardRes = awardAppointmentPointsHelper(customerData, earnedPoints, data.id);
+                    console.log(`[Loyalty System] Awarded ${earnedPoints} Style Points to ${customerData.email} for appointment ${data.id}:`, rewardRes);
                 }
             } catch (pointErr) {
                 console.error("Could not award points on completion:", pointErr.message);
@@ -423,4 +305,3 @@ export const updateAppointmentStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: err.message });
     }
 };
-

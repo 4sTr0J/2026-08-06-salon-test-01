@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Card Payment - StylePulse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0c0b08;
+            --card-bg: rgba(20, 18, 14, 0.95);
+            --gold-primary: #ffb82b;
+            --gold-bright: #ffcc00;
+            --gold-gradient: linear-gradient(135deg, #ffc845, #e5a93b);
+            --border-color: rgba(255, 184, 43, 0.25);
+            --text-secondary: rgba(255, 255, 255, 0.65);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(255, 184, 43, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 184, 43, 0.03) 0%, transparent 40%);
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .payment-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-panel {
+            padding: 36px 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .form-panel {
+            padding: 36px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-logo span { color: var(--gold-bright); }
+
+        .booking-details-box {
+            background: rgba(255, 184, 43, 0.05);
+            border: 1px solid rgba(255, 184, 43, 0.2);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .service-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .meta-item {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Points Redemption Box */
+        .points-redeem-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 184, 43, 0.25);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .points-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .points-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2ecc71;
+            user-select: none;
+        }
+
+        .points-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--gold-bright);
+        }
+
+        .price-breakdown {
+            margin-top: 14px;
+            font-size: 0.9rem;
+        }
+
+        .price-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .price-line.total {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 12px;
+            margin-top: 12px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Card Form */
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .form-sub {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 14px 12px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 10px rgba(255, 184, 43, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
+            color: var(--gold-bright);
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .pay-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--gold-gradient);
+            color: #000;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 184, 43, 0.35);
+        }
+
+        .pay-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .back-link:hover { color: var(--gold-bright); }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 14px;
+        }
+
+        /* Alert Toast */
+        #alert-toast {
+            display: none;
+            background: rgba(220, 40, 40, 0.15);
+            border: 1px solid rgba(220, 40, 40, 0.4);
+            color: #ff8080;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="payment-container">
+        <!-- Left: Summary & Loyalty Points -->
+        <div class="summary-panel">
+            <div>
+                <div class="brand-logo">
+                    <span>⚡</span> StylePulse <span>Payment</span>
+                </div>
+
+                <div class="booking-details-box">
+                    <div class="service-title" id="summary-service-name">Loading service...</div>
+                    <div class="meta-item">📅 <span id="summary-date-time">--</span></div>
+                    <div class="meta-item">📍 <span id="summary-salon-name">Exclusive Salon</span></div>
+                    <div class="meta-item" style="color: #ffcc00; margin-top: 8px; font-size: 0.8rem;">
+                        🛡️ Includes 30-min buffer protection
+                    </div>
+                </div>
+
+                <!-- Points Redemption Card -->
+                <div class="points-redeem-card">
+                    <div class="points-header">
+                        <div style="font-weight:600; font-size:0.92rem; color:#ffcc00;">💎 Style Points</div>
+                        <div style="font-size:0.75rem; color:#aaa;" id="available-points-label">0 pts available</div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #bbb; margin-bottom: 12px;">
+                        Redeem up to <strong style="color:#2ecc71;">Rs. 200 discount</strong> using your Style Points.
+                    </div>
+
+                    <div id="points-action-container">
+                        <label class="points-toggle" id="points-toggle-label">
+                            <input type="checkbox" id="redeem-checkbox">
+                            <span id="redeem-checkbox-text">Apply Points Discount</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Price Breakdown -->
+                <div class="price-breakdown">
+                    <div class="price-line">
+                        <span>Original Service Fee</span>
+                        <span id="price-original">Rs. 0</span>
+                    </div>
+                    <div class="price-line" id="discount-line" style="display: none; color: #2ecc71;">
+                        <span>Style Points Discount</span>
+                        <span id="price-discount">- Rs. 0</span>
+                    </div>
+                    <div class="price-line total">
+                        <span>Total Payable via Card</span>
+                        <span id="price-total" style="color: #ffcc00;">Rs. 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="security-badge">
+                🔒 256-Bit SSL Encrypted Card Processing
+            </div>
+        </div>
+
+        <!-- Right: Card Form -->
+        <div class="form-panel">
+            <div>
+                <h2 class="form-title">💳 Card Details</h2>
+                <p class="form-sub">Only full payment via credit/debit card is accepted to confirm your slot.</p>
+
+                <div id="alert-toast"></div>
+
+                <form id="card-payment-form">
+                    <div class="form-group">
+                        <label class="form-label">Name on Card</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👤</span>
+                            <input type="text" id="card-name" placeholder="John Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Card Number</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">💳</span>
+                            <input type="text" id="card-number" placeholder="4242 •••• •••• 4242" maxlength="19" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Expiry (MM/YY)</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">📅</span>
+                                <input type="text" id="card-expiry" placeholder="12/28" maxlength="5" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CVC / CVV</label>
+                            <div class="input-wrapper">
+                                <span class="input-icon">🔒</span>
+                                <input type="password" id="card-cvc" placeholder="•••" maxlength="4" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="pay-submit-btn" class="pay-btn">
+                        <span>Pay & Confirm Booking</span>
+                        <span id="btn-price-display">→</span>
+                    </button>
+                </form>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="salon-services.html" class="back-link">← Cancel and return to salon</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div id="payment-success-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; justify-content: center; align-items: center; padding: 20px;">
+        <div style="background: var(--card-bg, #1a1d24); border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 24px; padding: 36px 28px; max-width: 440px; width: 100%; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <div style="width: 76px; height: 76px; border-radius: 50%; background: linear-gradient(135deg, #2ecc71, #27ae60); display: flex; align-items: center; justify-content: center; font-size: 2.4rem; margin: 0 auto 20px; box-shadow: 0 10px 25px rgba(46, 204, 113, 0.4);">
+                ✓
+            </div>
+            
+            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--text-dark, #fff); margin: 0 0 8px 0; font-family: 'Outfit', sans-serif;">Payment Successful!</h2>
+            <p style="color: var(--text-muted, #9ca3af); font-size: 0.92rem; margin: 0 0 20px 0;">Your appointment has been confirmed & locked in.</p>
+
+            <div style="background: var(--bg-light, #121418); border: 1px solid var(--border-light, #2d3342); border-radius: 16px; padding: 18px; text-align: left; margin-bottom: 22px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.88rem;">
+                    <span style="color: var(--text-muted, #888);">Service:</span>
+                    <strong style="color: var(--text-dark, #fff);" id="success-service-name">Service</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.88rem;">
+                    <span style="color: var(--text-muted, #888);">Date & Time:</span>
+                    <span style="color: var(--orange-primary, #ff9f1c); font-weight: 700;" id="success-date-time">Today</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.88rem;">
+                    <span style="color: var(--text-muted, #888);">Amount Paid:</span>
+                    <strong style="color: #2ecc71;" id="success-amount-paid">Rs. 0</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+                    <span style="color: var(--text-muted, #888);">Booking Ref:</span>
+                    <span style="color: var(--text-muted, #888); font-family: monospace;" id="success-booking-ref">#REF</span>
+                </div>
+            </div>
+
+            <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 24px; font-size: 0.82rem; color: #2ecc71; display: flex; align-items: center; gap: 8px; text-align: left;">
+                <span style="font-size: 1.1rem;">📧</span>
+                <span>An automated confirmation receipt with your QR check-in code has been sent to your email!</span>
+            </div>
+
+            <button id="success-done-btn" style="width: 100%; padding: 14px; background: var(--orange-gradient, linear-gradient(135deg, #ff9f1c, #f59e0b)); border: none; border-radius: 14px; color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 6px 20px rgba(255, 159, 28, 0.35); transition: transform 0.2s;">
+                View in My Dashboard →
+            </button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes popIn {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+
+    <script>
+        const API = "http://localhost:5001";
+
+        // Read pending booking state from sessionStorage
+        const pendingStr = sessionStorage.getItem("pending_booking");
+        if (!pendingStr) {
+            alert("No appointment details found to checkout. Returning to salon menu.");
+            window.location.href = "salon-services.html";
+        }
+
+        const pending = JSON.parse(pendingStr || "{}");
+        const token = localStorage.getItem("stylepulse_token");
+        let user = {};
+        try {
+            const userStr = localStorage.getItem("stylepulse_user");
+            if (userStr) user = JSON.parse(userStr);
+        } catch (e) {
+            console.warn("User parse error:", e);
+        }
+
+        if (!token) {
+            console.warn("No token found, redirecting to login...");
+            window.location.href = "../login.html";
+        }
+
+        // Format 12-hour time
+        function fmt12(t) {
+            if (!t) return "";
+            const [h, m] = t.split(":").map(Number);
+            const ampm = h >= 12 ? "PM" : "AM";
+            const h12 = h % 12 || 12;
+            return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+        }
+
+        // Initialize UI Elements
+        const serviceNameEl = document.getElementById("summary-service-name");
+        const dateTimeEl = document.getElementById("summary-date-time");
+        const salonNameEl = document.getElementById("summary-salon-name");
+        const priceOriginalEl = document.getElementById("price-original");
+        const priceDiscountEl = document.getElementById("price-discount");
+        const priceTotalEl = document.getElementById("price-total");
+        const discountLine = document.getElementById("discount-line");
+        const btnPriceDisplay = document.getElementById("btn-price-display");
+        const availablePointsLabel = document.getElementById("available-points-label");
+        const redeemCheckbox = document.getElementById("redeem-checkbox");
+        const redeemCheckboxText = document.getElementById("redeem-checkbox-text");
+        const alertToast = document.getElementById("alert-toast");
+        const paySubmitBtn = document.getElementById("pay-submit-btn");
+
+        const basePrice = parseFloat(pending.price) || 0;
+        serviceNameEl.textContent = pending.serviceName || "Salon Service";
+        dateTimeEl.textContent = `${pending.date} at ${fmt12(pending.time)}`;
+        if (pending.salonName) salonNameEl.textContent = pending.salonName;
+        priceOriginalEl.textContent = `Rs. ${basePrice.toLocaleString()}`;
+        priceTotalEl.textContent = `Rs. ${basePrice.toLocaleString()}`;
+
+        let customerPoints = 0;
+        let maxDiscountPossible = 0;
+        let pointsDeducted = 0;
+        let isPointsApplied = false;
+
+        async function initPoints() {
+            try {
+                const userIdentifier = user.id || user.email;
+                const pointRes = await fetch(`${API}/api/loyalty/account/${userIdentifier}`);
+                if (pointRes.ok) {
+                    const pointData = await pointRes.json();
+                    customerPoints = pointData.account?.available_points || 0;
+                    availablePointsLabel.textContent = `${customerPoints.toLocaleString()} pts available`;
+
+                    // Max discount: up to Rs. 200, 100 points = Rs. 1
+                    const maxRedeemable = Math.min(customerPoints, 20000, basePrice * 100);
+                    maxDiscountPossible = Math.min(200, Math.floor(maxRedeemable / 100));
+
+                    if (maxDiscountPossible > 0) {
+                        redeemCheckboxText.textContent = `Apply Rs. ${maxDiscountPossible} OFF (${(maxDiscountPossible * 100).toLocaleString()} pts)`;
+                    } else {
+                        document.getElementById("points-action-container").innerHTML = `
+                            <span style="font-size:0.8rem; color:#888;">(Need at least 500 points to redeem a discount)</span>
+                        `;
+                    }
+                }
+            } catch (err) {
+                console.warn("Points load error:", err);
+            }
+        }
+
+        initPoints();
+
+        // Checkbox toggle logic
+        redeemCheckbox.addEventListener("change", (e) => {
+            isPointsApplied = e.target.checked;
+            if (isPointsApplied && maxDiscountPossible > 0) {
+                discountLine.style.display = "flex";
+                priceDiscountEl.textContent = `- Rs. ${maxDiscountPossible}`;
+                const finalAmount = Math.max(0, basePrice - maxDiscountPossible);
+                priceTotalEl.textContent = `Rs. ${finalAmount.toLocaleString()}`;
+                btnPriceDisplay.textContent = `(Rs. ${finalAmount.toLocaleString()})`;
+            } else {
+                discountLine.style.display = "none";
+                priceTotalEl.textContent = `Rs. ${basePrice.toLocaleString()}`;
+                btnPriceDisplay.textContent = `→`;
+            }
+        });
+
+        // Input card formatting
+        const cardNumInput = document.getElementById("card-number");
+        cardNumInput.addEventListener("input", (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            val = val.substring(0, 16);
+            let formatted = val.match(/.{1,4}/g)?.join(" ") || "";
+            e.target.value = formatted;
+        });
+
+        const cardExpiryInput = document.getElementById("card-expiry");
+        cardExpiryInput.addEventListener("input", (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            if (val.length >= 2) {
+                val = val.substring(0, 2) + "/" + val.substring(2, 4);
+            }
+            e.target.value = val;
+        });
+
+        function showError(msg) {
+            alertToast.style.display = "block";
+            alertToast.textContent = "⚠️ " + msg;
+        }
+
+        // Handle Card Form Submit
+        document.getElementById("card-payment-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            alertToast.style.display = "none";
+
+            const cardName = document.getElementById("card-name").value.trim();
+            const cardNum = document.getElementById("card-number").value.replace(/\s/g, "");
+            const cardExpiry = document.getElementById("card-expiry").value.trim();
+            const cardCvc = document.getElementById("card-cvc").value.trim();
+
+            if (cardNum.length < 16) {
+                showError("Please enter a valid 16-digit card number.");
+                return;
+            }
+            if (cardExpiry.length < 5 || !cardExpiry.includes("/")) {
+                showError("Please enter a valid expiry date (MM/YY).");
+                return;
+            }
+            if (cardCvc.length < 3) {
+                showError("Please enter a valid CVC code.");
+                return;
+            }
+
+            paySubmitBtn.disabled = true;
+            paySubmitBtn.innerHTML = `<span>⏳ Processing Payment & Confirming Slot…</span>`;
+
+            const pointsToRedeem = (isPointsApplied && maxDiscountPossible > 0) ? (maxDiscountPossible * 100) : 0;
+            const finalPaidAmount = Math.max(0, basePrice - (isPointsApplied ? maxDiscountPossible : 0));
+
+            try {
+                const res = await fetch(`${API}/api/auth/appointments`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        salonId: pending.salonId,
+                        serviceName: pending.serviceName,
+                        date: pending.date,
+                        time: pending.time,
+                        price: pending.price,
+                        redeemPoints: pointsToRedeem,
+                        paymentMethod: "CARD",
+                        cardLast4: cardNum.slice(-4)
+                    })
+                });
+
+                const data = await res.json();
+
+                if (res.status === 409) {
+                    showError(data.message || "Someone just booked this slot. Please select a different time.");
+                    paySubmitBtn.disabled = false;
+                    paySubmitBtn.innerHTML = `<span>Pay & Confirm Booking</span> <span>→</span>`;
+                    return;
+                }
+
+                if (data.success) {
+                    sessionStorage.removeItem("pending_booking");
+                    
+                    // Populate success modal
+                    document.getElementById("success-service-name").textContent = pending.serviceName || "Service";
+                    document.getElementById("success-date-time").textContent = `${pending.date} at ${fmt12(pending.time)}`;
+                    document.getElementById("success-amount-paid").textContent = `Rs. ${finalPaidAmount.toLocaleString()}`;
+                    if (data.appointment?.id) {
+                        document.getElementById("success-booking-ref").textContent = `#${String(data.appointment.id).slice(0, 8).toUpperCase()}`;
+                    }
+
+                    // Display success modal
+                    const modal = document.getElementById("payment-success-modal");
+                    modal.style.display = "flex";
+
+                    document.getElementById("success-done-btn").addEventListener("click", () => {
+                        window.location.href = "dashboard.html";
+                    });
+                } else {
+                    showError(data.message || "Payment transaction could not be processed.");
+                    paySubmitBtn.disabled = false;
+                    paySubmitBtn.innerHTML = `<span>Pay & Confirm Booking</span> <span>→</span>`;
+                }
+            } catch (err) {
+                console.error("Payment error:", err);
+                showError("Network connection error. Please try again.");
+                paySubmitBtn.disabled = false;
+                paySubmitBtn.innerHTML = `<span>Pay & Confirm Booking</span> <span>→</span>`;
+            }
+        });
+    </script>
+</body>
+</html>

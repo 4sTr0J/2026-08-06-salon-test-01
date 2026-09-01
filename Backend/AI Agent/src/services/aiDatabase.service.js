@@ -35,7 +35,7 @@ export const getBookedSlotsForDate = async (date) => {
     .from('appointments')
     .select('appointment_time')
     .eq('appointment_date', date)
-    .in('booking_status', ['Confirmed', 'Upcoming']);
+    .neq('booking_status', 'Cancelled');
 
   if (error) {
     console.warn('⚠️ Could not fetch booked slots:', error.message);

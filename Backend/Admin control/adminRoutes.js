@@ -1,5 +1,5 @@
 import express from "express";
-import { getPendingOwners, approveOwner, deleteOwner } from "../Admin control/adminController.js";
+import { getPendingOwners, approveOwner, deleteOwner } from "./adminController.js";
 
 const router = express.Router();
 
