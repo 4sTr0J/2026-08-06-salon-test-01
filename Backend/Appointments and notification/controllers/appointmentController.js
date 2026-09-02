@@ -228,17 +228,14 @@ export const handleCreateAppointment = async (req, res) => {
       appointment_time
     });
 
-    // Send the confirmation email immediately with payment discount summary
-    try {
-      await sendConfirmationEmail(appointment, {
-        discountApplied,
-        pointsDeducted,
-        paymentMethod: 'CARD'
-      });
-    } catch (err) {
+    // Send the confirmation email asynchronously with payment discount summary (non-blocking)
+    sendConfirmationEmail(appointment, {
+      discountApplied,
+      pointsDeducted,
+      paymentMethod: 'CARD'
+    }).catch(err => {
       console.error('⚠️ Could not send confirmation email:', err.message);
-      // We do not fail the booking if email fails, but log it.
-    }
+    });
 
     return res.status(201).json({
       success: true,
