@@ -6,6 +6,41 @@ const isSupabaseConfigured = () => {
     return url && url !== 'https://placeholder.supabase.co' && url.includes('.supabase.co');
 };
 
+// Admin Login Authentication Endpoint
+export const adminLogin = async (req, res) => {
+    const { email, password } = req.body;
+    const configuredPassword = process.env.ADMIN_PASSWORD || 'admin123';
+    const configuredEmail = process.env.ADMIN_EMAIL || 'annyafernando915@gmail.com';
+
+    if (email === configuredEmail && password === configuredPassword) {
+        // Return admin session token
+        return res.status(200).json({
+            success: true,
+            token: process.env.ADMIN_SECRET_TOKEN || 'stylepulse_admin_secret_token_secure_99',
+            message: "Super Admin authenticated successfully."
+        });
+    }
+
+    return res.status(401).json({
+        success: false,
+        message: "Invalid Admin credentials. Access denied."
+    });
+};
+
+// Admin Authentication Middleware
+export const verifyAdminSecret = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    const configuredSecret = process.env.ADMIN_SECRET_TOKEN || 'stylepulse_admin_secret_token_secure_99';
+
+    if (!authHeader || (!authHeader.includes(configuredSecret) && !authHeader.includes('Bearer ' + configuredSecret))) {
+        return res.status(403).json({
+            success: false,
+            message: "Unauthorized: Super Admin credentials required."
+        });
+    }
+    next();
+};
+
 export const getPendingOwners = async (req, res) => {
     if (!isSupabaseConfigured()) {
         return res.status(500).json({ success: false, message: "Database not configured." });

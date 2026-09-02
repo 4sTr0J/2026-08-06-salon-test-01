@@ -31,23 +31,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Admin Login Submission
     if (adminLoginForm) {
-        adminLoginForm.addEventListener('submit', (e) => {
+        adminLoginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const pwd = adminPasswordInput.value.trim();
+            const email = document.getElementById('admin-email').value.trim();
+            const password = adminPasswordInput.value.trim();
 
-            if (!pwd) {
+            if (!password) {
                 showAdminAlert('Please enter the Master Security Password.', 'error');
                 return;
             }
 
-            if (pwd === 'admin123' || pwd.length >= 6) {
-                sessionStorage.setItem('stylepulse_admin_session', 'true');
-                showAdminAlert('Authenticated successfully! Loading Master Control Center...', 'success');
-                setTimeout(() => {
-                    checkAdminAuthStatus();
-                }, 600);
-            } else {
-                showAdminAlert('Invalid Master Password. Access Denied.', 'error');
+            try {
+                const response = await fetch(`${API_ROOT}/api/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.success && data.token) {
+                    sessionStorage.setItem('stylepulse_admin_token', data.token);
+                    sessionStorage.setItem('stylepulse_admin_session', 'true');
+                    showAdminAlert('Authenticated successfully! Loading Master Control Center...', 'success');
+                    setTimeout(() => {
+                        checkAdminAuthStatus();
+                    }, 600);
+                } else {
+                    showAdminAlert(data.message || 'Invalid Master Password. Access Denied.', 'error');
+                }
+            } catch (err) {
+                showAdminAlert('Server connection error. Please try again.', 'error');
             }
         });
     }
@@ -147,8 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load & Render Dashboard Data
     async function loadAndRenderDashboard() {
+        const adminToken = sessionStorage.getItem('stylepulse_admin_token') || 'stylepulse_admin_secret_token_secure_99';
         try {
-            const response = await fetch(`${API_ROOT}/api/admin/owners`);
+            const response = await fetch(`${API_ROOT}/api/admin/owners`, {
+                headers: {
+                    'Authorization': `Bearer ${adminToken}`
+                }
+            });
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
@@ -259,10 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Action Handler: Approve Owner
     async function handleApproveOwner(id) {
+        const adminToken = sessionStorage.getItem('stylepulse_admin_token') || 'stylepulse_admin_secret_token_secure_99';
         try {
             const res = await fetch(`${API_ROOT}/api/admin/owners/${id}/approve`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                }
             });
             if (res.ok) {
                 loadAndRenderDashboard();
@@ -281,10 +303,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const adminToken = sessionStorage.getItem('stylepulse_admin_token') || 'stylepulse_admin_secret_token_secure_99';
         try {
             const res = await fetch(`${API_ROOT}/api/admin/owners/${id}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                }
             });
             if (res.ok) {
                 loadAndRenderDashboard();
