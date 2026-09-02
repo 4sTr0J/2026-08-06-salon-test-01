@@ -717,9 +717,10 @@
             }
 
             // Fetch salons (services are pre-loaded in the response by the backend)
+            const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
             try {
                 const headers = token ? { "Authorization": `Bearer ${token}` } : {};
-                const res = await fetch("http://localhost:5001/api/auth/salons", { headers });
+                const res = await fetch(`${API_ROOT}/api/auth/salons`, { headers });
                 const data = await res.json();
                 
                 if (data.success && data.salons) {
@@ -732,7 +733,7 @@
                 console.error("Salons load error:", err);
                 // Fallback attempt without auth header
                 try {
-                    const res = await fetch("http://localhost:5001/api/auth/salons");
+                    const res = await fetch(`${API_ROOT}/api/auth/salons`);
                     const data = await res.json();
                     if (data.success && data.salons) {
                         allSalons = data.salons;

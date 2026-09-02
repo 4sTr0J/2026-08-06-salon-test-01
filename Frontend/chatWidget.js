@@ -5,7 +5,7 @@
 // ====================================================
 
 (function () {
-  const API_BASE = 'http://localhost:5001';
+  const API_BASE = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
 
   // ── Generate a simple session ID (stored in sessionStorage) ──
   function getSessionId() {

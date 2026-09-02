@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (profileEmail) profileEmail.textContent = user.email;
     if (profileRole) profileRole.textContent = user.role || 'Customer';
 
+    const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+
     // 3. Logout Logic
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
@@ -64,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadCustomerAppointments() {
         try {
-            const res = await fetch("http://localhost:5001/api/auth/appointments", {
+            const res = await fetch(`${API_ROOT}/api/auth/appointments`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const data = await res.json();
@@ -410,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
             notifyBtn.textContent = "Sending...";
 
             try {
-                const res = await fetch(`http://localhost:5001/api/appointments/${appointmentId}/running-late`, {
+                const res = await fetch(`${API_ROOT}/api/appointments/${appointmentId}/running-late`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -451,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. Fetch Quote & check max 3 limit
         let quote = { isFree: true, fee: 0, pastReschedulesCount: 0, maxLimitReached: false, isAllowed: true, remainingReschedules: 3 };
         try {
-            const qRes = await fetch(`http://localhost:5001/api/appointments/${appointmentId}/reschedule-quote`, {
+            const qRes = await fetch(`${API_ROOT}/api/appointments/${appointmentId}/reschedule-quote`, {
                 headers: { "Authorization": `Bearer ${token}` }
             });
             const qData = await qRes.json();
@@ -552,7 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 grid.innerHTML = '<div style="grid-column: 1/-1; color: #888; font-size: 0.85rem;">Loading slots…</div>';
 
                 try {
-                    const res = await fetch(`http://localhost:5001/api/appointments/available?date=${iso}&salonId=${salonId || ''}`);
+                    const res = await fetch(`${API_ROOT}/api/appointments/available?date=${iso}&salonId=${salonId || ''}`);
                     const data = await res.json();
                     const available = data.availableSlots || [];
                     const operating = data.operatingSlots || available;
@@ -606,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = "Rescheduling...";
 
             try {
-                const res = await fetch(`http://localhost:5001/api/appointments/${appointmentId}/reschedule`, {
+                const res = await fetch(`${API_ROOT}/api/appointments/${appointmentId}/reschedule`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -618,11 +620,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 modal.remove();
                 if (data.success) {
-                    showRescheduleSuccessModal({
-                        newDate: selectedDate,
-                        newTime: selectedSlot,
-                        serviceName: serviceName,
-                        feeCharged: data.feeCharged || 0,
                         totalFee: data.totalRescheduleFee || 0,
                         rescheduleCount: data.rescheduleCount || 1,
                         message: data.message
@@ -775,9 +772,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(modalDiv);
 
         modalDiv.querySelector('#close-success-modal-btn').addEventListener('click', () => modalDiv.remove());
-        modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) modalDiv.remove(); });
-    }
-
+        
     // Cancellation logic
     window.handleCancelAppointment = async function(appointmentId) {
         if (!confirm("Are you sure you want to cancel this appointment?")) {
@@ -785,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         try {
-            const res = await fetch(`http://localhost:5001/api/appointments/${appointmentId}/cancel`, {
+            const res = await fetch(`${API_ROOT}/api/appointments/${appointmentId}/cancel`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -796,102 +791,74 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (data.success) {
                 const refund = data.data.refundPercentage;
-                const hours = data.data.hoursUntilAppointment;
-                
-                let message = `Appointment cancelled successfully.`;
-                if (refund > 0) {
-                    message += ` You will receive a ${refund}% refund since you cancelled ${hours} hours in advance.`;
-                } else {
-                    message += ` Unfortunately, no refund is applicable due to the salon's cancellation policy.`;
-                }
-                
-                showAlert(message, "success", 4000);
-                loadCustomerAppointments(); // reload the appointments to update UI
+                showAlert(`Appointment cancelled. Eligible Refund: ${refund}% under salon cancellation policy.`, "success", 6000);
+                loadCustomerAppointments();
             } else {
                 showAlert(data.message || "Failed to cancel appointment", "error");
             }
-        } catch (err) {
-            console.error("Cancel Error:", err);
-            showAlert("An error occurred while cancelling.", "error");
+        } catch (e) {
+            showAlert("Server error while cancelling appointment.", "error");
         }
     };
 
-    // Floating Review Modal script injection helper
-    window.openReviewModal = function(salonId, appointmentId, serviceName, salonName) {
-        // Close notification dropdown if open
-        const notifDrop = document.getElementById("notif-dropdown");
-        if (notifDrop) notifDrop.style.display = "none";
-
-        const modalId = 'sp-review-modal';
-        let oldModal = document.getElementById(modalId);
-        if (oldModal) oldModal.remove();
+    // ── NLP REVIEW MODAL LOGIC ────────────────────────────────────────────────
+    window.openReviewModal = function(salonId, appointmentId, salonName) {
+        const existing = document.getElementById('sp-review-modal');
+        if (existing) existing.remove();
 
         const modal = document.createElement('div');
-        modal.id = modalId;
-        Object.assign(modal.style, {
-            position: "fixed", inset: "0", background: "rgba(0,0,0,0.85)",
-            display: "flex", alignItems: "center", justifycontent: "center",
-            zIndex: "10000", backdropFilter: "blur(10px)", display: "flex",
-            justifyContent: "center", alignItems: "center"
-        });
+        modal.id = 'sp-review-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000; backdrop-filter: blur(8px);
+        `;
 
         modal.innerHTML = `
-            <div style="background: #12110e; border: 1px solid rgba(255, 184, 43, 0.45); border-radius: 18px; padding: 2.2rem; width: 90%; max-width: 440px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); color: #fff; font-family: 'Poppins', sans-serif;">
-                <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.5rem; color: #ffcc00; margin: 0 0 0.5rem;">⭐ Write a Review</h3>
-                <p style="font-size: 0.88rem; color: rgba(255,255,255,0.6); margin-bottom: 1.5rem;">For ${serviceName} at ${salonName}</p>
-                
-                <div style="display: flex; flex-direction: column; gap: 1.2rem; text-align: left; margin-bottom: 1.8rem;">
-                    <div>
-                        <label style="font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Rating</label>
-                        <div style="display: flex; gap: 8px;" id="review-stars-container">
-                            ${[1,2,3,4,5].map(num => `<span class="review-star" data-value="${num}" style="font-size: 1.8rem; cursor: pointer; color: rgba(255,255,255,0.25); transition: color 0.2s;">★</span>`).join('')}
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-size: 0.8rem; color: rgba(255,255,255,0.5); display: block; margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Your Review &amp; Feedback</label>
-                        <textarea id="review-textarea" placeholder="Tell us about your experience..." style="width: 100%; height: 90px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; padding: 10px; font-family: inherit; font-size: 0.9rem; resize: none; box-sizing: border-box; outline: none;"></textarea>
-                    </div>
+            <div style="background: #111116; border: 1px solid rgba(255,204,0,0.3); border-radius: 16px; width: 90%; max-width: 460px; padding: 2rem; color: #fff; box-shadow: 0 20px 60px rgba(0,0,0,0.8);">
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.3rem; color: #ffcc00;">Rate Your Experience</h3>
+                <p style="color: #aaa; font-size: 0.85rem; margin-bottom: 1.2rem;">How was your visit at <strong>${salonName || 'the salon'}</strong>?</p>
+
+                <!-- Star Rating -->
+                <div id="sp-star-container" style="display: flex; gap: 8px; font-size: 1.8rem; cursor: pointer; margin-bottom: 1.2rem; justify-content: center;">
+                    <span data-v="1" style="color: #444; transition: color 0.15s;">★</span>
+                    <span data-v="2" style="color: #444; transition: color 0.15s;">★</span>
+                    <span data-v="3" style="color: #444; transition: color 0.15s;">★</span>
+                    <span data-v="4" style="color: #444; transition: color 0.15s;">★</span>
+                    <span data-v="5" style="color: #444; transition: color 0.15s;">★</span>
                 </div>
 
+                <!-- Review Textarea -->
+                <textarea id="sp-review-text" placeholder="Share your experience (e.g., 'Loved the haircut, very clean salon and friendly staff!')..." style="width: 100%; height: 90px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #fff; padding: 10px; font-size: 0.85rem; resize: none; box-sizing: border-box; margin-bottom: 1.2rem;"></textarea>
+
+                <!-- Action Buttons -->
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button id="cancel-review-btn" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
-                    <button id="submit-review-btn" style="background: linear-gradient(135deg, #ffc845, #e5a93b); border: none; color: #000; padding: 8px 24px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.9rem; opacity: 0.5; pointer-events: none;">Submit Feedback</button>
+                    <button id="cancel-review-btn" style="padding: 10px 18px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; color: #aaa; font-size: 0.85rem; cursor: pointer;">Skip</button>
+                    <button id="submit-review-btn" style="padding: 10px 22px; background: linear-gradient(135deg, #ffcc00, #ff9900); border: none; border-radius: 8px; color: #000; font-weight: 700; font-size: 0.85rem; cursor: pointer;">Submit Review</button>
                 </div>
             </div>
         `;
 
         document.body.appendChild(modal);
 
-        let selectedRating = 0;
-        const stars = modal.querySelectorAll('.review-star');
-        const textarea = modal.querySelector('#review-textarea');
+        let selectedRating = 5;
+        const stars = modal.querySelectorAll('#sp-star-container span');
+        const textarea = modal.querySelector('#sp-review-text');
         const submitBtn = modal.querySelector('#submit-review-btn');
 
-        stars.forEach(star => {
-            star.addEventListener('mouseover', () => {
-                const val = parseInt(star.dataset.value);
-                stars.forEach((s, idx) => { s.style.color = idx < val ? '#ffcc00' : 'rgba(255,255,255,0.25)'; });
+        function updateStars(val) {
+            stars.forEach(s => {
+                s.style.color = parseInt(s.getAttribute('data-v')) <= val ? '#ffcc00' : '#444';
             });
-            star.addEventListener('mouseout', () => {
-                stars.forEach((s, idx) => { s.style.color = idx < selectedRating ? '#ffcc00' : 'rgba(255,255,255,0.25)'; });
-            });
-            star.addEventListener('click', () => {
-                selectedRating = parseInt(star.dataset.value);
-                validate();
+        }
+        updateStars(selectedRating);
+
+        stars.forEach(s => {
+            s.addEventListener('click', () => {
+                selectedRating = parseInt(s.getAttribute('data-v'));
+                updateStars(selectedRating);
             });
         });
-
-        textarea.addEventListener('input', validate);
-
-        function validate() {
-            if (selectedRating > 0 && textarea.value.trim().length > 3) {
-                submitBtn.style.opacity = '1';
-                submitBtn.style.pointerEvents = 'all';
-            } else {
-                submitBtn.style.opacity = '0.5';
-                submitBtn.style.pointerEvents = 'none';
-            }
-        }
 
         modal.querySelector('#cancel-review-btn').addEventListener('click', () => modal.remove());
 
@@ -900,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                const res = await fetch('http://localhost:5001/api/reviews', {
+                const res = await fetch(`${API_ROOT}/api/reviews`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

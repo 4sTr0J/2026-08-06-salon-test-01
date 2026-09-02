@@ -231,7 +231,8 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.innerHTML = `<span class="btn-text">CREATING ACCOUNT...</span>`;
 
             try {
-                const response = await fetch('http://localhost:5001/api/auth/register', {
+                const apiBase = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+                const response = await fetch(`${apiBase}/api/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 

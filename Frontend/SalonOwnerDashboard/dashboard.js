@@ -22,7 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // API Base URL
-    const API_BASE = "http://localhost:5001/api/owner";
+    const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+    const API_BASE = `${API_ROOT}/api/owner`;
 
     // DOM Elements
     const ownerNameDisplay = document.getElementById("owner-name-display");
@@ -133,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 2.5 Fetch Cancellation Policy
     async function loadCancellationPolicy() {
         try {
-            const res = await fetch(`http://localhost:5001/api/cancellation-policy/active?salon_id=${user.id}`);
+            const res = await fetch(`${API_ROOT}/api/cancellation-policy/active?salon_id=${user.id}`);
             const data = await res.json();
             if (data.policy) {
                 document.getElementById('setting-cancellation-policy').value = data.policy.policy_type;
@@ -212,7 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.success) {
                     // Update cancellation policy as well
                     const selectedPolicy = document.getElementById('setting-cancellation-policy').value;
-                    await fetch("http://localhost:5001/api/cancellation-policy", {
+                    await fetch(`${API_ROOT}/api/cancellation-policy`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
@@ -787,7 +788,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!reviewsFeed) return;
         try {
             // Fetch reviews
-            const res = await fetch(`http://localhost:5001/api/reviews/salon/${user.id}`);
+            const res = await fetch(`${API_ROOT}/api/reviews/salon/${user.id}`);
             const data = await res.json();
             if (data.success && data.reviews) {
                 allReviews = data.reviews;
@@ -802,7 +803,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadReviewSummary() {
         if (!nlpRating) return;
         try {
-            const res = await fetch(`http://localhost:5001/api/reviews/salon/${user.id}/summary`);
+            const res = await fetch(`${API_ROOT}/api/reviews/salon/${user.id}/summary`);
             const data = await res.json();
             if (data.success) {
                 nlpRating.textContent = data.averageRating > 0 ? data.averageRating.toFixed(1) : "0.0";

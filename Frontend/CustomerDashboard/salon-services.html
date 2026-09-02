@@ -359,9 +359,10 @@
             }
 
             // Fetch Services from Backend
+            const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
             const container = document.getElementById("services-list-container");
             try {
-                const res = await fetch(`http://localhost:5001/api/auth/salons/${salonId}/services`, {
+                const res = await fetch(`${API_ROOT}/api/auth/salons/${salonId}/services`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -409,7 +410,7 @@
         });
 
         // ── FRESHA-STYLE BOOKING FLOW ─────────────────────────────────────
-        const API = "http://localhost:5001";
+        const API = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
         // All possible slots (9am–7pm, every 30 min)
         const ALL_SLOTS = [
             "09:00","09:30","10:00","10:30","11:00","11:30",

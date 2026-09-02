@@ -62,7 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Loyalty API Base URL
-    const LOYALTY_API = 'http://localhost:5001/api/loyalty';
+    const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+    const LOYALTY_API = `${API_ROOT}/api/loyalty`;
     const customerId = user.id || user.email;
     const userEmail = user.email || '';
 

@@ -24,6 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let searchQuery = '';
     let autoPollInterval = null;
 
+    const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+
     // Initial Auth Check
     checkAdminAuthStatus();
 
@@ -146,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load & Render Dashboard Data
     async function loadAndRenderDashboard() {
         try {
-            const response = await fetch('http://localhost:5001/api/admin/owners');
+            const response = await fetch(`${API_ROOT}/api/admin/owners`);
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
@@ -258,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Action Handler: Approve Owner
     async function handleApproveOwner(id) {
         try {
-            const res = await fetch(`http://localhost:5001/api/admin/owners/${id}/approve`, {
+            const res = await fetch(`${API_ROOT}/api/admin/owners/${id}/approve`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -280,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res = await fetch(`http://localhost:5001/api/admin/owners/${id}`, {
+            const res = await fetch(`${API_ROOT}/api/admin/owners/${id}`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' }
             });
