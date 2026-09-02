@@ -24,16 +24,29 @@ dotenv.config();
 
 const app = express();
 
-// Allow React frontend connection on any localhost port
+// Allow localhost and cloud frontend connections (Railway, custom domains)
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
+        // Allow requests with no origin (like mobile apps, curl, or server-to-server)
         if (!origin) return callback(null, true);
-        // Allow any localhost origin
+        
+        // Allow any localhost / local IP
         if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
             return callback(null, true);
         }
-        callback(new Error('Not allowed by CORS'));
+        
+        // Allow Railway domains (*.up.railway.app, *.railway.app)
+        if (origin.endsWith('.railway.app') || origin.includes('.up.railway.app')) {
+            return callback(null, true);
+        }
+
+        // Allow custom FRONTEND_URL or ALLOWED_ORIGINS if configured
+        const allowed = process.env.FRONTEND_URL || process.env.ALLOWED_ORIGINS;
+        if (allowed && allowed.split(',').map(s => s.trim()).includes(origin)) {
+            return callback(null, true);
+        }
+
+        callback(null, true); // Fallback allow for public frontend API access
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
