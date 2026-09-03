@@ -599,9 +599,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 <tr>
                     <td>
                         <div class="contact-cell">
-                            <strong style="color: #fff; font-size: 0.95rem;">👤 ${displayName}</strong>
+                            <div style="font-family: monospace; font-size: 0.72rem; color: var(--gold-bright); background: rgba(255, 184, 43, 0.1); border: 1px solid rgba(255, 184, 43, 0.25); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; font-weight: 700; letter-spacing: 0.5px;">
+                                #${(a.id || '').substring(0, 8)}
+                            </div>
+                            <strong style="color: #fff; font-size: 0.95rem; display: block;">👤 ${displayName}</strong>
                             ${a.client_email && a.client_email !== 'N/A' ? `<span style="font-size:0.75rem; color:rgba(255,204,0,0.85); display:block; margin: 1px 0;">✉️ ${a.client_email}</span>` : ''}
-                            <span style="font-size:0.75rem; color:rgba(255,255,255,0.55);">📞 ${a.client_phone}</span>
+                            <span style="font-size:0.75rem; color:rgba(255,255,255,0.55); display:block;">📞 ${a.client_phone}</span>
                             ${lateAlertHtml}
                         </div>
                     </td>
@@ -687,6 +690,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return `
                 <div class="booking-item-mini" style="${a.late_notification ? 'border-left: 3px solid #ffcc00;' : ''}">
                     <div class="booking-client-info">
+                        <span style="font-family: monospace; font-size: 0.7rem; color: var(--gold-bright); font-weight: 700; display: block; margin-bottom: 2px;">#${(a.id || '').substring(0, 8)}</span>
                         <h4>👤 ${displayName}</h4>
                         ${a.client_email && a.client_email !== 'N/A' ? `<p style="font-size:0.75rem; color:rgba(255,204,0,0.85); margin:2px 0;">✉️ ${a.client_email}</p>` : ''}
                         <p>💇 Service: ${a.service} (with ${a.stylist})</p>

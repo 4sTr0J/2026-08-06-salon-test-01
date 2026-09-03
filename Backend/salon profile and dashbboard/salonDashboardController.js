@@ -357,6 +357,55 @@ export const updateSalonAppointmentStatus = async (req, res) => {
 
                     const rewardRes = awardAppointmentPointsHelper(customerData, earnedPoints, data.id);
                     console.log(`[Loyalty System] Awarded ${earnedPoints} Style Points to ${customerData.email} for appointment ${data.id}:`, rewardRes);
+
+                    // Financial Ledger Record: 10% Platform Commission, 90% Salon Earnings
+                    if (price > 0) {
+                        try {
+                            const { default: loyaltyDb } = await import("../database/loyaltyDb.js");
+                            const existingPayment = loyaltyDb.prepare("SELECT id FROM payments WHERE appointment_id = ?").get(data.id);
+
+                            if (!existingPayment) {
+                                const crypto = await import('crypto');
+                                const platformCommissionPct = 10.00;
+                                const platformCommissionAmt = parseFloat((price * (platformCommissionPct / 100)).toFixed(2));
+                                const salonEarnings = parseFloat((price - platformCommissionAmt).toFixed(2));
+                                const paymentId = crypto.randomUUID();
+
+                                loyaltyDb.prepare(`
+                                    INSERT INTO payments (
+                                        id, appointment_id, customer_email, salon_id, gross_amount, 
+                                        points_discount, net_amount, platform_commission_pct, 
+                                        platform_commission_amt, salon_earnings, payment_status, 
+                                        card_last4, payment_method
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                `).run(
+                                    paymentId, data.id, data.customer_email || 'guest@example.com', data.salon_id,
+                                    price, 0, price, platformCommissionPct, platformCommissionAmt,
+                                    salonEarnings, 'Completed', 'CASH', 'CARD'
+                                );
+
+                                loyaltyDb.prepare(`
+                                    INSERT INTO salon_earnings (
+                                        id, salon_id, payment_id, appointment_id, transaction_type, amount, description
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                                `).run(
+                                    crypto.randomUUID(), data.salon_id, paymentId, data.id, 'CREDIT',
+                                    salonEarnings, `Payment collected for appt ${data.id.substring(0, 8)}`
+                                );
+
+                                loyaltyDb.prepare(`
+                                    INSERT INTO platform_revenue (
+                                        id, salon_id, payment_id, appointment_id, transaction_type, amount, description
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                                `).run(
+                                    crypto.randomUUID(), data.salon_id, paymentId, data.id, 'CREDIT',
+                                    platformCommissionAmt, `Platform commission (10%) on appt ${data.id.substring(0, 8)}`
+                                );
+                            }
+                        } catch (finErr) {
+                            console.warn("Could not log financial completion record:", finErr.message);
+                        }
+                    }
                 }
             } catch (pointErr) {
                 console.error("Could not award points on completion:", pointErr.message);
@@ -366,6 +415,37 @@ export const updateSalonAppointmentStatus = async (req, res) => {
         return res.status(200).json({ success: true, message: `Appointment marked as ${status} successfully.`, appointment: data });
     } catch (err) {
         console.error("Error updating appointment status:", err);
+        return res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// 5. Get Salon Financial Earnings
+export const getSalonEarnings = async (req, res) => {
+    try {
+        const ownerId = req.user.id;
+        const { default: loyaltyDb } = await import("../database/loyaltyDb.js");
+
+        const data = loyaltyDb.prepare("SELECT * FROM salon_earnings WHERE salon_id = ? ORDER BY created_at DESC").all(ownerId) || [];
+
+        let totalCredits = 0;
+        let totalDebits = 0;
+
+        data.forEach(txn => {
+            const amt = parseFloat(txn.amount) || 0;
+            if (txn.transaction_type === 'CREDIT') totalCredits += amt;
+            if (txn.transaction_type === 'DEBIT') totalDebits += amt;
+        });
+
+        return res.status(200).json({
+            success: true,
+            totalCredits: parseFloat(totalCredits.toFixed(2)),
+            totalDebits: parseFloat(totalDebits.toFixed(2)),
+            netEarnings: parseFloat((totalCredits - totalDebits).toFixed(2)),
+            transactions: data
+        });
+
+    } catch (err) {
+        console.error("Error fetching salon earnings:", err);
         return res.status(500).json({ success: false, message: err.message });
     }
 };

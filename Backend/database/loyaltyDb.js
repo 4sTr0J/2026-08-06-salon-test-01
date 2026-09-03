@@ -49,6 +49,10 @@ const initDb = () => {
     db.exec(`ALTER TABLE profiles ADD COLUMN password TEXT;`);
   } catch (err) {}
 
+  try {
+    db.exec(`ALTER TABLE payments ADD COLUMN payout_status TEXT DEFAULT 'Pending_Release';`);
+  } catch (err) {}
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS profiles (
       id TEXT PRIMARY KEY,
@@ -143,6 +147,83 @@ const initDb = () => {
       new_time TEXT,
       reschedule_count INTEGER DEFAULT 1,
       fee_charged REAL DEFAULT 0.0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS cancellation_policies (
+      id TEXT PRIMARY KEY,
+      salon_id TEXT NOT NULL,
+      policy_type TEXT NOT NULL,
+      refund_percentage INTEGER NOT NULL,
+      cancellation_window_hours INTEGER NOT NULL,
+      description TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id TEXT PRIMARY KEY,
+      appointment_id TEXT NOT NULL,
+      customer_email TEXT NOT NULL,
+      salon_id TEXT NOT NULL,
+      gross_amount REAL NOT NULL,
+      points_discount REAL NOT NULL DEFAULT 0,
+      net_amount REAL NOT NULL,
+      platform_commission_pct REAL NOT NULL DEFAULT 10.00,
+      platform_commission_amt REAL NOT NULL,
+      salon_earnings REAL NOT NULL,
+      payment_status TEXT NOT NULL DEFAULT 'Completed',
+      payout_status TEXT NOT NULL DEFAULT 'Pending_Release',
+      card_last4 TEXT,
+      payment_method TEXT NOT NULL DEFAULT 'CARD',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS salon_earnings (
+      id TEXT PRIMARY KEY,
+      salon_id TEXT NOT NULL,
+      payment_id TEXT,
+      appointment_id TEXT,
+      transaction_type TEXT NOT NULL,
+      amount REAL NOT NULL,
+      description TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS platform_revenue (
+      id TEXT PRIMARY KEY,
+      payment_id TEXT,
+      appointment_id TEXT,
+      salon_id TEXT,
+      transaction_type TEXT NOT NULL,
+      amount REAL NOT NULL,
+      description TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS cancellation_refunds (
+      id TEXT PRIMARY KEY,
+      appointment_id TEXT NOT NULL,
+      customer_email TEXT NOT NULL,
+      salon_id TEXT,
+      refund_percentage REAL NOT NULL,
+      refund_amount REAL NOT NULL,
+      bank_name TEXT NOT NULL,
+      branch_name TEXT,
+      account_number TEXT NOT NULL,
+      account_holder_name TEXT NOT NULL,
+      status TEXT DEFAULT 'Pending_Bank_Transfer',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);

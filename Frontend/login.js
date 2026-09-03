@@ -87,11 +87,32 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<span class="btn-text">VERIFYING CREDENTIALS...</span>`;
 
-
-
             try {
-                // Attempt Express Backend Auth API
                 const apiBase = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+
+                // Check if logging in with Super Admin credentials
+                if (email.toLowerCase() === 'annyafernando915@gmail.com') {
+                    const adminRes = await fetch(`${apiBase}/api/admin/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    }).catch(() => null);
+
+                    if (adminRes && adminRes.ok) {
+                        const adminData = await adminRes.json();
+                        if (adminData.success && adminData.token) {
+                            sessionStorage.setItem('stylepulse_admin_token', adminData.token);
+                            sessionStorage.setItem('stylepulse_admin_session', 'true');
+                            showAlert('👑 Super Admin Authenticated! Redirecting to Admin Portal...', 'success', 1500);
+                            setTimeout(() => {
+                                window.location.href = 'AdminDashboard/admin.html';
+                            }, 1200);
+                            return;
+                        }
+                    }
+                }
+
+                // Attempt Express Backend Auth API
                 const response = await fetch(`${apiBase}/api/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

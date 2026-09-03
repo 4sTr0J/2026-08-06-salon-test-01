@@ -283,7 +283,7 @@ function initDashboard() {
             const isCompleted = (a.booking_status || "").toLowerCase() === "completed";
             const isCancelled = (a.booking_status || "").toLowerCase() === "cancelled";
             const isRescheduled = a.is_rescheduled || (a.booking_status || "").toLowerCase() === "rescheduled";
-            const isUpcoming = ((a.booking_status || "").toLowerCase() === "upcoming" || (a.booking_status || "").toLowerCase() === "confirmed") && !isCancelled;
+            const isUpcoming = !isCancelled && !isCompleted;
             
             const reviewButtonHtml = isCompleted 
                 ? (a.isReviewed 
@@ -569,7 +569,10 @@ function initDashboard() {
         for (let i = 0; i < 14; i++) {
             const d = new Date(today);
             d.setDate(today.getDate() + i);
-            const iso = d.toISOString().split("T")[0];
+            const isoYear = d.getFullYear();
+            const isoMonth = String(d.getMonth() + 1).padStart(2, '0');
+            const isoDay = String(d.getDate()).padStart(2, '0');
+            const iso = `${isoYear}-${isoMonth}-${isoDay}`;
 
             const chip = document.createElement("div");
             chip.style.cssText = "min-width: 58px; padding: 10px 6px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); cursor: pointer; text-align: center; flex-shrink: 0; transition: all 0.2s;";
@@ -823,32 +826,215 @@ function initDashboard() {
         modalDiv.querySelector('#close-success-modal-btn').addEventListener('click', () => modalDiv.remove());
     }
 
-    // Cancellation logic
+    // Cancellation logic with automated refund bank details collection
     window.handleCancelAppointment = async function(appointmentId) {
-        if (!confirm("Are you sure you want to cancel this appointment?")) {
-            return;
-        }
-        
+        // Safe client name lookup
+        let clientName = '';
         try {
-            const res = await fetch(`${API_ROOT}/api/appointments/${appointmentId}/cancel`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                }
+            const u = JSON.parse(localStorage.getItem('stylepulse_user') || '{}');
+            clientName = u.full_name || u.name || '';
+        } catch (e) {}
+
+        const activeToken = localStorage.getItem('stylepulse_token') || token;
+
+        // Build the modal immediately with loading state
+        const existing = document.getElementById('sp-cancel-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'sp-cancel-modal';
+        modal.style.cssText = `
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000; backdrop-filter: blur(8px); padding: 20px;
+        `;
+
+        modal.innerHTML = `
+            <div style="background: #14120c; border: 1px solid rgba(255, 184, 43, 0.4); border-radius: 18px; width: 100%; max-width: 500px; box-shadow: 0 25px 70px rgba(0,0,0,0.85); font-family: 'Poppins', sans-serif; color: #fff; overflow: hidden;">
+                <!-- Modal Header -->
+                <div style="padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.3rem;">⚠️</span>
+                        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #ffcc00;">Cancel Appointment</h3>
+                    </div>
+                    <button id="close-cancel-modal-btn" style="background: transparent; border: none; color: #888; font-size: 1.4rem; cursor: pointer;">&times;</button>
+                </div>
+
+                <!-- Modal Body (Dynamic) -->
+                <div id="cancel-modal-body" style="padding: 22px; max-height: 72vh; overflow-y: auto;">
+                    <div style="text-align: center; padding: 30px 10px; color: #ffcc00;">
+                        <div style="font-size: 1.8rem; margin-bottom: 10px;">⏳</div>
+                        <div style="font-size: 0.95rem; font-weight: 600;">Checking cancellation policy &amp; refund eligibility...</div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div id="cancel-modal-footer" style="padding: 14px 22px; border-top: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); display: flex; justify-content: flex-end; gap: 12px;">
+                    <button id="cancel-keep-appt-btn" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Keep Appointment</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        modal.querySelector('#close-cancel-modal-btn').onclick = () => modal.remove();
+        modal.querySelector('#cancel-keep-appt-btn').onclick = () => modal.remove();
+
+        // Fetch cancellation preview to check refund eligibility
+        let preview = null;
+        try {
+            const previewRes = await fetch(`${API_ROOT}/api/appointments/${appointmentId}/cancel-preview`, {
+                headers: { 'Authorization': `Bearer ${activeToken}` }
             });
-            const data = await res.json();
-            
-            if (data.success) {
-                const refund = data.data.refundPercentage;
-                showAlert(`Appointment cancelled. Eligible Refund: ${refund}% under salon cancellation policy.`, "success", 6000);
-                loadCustomerAppointments();
-            } else {
-                showAlert(data.message || "Failed to cancel appointment", "error");
+            if (previewRes.ok) {
+                const pData = await previewRes.json();
+                if (pData.success) preview = pData.data;
             }
         } catch (e) {
-            showAlert("Server error while cancelling appointment.", "error");
+            console.warn("Could not fetch cancellation preview:", e);
         }
+
+        const isEligible = preview ? preview.refundPercentage > 0 : true;
+        const refundPct = preview ? preview.refundPercentage : 100;
+        const refundAmt = preview ? parseFloat(preview.refundAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2 }) : '0.00';
+
+        const bodyElem = modal.querySelector('#cancel-modal-body');
+        const footerElem = modal.querySelector('#cancel-modal-footer');
+
+        if (!bodyElem || !footerElem) return;
+
+        bodyElem.innerHTML = `
+            ${isEligible ? `
+                <!-- Refund Eligibility Banner -->
+                <div style="background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.35); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #86efac; font-size: 0.95rem;">
+                        <span>🎉</span> <span>Eligible for ${refundPct}% Refund!</span>
+                    </div>
+                    <div style="font-size: 1.45rem; font-weight: 800; color: #4ade80; margin: 4px 0;">
+                        Rs. ${refundAmt}
+                    </div>
+                    <p style="font-size: 0.78rem; color: #bbb; margin: 0; line-height: 1.4;">
+                        ${preview ? preview.policyDescription : 'Eligible for direct refund under salon cancellation policy.'}
+                    </p>
+                </div>
+
+                <!-- Bank Details Request Notice -->
+                <div style="background: rgba(255, 184, 43, 0.08); border: 1px dashed rgba(255, 184, 43, 0.4); border-radius: 12px; padding: 12px 14px; margin-bottom: 18px; font-size: 0.8rem; color: #e5a93b; line-height: 1.4;">
+                    🏛️ <strong>Refund Bank Details:</strong>
+                    Please enter your Sri Lankan bank account details below so StylePulse Administration can process and transfer your refund.
+                </div>
+
+                <!-- Bank Details Form -->
+                <form id="sp-bank-refund-form" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #ccc; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Bank Name *</label>
+                        <select id="refund-bank-name" required style="width: 100%; padding: 10px 12px; background: #1c1a14; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none;">
+                            <option value="" disabled selected>Select Your Bank</option>
+                            <option value="Commercial Bank of Ceylon">Commercial Bank of Ceylon</option>
+                            <option value="Bank of Ceylon (BOC)">Bank of Ceylon (BOC)</option>
+                            <option value="Sampath Bank">Sampath Bank</option>
+                            <option value="Hatton National Bank (HNB)">Hatton National Bank (HNB)</option>
+                            <option value="Nations Trust Bank (NTB)">Nations Trust Bank (NTB)</option>
+                            <option value="People's Bank">People's Bank</option>
+                            <option value="Seylan Bank">Seylan Bank</option>
+                            <option value="DFCC Bank">DFCC Bank</option>
+                            <option value="National Development Bank (NDB)">National Development Bank (NDB)</option>
+                            <option value="Pan Asia Bank">Pan Asia Bank</option>
+                            <option value="Other Bank">Other Bank</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #ccc; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Branch Name / Code *</label>
+                            <input type="text" id="refund-branch-name" placeholder="e.g. Colombo 03" required style="width: 100%; padding: 10px 12px; background: #1c1a14; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none; box-sizing: border-box;" />
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #ccc; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Account Number *</label>
+                            <input type="text" id="refund-account-num" placeholder="e.g. 1000234567" required style="width: 100%; padding: 10px 12px; background: #1c1a14; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none; box-sizing: border-box;" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #ccc; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Account Holder Name *</label>
+                        <input type="text" id="refund-holder-name" value="${clientName}" placeholder="Full name as shown on passbook" required style="width: 100%; padding: 10px 12px; background: #1c1a14; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none; box-sizing: border-box;" />
+                    </div>
+                </form>
+            ` : `
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #f87171; font-size: 0.95rem;">
+                        <span>⚠️</span> <span>Late Cancellation (0% Refund)</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: #ccc; margin: 6px 0 0 0; line-height: 1.45;">
+                        ${preview ? preview.policyDescription : 'This booking is inside the late cancellation window and is non-refundable.'}
+                    </p>
+                </div>
+                <p style="font-size: 0.85rem; color: #aaa; margin: 0 0 16px 0;">
+                    Are you sure you want to cancel this booking? This action cannot be undone.
+                </p>
+            `}
+        `;
+
+        footerElem.innerHTML = `
+            <button id="cancel-keep-appt-btn-2" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;">Keep Appointment</button>
+            <button id="confirm-cancel-submit-btn" style="background: ${isEligible ? 'linear-gradient(135deg, #ffcc00, #ff9900)' : '#e74c3c'}; border: none; color: ${isEligible ? '#000' : '#fff'}; padding: 9px 20px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.85rem;">
+                ${isEligible ? 'Confirm & Request Refund' : 'Cancel Appointment'}
+            </button>
+        `;
+
+        modal.querySelector('#cancel-keep-appt-btn-2').onclick = () => modal.remove();
+
+        modal.querySelector('#confirm-cancel-submit-btn').onclick = async () => {
+            let bankDetails = null;
+
+            if (isEligible) {
+                const bankNameElem = modal.querySelector('#refund-bank-name');
+                const branchNameElem = modal.querySelector('#refund-branch-name');
+                const accountNumElem = modal.querySelector('#refund-account-num');
+                const holderNameElem = modal.querySelector('#refund-holder-name');
+
+                const bankName = bankNameElem ? bankNameElem.value : '';
+                const branchName = branchNameElem ? branchNameElem.value.trim() : '';
+                const accountNumber = accountNumElem ? accountNumElem.value.trim() : '';
+                const accountHolderName = holderNameElem ? holderNameElem.value.trim() : '';
+
+                if (!bankName || !branchName || !accountNumber || !accountHolderName) {
+                    alert("Please fill in all bank details so we can transfer your refund.");
+                    return;
+                }
+
+                bankDetails = { bankName, branchName, accountNumber, accountHolderName };
+            }
+
+            const btn = modal.querySelector('#confirm-cancel-submit-btn');
+            btn.disabled = true;
+            btn.textContent = "Processing...";
+
+            try {
+                const res = await fetch(`${API_ROOT}/api/appointments/${appointmentId}/cancel`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${activeToken}`
+                    },
+                    body: JSON.stringify({ bankDetails })
+                });
+
+                const data = await res.json();
+                modal.remove();
+
+                if (data.success) {
+                    showAlert(data.message, "success", 7000);
+                    loadCustomerAppointments();
+                } else {
+                    showAlert(data.message || "Failed to cancel appointment", "error");
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = isEligible ? 'Confirm & Request Refund' : 'Cancel Appointment';
+                showAlert("Server error while cancelling appointment.", "error");
+            }
+        };
     };
 
     // ── NLP REVIEW MODAL LOGIC ────────────────────────────────────────────────

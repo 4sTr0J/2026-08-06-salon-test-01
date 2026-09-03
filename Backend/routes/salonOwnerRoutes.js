@@ -3,7 +3,8 @@ import {
     getSalonProfile,
     updateSalonProfile,
     getSalonAppointments,
-    updateSalonAppointmentStatus
+    updateSalonAppointmentStatus,
+    getSalonEarnings
 } from "../salon profile and dashbboard/salonDashboardController.js";
 import {
     getOwnerServices,
@@ -24,5 +25,6 @@ router.post("/services", addSalonService);
 router.delete("/services/:id", deleteSalonService);
 router.get("/appointments", getSalonAppointments);
 router.put("/appointments/:id/status", updateSalonAppointmentStatus);
+router.get("/earnings", getSalonEarnings);
 
 export default router;

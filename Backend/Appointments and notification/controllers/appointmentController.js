@@ -1,6 +1,8 @@
 import * as appointmentService from '../services/appointmentService.js';
 import { sendConfirmationEmail } from '../services/emailService.js';
 import { awardAppointmentPointsHelper } from '../../controllers/loyaltyController.js';
+import loyaltyDb from '../../config/loyaltyDb.js';
+import crypto from 'crypto';
 
 // All salon operating slots (9am – 6:30pm, every 30 min)
 const ALL_SLOTS = [
@@ -235,6 +237,71 @@ export const handleCreateAppointment = async (req, res) => {
       appointment_time
     });
 
+    // Immediate Payment & Admin Revenue Ledger Recording
+    try {
+      let grossAmount = parseFloat(req.body.price || 0);
+
+      // If price wasn't passed, lookup from salon_owner_services
+      if (!grossAmount || grossAmount <= 0) {
+        try {
+          const { data: svc } = await appointmentService.db
+            .from('salon_owner_services')
+            .select('price')
+            .eq('owner_id', salon_id)
+            .ilike('name', `%${service_name}%`)
+            .maybeSingle();
+          if (svc && svc.price) {
+            grossAmount = parseFloat(svc.price);
+          }
+        } catch (e) {}
+      }
+      if (!grossAmount || grossAmount <= 0) grossAmount = 3500;
+
+      const netAmount = Math.max(0, grossAmount - discountApplied);
+      const platformCommissionPct = 10.00;
+      const platformCommissionAmt = parseFloat((netAmount * (platformCommissionPct / 100)).toFixed(2));
+      const salonEarnings = parseFloat((netAmount - platformCommissionAmt).toFixed(2));
+      const paymentId = crypto.randomUUID();
+
+      loyaltyDb.prepare(`
+        INSERT INTO payments (
+          id, appointment_id, customer_email, salon_id, gross_amount,
+          points_discount, net_amount, platform_commission_pct,
+          platform_commission_amt, salon_earnings, payment_status,
+          payout_status, card_last4, payment_method
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        paymentId, appointment.id, customer_email, salon_id,
+        grossAmount, discountApplied, netAmount, platformCommissionPct,
+        platformCommissionAmt, salonEarnings, 'Completed',
+        'Pending_Release', req.body.cardLast4 || '1234', req.body.paymentMethod || 'CARD'
+      );
+
+      // Record Salon Earnings Ledger (Credit 90%)
+      loyaltyDb.prepare(`
+        INSERT INTO salon_earnings (
+          id, salon_id, payment_id, appointment_id, transaction_type, amount, description
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        crypto.randomUUID(), salon_id, paymentId, appointment.id, 'CREDIT',
+        salonEarnings, `Payment collected for appt ${appointment.id.substring(0, 8)}`
+      );
+
+      // Record Admin Platform Revenue Ledger (Credit 10%)
+      loyaltyDb.prepare(`
+        INSERT INTO platform_revenue (
+          id, salon_id, payment_id, appointment_id, transaction_type, amount, description
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        crypto.randomUUID(), salon_id, paymentId, appointment.id, 'CREDIT',
+        platformCommissionAmt, `Platform commission (10%) on appt ${appointment.id.substring(0, 8)}`
+      );
+
+      console.log(`[Admin Ledger] Recorded payment & 10% commission (Rs. ${platformCommissionAmt}) immediately for appt ${appointment.id.substring(0, 8)}`);
+    } catch (finErr) {
+      console.error('⚠️ Could not record payment in admin ledger immediately:', finErr.message);
+    }
+
     // Send the confirmation email asynchronously with payment discount summary (non-blocking)
     sendConfirmationEmail(appointment, {
       discountApplied,
@@ -272,9 +339,6 @@ export const handleCreateAppointment = async (req, res) => {
     });
   }
 };
-
-import loyaltyDb from '../../config/loyaltyDb.js';
-import crypto from 'crypto';
 
 export const handleNotifyRunningLate = async (req, res) => {
   try {

@@ -12,6 +12,7 @@ import reviewRoutes from "./salon_reviews/reviewRoutes.js";
 import cancellationPolicyRoutes from "./appointment_cancellation/cancellationPolicyRoutes.js";
 import appointmentCancelRoutes from "./appointment_cancellation/appointmentCancelRoutes.js";
 import loyaltyRoutes from "./routes/loyaltyRoutes.js";
+import paymentRoutes from "./payment policies/paymentRoutes.js";
 
 // Modular Domain Routes
 import customerDomainRoutes from "./Customer profile management/customerRoutes.js";
@@ -76,6 +77,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/cancellation-policy", cancellationPolicyRoutes);
 app.use("/api/appointments", appointmentCancelRoutes);
 app.use("/api/loyalty", loyaltyRoutes);
+app.use("/api/payments", paymentRoutes);
 
 const PORT = process.env.PORT || 5001;
 
