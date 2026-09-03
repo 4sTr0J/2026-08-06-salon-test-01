@@ -100,9 +100,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response && response.ok) {
                     const data = await response.json();
+                    const userRole = (data.user?.role || '').toLowerCase();
+                    const selectedRole = currentRole.toLowerCase();
+
+                    // Client-side role validation safeguard
+                    if (selectedRole === 'client' && userRole === 'owner') {
+                        showAlert("This account is registered as a Salon Owner. Please switch to the 'Salon Owner' tab to log in.", 'error', 4500);
+                        return;
+                    }
+                    if (selectedRole === 'owner' && userRole !== 'owner') {
+                        showAlert("This account is registered as a Client. Please switch to the 'Client' tab to log in.", 'error', 4500);
+                        return;
+                    }
+
                     localStorage.setItem('stylepulse_token', data.token || 'mock_jwt_token');
                     localStorage.setItem('stylepulse_user', JSON.stringify(data.user || { email, role: currentRole }));
-                    const userRole = data.user?.role || currentRole;
                     showAlert('Login successful! Redirecting to dashboard...', 'success', 1500);
                     setTimeout(() => {
                         if (userRole === 'owner') {
@@ -114,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     const errorData = response ? await response.json() : null;
                     const errorMessage = errorData?.message || 'Invalid email or password. Please try again.';
-                    showAlert(errorMessage, 'error', 4000);
+                    showAlert(errorMessage, 'error', 4500);
                 }
             } catch (err) {
                 console.error('Login error:', err);

@@ -629,7 +629,9 @@
                         price: pending.price,
                         redeemPoints: pointsToRedeem,
                         paymentMethod: "CARD",
-                        cardLast4: cardNum.slice(-4)
+                        cardLast4: cardNum.slice(-4),
+                        customer_name: user?.fullName || user?.name || (user?.email ? user.email.split('@')[0] : 'Customer'),
+                        customer_email: user?.email || undefined
                     })
                 });
 

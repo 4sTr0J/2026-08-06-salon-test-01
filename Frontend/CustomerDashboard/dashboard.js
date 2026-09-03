@@ -1,10 +1,9 @@
-document.addEventListener('DOMContentLoaded', () => {
+function initDashboard() {
     // 1. Check Authentication Status (Auth Guard)
     const token = localStorage.getItem('stylepulse_token');
     const userStr = localStorage.getItem('stylepulse_user');
 
     if (!token || !userStr) {
-        // Not logged in, redirect to login page
         window.location.href = '../login.html';
         return;
     }
@@ -13,32 +12,72 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         user = JSON.parse(userStr);
     } catch (e) {
-        // Invalid user data
         localStorage.removeItem('stylepulse_token');
         localStorage.removeItem('stylepulse_user');
         window.location.href = '../login.html';
         return;
     }
 
+    // Guard: if user object is empty or malformed
+    if (!user || typeof user !== 'object') {
+        localStorage.removeItem('stylepulse_token');
+        localStorage.removeItem('stylepulse_user');
+        window.location.href = '../login.html';
+        return;
+    }
+
+    // Role Guard: Salon owners belong in the Owner Portal, not Customer Dashboard
+    if (user.role === 'owner') {
+        window.location.href = '../SalonOwnerDashboard/dashboard.html';
+        return;
+    }
+
     // 2. Populate User Data in UI
-    const nameDisplay = document.getElementById('user-name-display');
-    const emailDisplay = document.getElementById('user-email-display');
-    const profileName = document.getElementById('profile-name');
-    const profileEmail = document.getElementById('profile-email');
-    const profileRole = document.getElementById('profile-role');
+    try {
+        const nameDisplay = document.getElementById('user-name-display');
+        const emailDisplay = document.getElementById('user-email-display');
+        const profileName = document.getElementById('profile-name');
+        const profileEmail = document.getElementById('profile-email');
+        const profileRole = document.getElementById('profile-role');
 
-    // Extract first name for the greeting
-    const fullName = user.fullName || user.name || user.email.split('@')[0];
-    const firstName = fullName.split(' ')[0];
+        const userEmail = user.email || '';
+        const fullName = user.fullName || user.name || (userEmail ? userEmail.split('@')[0] : 'Friend');
+        const firstName = fullName.split(' ')[0];
 
-    if (nameDisplay) nameDisplay.textContent = firstName;
-    if (emailDisplay) emailDisplay.textContent = user.email;
-    
-    if (profileName) profileName.textContent = fullName;
-    if (profileEmail) profileEmail.textContent = user.email;
-    if (profileRole) profileRole.textContent = user.role || 'Customer';
+        if (nameDisplay) nameDisplay.textContent = firstName;
+        if (emailDisplay) emailDisplay.textContent = userEmail;
+        if (profileName) profileName.textContent = fullName;
+        if (profileEmail) profileEmail.textContent = userEmail;
+        if (profileRole) profileRole.textContent = user.role || 'Customer';
+    } catch (uiErr) {
+        console.error('Dashboard UI init error:', uiErr);
+    }
 
     const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+
+    // Load Loyalty Rewards Summary on Dashboard
+    async function loadRewardsSummary() {
+        const pointsEl = document.getElementById('dash-points-display');
+        const tierEl = document.getElementById('dash-reward-tier');
+        if (!pointsEl) return;
+        try {
+            const customerId = user.id || user.email;
+            const res = await fetch(`${API_ROOT}/api/loyalty/account/${customerId}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (data && data.account) {
+                    pointsEl.textContent = (data.account.available_points || 0).toLocaleString();
+                    if (tierEl) tierEl.textContent = data.account.current_tier || 'BRONZE';
+                }
+            } else {
+                pointsEl.textContent = '0';
+            }
+        } catch (err) {
+            console.warn("Rewards summary load error:", err);
+            pointsEl.textContent = '0';
+        }
+    }
+    loadRewardsSummary();
 
     // 3. Logout Logic
     const logoutBtn = document.getElementById('logout-btn');
@@ -249,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const reviewButtonHtml = isCompleted 
                 ? (a.isReviewed 
                     ? `<span style="margin-top: 8px; font-size: 0.8rem; font-weight: 700; color: #2ecc71;">✓ Reviewed</span>`
-                    : `<button onclick="openReviewModal('${a.salon_id}', '${a.id}', '${a.service_name.replace(/'/g, "\\'")}', '${a.salon_name ? a.salon_name.replace(/'/g, "\\'") : 'StylePulse Salon'}')" style="margin-top: 8px; background: linear-gradient(135deg, #ffc845, #e5a93b); border: none; color: #000; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">⭐ Rate &amp; Review</button>`
+                    : `<button onclick="openReviewModal('${a.salon_id}', '${a.id}', '${(a.service_name || 'Salon Service').replace(/'/g, "\\'")}', '${a.salon_name ? a.salon_name.replace(/'/g, "\\'") : 'StylePulse Salon'}')" style="margin-top: 8px; background: linear-gradient(135deg, #ffc845, #e5a93b); border: none; color: #000; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700;">⭐ Rate &amp; Review</button>`
                   )
                 : '';
 
@@ -290,23 +329,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const statusBadgeClass = isRescheduled ? 'rescheduled' : (a.booking_status || 'confirmed').toLowerCase();
 
             return `
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 1.25rem; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <div>
-                        <h4 style="color: #ffcc00; font-family: 'Outfit', sans-serif; font-size: 1.1rem; margin: 0;">🏢 ${a.salon_name || 'StylePulse Salon'}</h4>
-                        <p style="margin: 0.2rem 0; font-weight: 500; font-size: 0.95rem; color: #fff;">💇 ${a.service_name}</p>
-                        <p style="margin: 0; font-size: 0.82rem; color: rgba(255,255,255,0.5);">📍 ${a.salon_address || 'Address not listed'}</p>
-                        <p style="margin: 0.3rem 0 0; font-size: 0.75rem; color: #2ecc71;">🛡️ Includes 30-min buffer window</p>
-                        ${rescheduleTagHtml}
-                    </div>
-                    <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
-                        <span style="font-size: 0.9rem; font-weight: 600; color: #fff; display: block;">⏱ ${dateFormatted} at ${a.appointment_time}</span>
-                        <span style="display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; margin-top: 6px; background: rgba(255,184,43,0.15); color: #ffcc00; border: 1px solid rgba(255,184,43,0.3);">${statusBadgeText}</span>
-                        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end;">
-                            ${reviewButtonHtml}
-                            ${rescheduleButtonHtml}
-                            ${lateButtonHtml}
-                            ${cancelButtonHtml}
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); padding: 1.25rem; border-radius: 12px; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,204,0,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
+                    <!-- Top row: salon info + date/status -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <h4 style="color: #ffcc00; font-family: 'Outfit', sans-serif; font-size: 1.05rem; margin: 0;">🏢 ${a.salon_name || 'StylePulse Salon'}</h4>
+                            <p style="margin: 0.2rem 0; font-weight: 500; font-size: 0.92rem; color: #fff;">💇 ${a.service_name || 'Salon Service'}</p>
+                            <p style="margin: 0; font-size: 0.8rem; color: rgba(255,255,255,0.5);">📍 ${a.salon_address || 'Address not listed'}</p>
+                            <p style="margin: 0.3rem 0 0; font-size: 0.72rem; color: #2ecc71;">🛡️ Includes 30-min buffer window</p>
+                            ${rescheduleTagHtml}
                         </div>
+                        <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                            <span style="font-size: 0.88rem; font-weight: 600; color: #fff; display: block; white-space: nowrap;">⏱ ${dateFormatted} at ${a.appointment_time}</span>
+                            <span style="display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: rgba(255,184,43,0.15); color: #ffcc00; border: 1px solid rgba(255,184,43,0.3);">${statusBadgeText}</span>
+                        </div>
+                    </div>
+                    <!-- Bottom row: action buttons always visible -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                        ${reviewButtonHtml}
+                        ${rescheduleButtonHtml}
+                        ${lateButtonHtml}
+                        ${cancelButtonHtml}
+                        ${!reviewButtonHtml && !rescheduleButtonHtml && !lateButtonHtml && !cancelButtonHtml ? '<span style="font-size:0.8rem; color: rgba(255,255,255,0.3); font-style: italic;">No actions available</span>' : ''}
                     </div>
                 </div>
             `;
@@ -620,6 +664,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 modal.remove();
                 if (data.success) {
+                    showRescheduleSuccessModal({
+                        newDate: selectedDate,
+                        newTime: selectedSlot,
+                        serviceName,
+                        feeCharged: data.feeCharged || 0,
                         totalFee: data.totalRescheduleFee || 0,
                         rescheduleCount: data.rescheduleCount || 1,
                         message: data.message
@@ -772,7 +821,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(modalDiv);
 
         modalDiv.querySelector('#close-success-modal-btn').addEventListener('click', () => modalDiv.remove());
-        
+    }
+
     // Cancellation logic
     window.handleCancelAppointment = async function(appointmentId) {
         if (!confirm("Are you sure you want to cancel this appointment?")) {
@@ -900,23 +950,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    // Set up tab button listeners
-    tabButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            tabButtons.forEach(b => {
+    // Global tab switcher
+    window.switchTab = function(status) {
+        activeFilterStatus = status;
+        const btns = document.querySelectorAll(".tab-btn");
+        btns.forEach(b => {
+            if ((b.getAttribute("data-status") || "").toLowerCase() === status.toLowerCase()) {
+                b.classList.add("active");
+                b.style.color = "#ffcc00";
+            } else {
                 b.classList.remove("active");
                 b.style.color = "rgba(255,255,255,0.6)";
-            });
-            btn.classList.add("active");
-            btn.style.color = "#ffcc00";
-            activeFilterStatus = btn.getAttribute("data-status");
-            renderAppointments();
+            }
+        });
+        renderAppointments();
+    };
+
+    // Set up tab button listeners
+    const btns = document.querySelectorAll(".tab-btn");
+    btns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const status = btn.getAttribute("data-status") || "Upcoming";
+            window.switchTab(status);
         });
     });
 
     // Load on init
     loadCustomerAppointments();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDashboard);
+} else {
+    initDashboard();
+}
 
 // Helper for showing alerts (reused from auth scripts)
 function showAlert(message, type = 'success', duration = 3000) {

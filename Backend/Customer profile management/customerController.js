@@ -235,7 +235,7 @@ export const register = async (req, res) => {
 // =========================
 export const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, role: requestedRole } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ success: false, message: "Email and password are required." });
@@ -251,25 +251,50 @@ export const login = async (req, res) => {
                 }
                 
                 const client = supabaseAdmin || supabase;
-                const userRole = data.user.user_metadata?.role || data.user.app_metadata?.role || 'customer';
                 
-                if (userRole === 'owner') {
-                    const { data: salonProfile } = await client
-                        .from('salon_owners')
-                        .select('is_approved')
-                        .eq('id', data.user.id)
-                        .maybeSingle();
-                    
-                    if (salonProfile && salonProfile.is_approved === false) {
-                        return res.status(401).json({ success: false, message: "Your account is pending approval by the admin." });
+                // Check if account is in salon_owners table
+                const { data: salonProfile } = await client
+                    .from('salon_owners')
+                    .select('id, is_approved')
+                    .or(`id.eq.${data.user.id},email.eq.${normalizedEmail}`)
+                    .maybeSingle();
+
+                const actualRole = salonProfile ? 'owner' : (data.user.user_metadata?.role || data.user.app_metadata?.role || 'customer');
+                
+                // Enforce Role Separation: Client vs Salon Owner
+                if (requestedRole) {
+                    const wantOwner = String(requestedRole).toLowerCase() === 'owner';
+                    const isOwner = actualRole === 'owner';
+
+                    if (wantOwner && !isOwner) {
+                        return res.status(403).json({
+                            success: false,
+                            message: "This account is registered as a Client. Please select the 'Client' tab to log in."
+                        });
                     }
+
+                    if (!wantOwner && isOwner) {
+                        return res.status(403).json({
+                            success: false,
+                            message: "This account is registered as a Salon Owner. Please select the 'Salon Owner' tab to log in."
+                        });
+                    }
+                }
+
+                if (actualRole === 'owner' && salonProfile && salonProfile.is_approved === false) {
+                    return res.status(401).json({ success: false, message: "Your account is pending approval by the admin." });
                 }
                 
                 await recordLoginActivity(req, data.user, data.session);
+                const safePayload = {
+                    ...getSafeUserPayload(data.user),
+                    role: actualRole
+                };
+
                 return res.status(200).json({
                     success: true,
                     message: "Login successful.",
-                    user: getSafeUserPayload(data.user),
+                    user: safePayload,
                     token: data.session?.access_token,
                     session: data.session
                 });
@@ -290,8 +315,30 @@ export const login = async (req, res) => {
             return res.status(401).json({ success: false, message: "Invalid email or password." });
         }
 
+        const localUserRole = localUser.role || 'customer';
+
+        // Enforce Role Separation in local fallback
+        if (requestedRole) {
+            const wantOwner = String(requestedRole).toLowerCase() === 'owner';
+            const isOwner = localUserRole === 'owner';
+
+            if (wantOwner && !isOwner) {
+                return res.status(403).json({
+                    success: false,
+                    message: "This account is registered as a Client. Please select the 'Client' tab to log in."
+                });
+            }
+
+            if (!wantOwner && isOwner) {
+                return res.status(403).json({
+                    success: false,
+                    message: "This account is registered as a Salon Owner. Please select the 'Salon Owner' tab to log in."
+                });
+            }
+        }
+
         const token = jwt.sign(
-            { id: localUser.id, email: localUser.email, role: localUser.role },
+            { id: localUser.id, email: localUser.email, role: localUserRole },
             JWT_SECRET,
             { expiresIn: "7d" }
         );
@@ -299,7 +346,7 @@ export const login = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Login successful.",
-            user: { id: localUser.id, email: localUser.email, fullName: localUser.fullName, phone: localUser.phone, role: localUser.role },
+            user: { id: localUser.id, email: localUser.email, fullName: localUser.fullName, phone: localUser.phone, role: localUserRole },
             token
         });
     } catch (err) {

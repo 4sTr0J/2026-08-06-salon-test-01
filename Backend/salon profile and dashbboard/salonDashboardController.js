@@ -1,5 +1,21 @@
 import supabase, { supabaseAdmin } from "../config/supabase.js";
 import { awardAppointmentPointsHelper } from "../controllers/loyaltyController.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const USERS_FILE = path.join(__dirname, "..", "data", "users.json");
+
+const getLocalUsers = () => {
+    try {
+        if (!fs.existsSync(USERS_FILE)) return [];
+        return JSON.parse(fs.readFileSync(USERS_FILE, "utf-8"));
+    } catch (err) {
+        return [];
+    }
+};
 
 // Helper to check Supabase config
 const isSupabaseConfigured = () => {
@@ -181,15 +197,63 @@ export const getSalonAppointments = async (req, res) => {
 
         const appointmentsWithClients = await Promise.all(data.map(async (apt) => {
             let phone = "N/A";
+            let clientName = (apt.customer_name && apt.customer_name.trim().toLowerCase() !== "customer" && apt.customer_name.trim().toLowerCase() !== "guest client") 
+                ? apt.customer_name.trim() 
+                : null;
+
             if (apt.customer_email) {
-                const { data: userData } = await client
-                    .from("users")
-                    .select("phone")
-                    .eq("email", apt.customer_email)
-                    .maybeSingle();
-                if (userData?.phone) {
-                    phone = userData.phone;
+                // 1. Check Supabase users table (full_name and phone)
+                try {
+                    const { data: userData } = await client
+                        .from("users")
+                        .select("phone, full_name")
+                        .eq("email", apt.customer_email)
+                        .maybeSingle();
+                    if (userData) {
+                        if (userData.phone) phone = userData.phone;
+                        if (!clientName && userData.full_name && userData.full_name.trim().toLowerCase() !== "customer") {
+                            clientName = userData.full_name.trim();
+                        }
+                    }
+                } catch (e) {}
+
+                // 2. Check local users.json
+                if (!clientName || phone === "N/A") {
+                    try {
+                        const localUsers = getLocalUsers();
+                        const localUser = localUsers.find(u => u.email?.toLowerCase() === apt.customer_email.toLowerCase());
+                        if (localUser) {
+                            if (!clientName && localUser.fullName && localUser.fullName.trim().toLowerCase() !== "customer") {
+                                clientName = localUser.fullName.trim();
+                            }
+                            if (phone === "N/A" && localUser.phone) phone = localUser.phone;
+                        }
+                    } catch (e) {}
                 }
+
+                // 3. Check loyaltyDb profiles
+                if (!clientName || phone === "N/A") {
+                    try {
+                        const { default: loyaltyDb } = await import("../database/loyaltyDb.js");
+                        const profile = loyaltyDb.prepare("SELECT full_name, phone FROM profiles WHERE LOWER(email) = ?").get(apt.customer_email.toLowerCase());
+                        if (profile) {
+                            if (!clientName && profile.full_name && profile.full_name.trim().toLowerCase() !== "customer") {
+                                clientName = profile.full_name.trim();
+                            }
+                            if (phone === "N/A" && profile.phone) phone = profile.phone;
+                        }
+                    } catch (e) {}
+                }
+
+                // 4. Fallback to readable username from email (e.g. yohisalon, dd, wasuka)
+                if (!clientName) {
+                    const username = apt.customer_email.split('@')[0];
+                    clientName = username.charAt(0).toUpperCase() + username.slice(1);
+                }
+            }
+
+            if (!clientName) {
+                clientName = "Client";
             }
 
             const lateInfo = lateAlertsMap[apt.id] || null;
@@ -200,7 +264,7 @@ export const getSalonAppointments = async (req, res) => {
 
             return {
                 id: apt.id,
-                client_name: apt.customer_name || "Guest Client",
+                client_name: clientName,
                 client_email: apt.customer_email || "N/A",
                 client_phone: phone,
                 service: apt.service_name || "Salon Service",

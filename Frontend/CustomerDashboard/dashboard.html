@@ -238,10 +238,10 @@
                 </div>
                 <!-- Filter Tabs -->
                 <div class="appointment-tabs" style="display: flex; gap: 10px; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; overflow-x: auto;">
-                    <button class="tab-btn active" data-status="Upcoming" style="background: transparent; border: none; color: #fff; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Upcoming</button>
-                    <button class="tab-btn" data-status="completed" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Completed</button>
-                    <button class="tab-btn" data-status="cancelled" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Cancelled</button>
-                    <button class="tab-btn" data-status="rescheduled" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Rescheduled</button>
+                    <button class="tab-btn active" data-status="Upcoming" onclick="window.switchTab('Upcoming')" style="background: transparent; border: none; color: #fff; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Upcoming</button>
+                    <button class="tab-btn" data-status="completed" onclick="window.switchTab('completed')" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Completed</button>
+                    <button class="tab-btn" data-status="cancelled" onclick="window.switchTab('cancelled')" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Cancelled</button>
+                    <button class="tab-btn" data-status="rescheduled" onclick="window.switchTab('rescheduled')" style="background: transparent; border: none; color: rgba(255,255,255,0.6); font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 0.3s;">Rescheduled</button>
                 </div>
                 <div class="card-content" id="appointments-list-container">
                     <div class="empty-state">
@@ -291,7 +291,7 @@
         .alert-message { font-family: 'Poppins', sans-serif; font-size: 0.9rem; font-weight: 500; color: #fff; }
     </style>
 
-    <script src="dashboard.js"></script>
+    <script src="dashboard.js?v=20260904-02"></script>
     <script src="../chatWidget.js"></script>
 </body>
 </html>

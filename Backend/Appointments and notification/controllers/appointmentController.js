@@ -140,8 +140,15 @@ export const handleGetAvailableSlots = async (req, res) => {
 export const handleCreateAppointment = async (req, res) => {
   try {
     // 1. Resolve customer details (allow req.body payload or fallback to authenticated req.user)
-    const customer_name = req.body.customer_name || (req.user ? (req.user.name || req.user.full_name) : null) || "Customer";
     const customer_email = req.body.customer_email || (req.user ? req.user.email : null);
+    let customer_name = req.body.customer_name || 
+      (req.user ? (req.user.fullName || req.user.name || req.user.full_name || req.user.user_metadata?.fullName || req.user.user_metadata?.full_name) : null);
+    
+    if ((!customer_name || customer_name.toLowerCase() === 'customer') && customer_email) {
+      const username = customer_email.split('@')[0];
+      customer_name = username.charAt(0).toUpperCase() + username.slice(1);
+    }
+    if (!customer_name) customer_name = "Customer";
     
     // 2. Resolve other properties, mapping from both potential formats
     const salon_id = req.body.salonId || req.body.salon_id;

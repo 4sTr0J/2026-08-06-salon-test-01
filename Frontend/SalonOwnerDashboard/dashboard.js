@@ -587,12 +587,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             ` : `<strong>Rs. ${totalPriceNum.toLocaleString()}</strong>`;
 
+            // Resolve client display name
+            let displayName = a.client_name;
+            if ((!displayName || displayName.toLowerCase() === 'customer' || displayName.toLowerCase() === 'guest client') && a.client_email && a.client_email !== 'N/A') {
+                const prefix = a.client_email.split('@')[0];
+                displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+            }
+            if (!displayName) displayName = 'Customer';
+
             return `
                 <tr>
                     <td>
                         <div class="contact-cell">
-                            <strong>👤 ${a.client_name}</strong>
-                            <span style="font-size:0.75rem; color:rgba(255,255,255,0.5);">📞 ${a.client_phone}</span>
+                            <strong style="color: #fff; font-size: 0.95rem;">👤 ${displayName}</strong>
+                            ${a.client_email && a.client_email !== 'N/A' ? `<span style="font-size:0.75rem; color:rgba(255,204,0,0.85); display:block; margin: 1px 0;">✉️ ${a.client_email}</span>` : ''}
+                            <span style="font-size:0.75rem; color:rgba(255,255,255,0.55);">📞 ${a.client_phone}</span>
                             ${lateAlertHtml}
                         </div>
                     </td>
@@ -662,6 +671,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         todayBookingsList.innerHTML = todayApps.map(a => {
+            let displayName = a.client_name;
+            if ((!displayName || displayName.toLowerCase() === 'customer' || displayName.toLowerCase() === 'guest client') && a.client_email && a.client_email !== 'N/A') {
+                const prefix = a.client_email.split('@')[0];
+                displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
+            }
+            if (!displayName) displayName = 'Customer';
+
             const lateAlertHtml = a.late_notification ? `
                 <div style="margin-top: 4px; background: rgba(255, 184, 43, 0.15); border: 1px solid rgba(255, 184, 43, 0.5); border-radius: 4px; padding: 2px 6px; font-size: 0.72rem; color: #ffcc00; font-weight: 600;">
                     ⚠️ Running ${a.late_notification.delay_minutes}m Late ${a.late_notification.note ? `("${a.late_notification.note}")` : ''}
@@ -671,7 +687,8 @@ document.addEventListener("DOMContentLoaded", () => {
             return `
                 <div class="booking-item-mini" style="${a.late_notification ? 'border-left: 3px solid #ffcc00;' : ''}">
                     <div class="booking-client-info">
-                        <h4>👤 ${a.client_name}</h4>
+                        <h4>👤 ${displayName}</h4>
+                        ${a.client_email && a.client_email !== 'N/A' ? `<p style="font-size:0.75rem; color:rgba(255,204,0,0.85); margin:2px 0;">✉️ ${a.client_email}</p>` : ''}
                         <p>💇 Service: ${a.service} (with ${a.stylist})</p>
                         ${lateAlertHtml}
                     </div>
