@@ -1,9 +1,8 @@
+import '../../config/env.js';
 import nodemailer from 'nodemailer';
 import QRCode from 'qrcode';
 import { generateReminderEmailHTML } from '../utils/emailTemplates.js';
 import { formatDisplayDate, formatDisplayTime } from '../utils/dateUtils.js';
-import dotenv from 'dotenv';
-dotenv.config();
 
 // The system is now configured to send REAL emails to your customers using Gmail.
 // IMPORTANT: You CANNOT use your normal Gmail password. You MUST use a 16-letter App Password.

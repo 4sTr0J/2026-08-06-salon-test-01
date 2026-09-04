@@ -1,21 +1,16 @@
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
-dotenv.config();
+import '../../../config/env.js';
+import supabase, { supabaseAdmin } from '../../../config/supabase.js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+const db = supabaseAdmin || supabase;
 
 /**
- * Fetches all active services from the Supabase `services` table.
- * Returns an array of service objects with name, price, duration etc.
+ * Fetches all active services from the Supabase `salon_owner_services` table.
+ * Returns an array of service objects with name, price, duration, category.
  */
 export const getSalonServices = async () => {
-  const { data, error } = await supabaseAdmin
-    .from('services')
-    .select('name, price, duration, description, category')
-    .eq('is_active', true)
+  const { data, error } = await db
+    .from('salon_owner_services')
+    .select('name, price, duration, category')
     .order('category');
 
   if (error) {
@@ -31,7 +26,7 @@ export const getSalonServices = async () => {
  * @returns {string[]} Array of booked time strings e.g. ['09:00', '10:30']
  */
 export const getBookedSlotsForDate = async (date) => {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await db
     .from('appointments')
     .select('appointment_time')
     .eq('appointment_date', date)
@@ -50,9 +45,11 @@ export const getBookedSlotsForDate = async (date) => {
  * @param {number} limit 
  */
 export const getConversationHistory = async (conversationId, limit = 10) => {
-  const { data, error } = await supabaseAdmin
+  if (!conversationId) return [];
+
+  const { data, error } = await db
     .from('ai_messages')
-    .select('role, content, created_at')
+    .select('sender, content, created_at')
     .eq('conversation_id', conversationId)
     .order('created_at', { ascending: true })
     .limit(limit);
@@ -61,7 +58,10 @@ export const getConversationHistory = async (conversationId, limit = 10) => {
     console.warn('⚠️ Could not fetch conversation history:', error.message);
     return [];
   }
-  return data || [];
+  return (data || []).map(m => ({
+    role: m.sender === 'model' || m.sender === 'assistant' ? 'model' : 'user',
+    content: m.content
+  }));
 };
 
 /**
@@ -71,9 +71,17 @@ export const getConversationHistory = async (conversationId, limit = 10) => {
  * @param {string} content 
  */
 export const saveMessage = async (conversationId, role, content) => {
-  const { error } = await supabaseAdmin
+  if (!conversationId || !content) return;
+
+  const sender = role === 'model' || role === 'assistant' ? 'model' : 'user';
+
+  const { error } = await db
     .from('ai_messages')
-    .insert([{ conversation_id: conversationId, role, content }]);
+    .insert([{
+      conversation_id: conversationId,
+      sender,
+      content
+    }]);
 
   if (error) {
     console.warn('⚠️ Could not save message:', error.message);
@@ -85,27 +93,38 @@ export const saveMessage = async (conversationId, role, content) => {
  * @param {string} sessionId - Unique session/user identifier.
  */
 export const getOrCreateConversation = async (sessionId) => {
-  // Try to find existing active conversation
-  const { data: existing } = await supabaseAdmin
-    .from('ai_conversations')
-    .select('id')
-    .eq('session_id', sessionId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single();
+  if (!sessionId) return null;
+  const sessionTitle = `session_${sessionId}`;
 
-  if (existing) return existing.id;
+  try {
+    // Try to find existing conversation by session title
+    const { data: existing } = await db
+      .from('ai_conversations')
+      .select('id')
+      .eq('title', sessionTitle)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-  // Create a new one
-  const { data: created, error } = await supabaseAdmin
-    .from('ai_conversations')
-    .insert([{ session_id: sessionId }])
-    .select('id')
-    .single();
+    if (existing && existing.id) return existing.id;
 
-  if (error) {
-    console.warn('⚠️ Could not create conversation:', error.message);
+    // Create a new conversation record
+    const { data: created, error } = await db
+      .from('ai_conversations')
+      .insert([{
+        title: sessionTitle,
+        user_id: '00000000-0000-0000-0000-000000000000'
+      }])
+      .select('id')
+      .single();
+
+    if (error) {
+      console.warn('⚠️ Could not create conversation:', error.message);
+      return null;
+    }
+    return created?.id || null;
+  } catch (err) {
+    console.warn('⚠️ Conversation lookup error:', err.message);
     return null;
   }
-  return created?.id || null;
 };

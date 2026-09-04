@@ -1,5 +1,5 @@
+import "./config/env.js";
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 
 // Existing route integrations
@@ -20,8 +20,6 @@ import salonDashboardDomainRoutes from "./salon profile and dashbboard/salonDash
 import salonServicesDomainRoutes from "./salon services/serviceRoutes.js";
 
 import { startReminderScheduler } from "./Appointments and notification/jobs/reminderScheduler.js";
-
-dotenv.config();
 
 const app = express();
 
