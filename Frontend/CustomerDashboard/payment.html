@@ -638,6 +638,15 @@
 
                 const data = await res.json();
 
+                if (res.status === 401) {
+                    showError("Your login session has expired. Redirecting to login to refresh your session...");
+                    localStorage.removeItem("stylepulse_token");
+                    setTimeout(() => {
+                        window.location.href = "../login.html";
+                    }, 2500);
+                    return;
+                }
+
                 if (res.status === 409) {
                     showError(data.message || "Someone just booked this slot. Please select a different time.");
                     paySubmitBtn.disabled = false;

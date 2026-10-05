@@ -181,11 +181,18 @@ export const register = async (req, res) => {
                     saveLocalUsers(localUsers);
                 }
 
+                const regToken = authSession ? jwt.sign(
+                    { id: authUser.id, email: normalizedEmail, role: "customer", fullName },
+                    JWT_SECRET,
+                    { expiresIn: "30d" }
+                ) : null;
+
                 return res.status(201).json({
                     success: true,
                     message: authSession ? "Registration successful!" : "Registration successful! Please check your email to confirm your account, then sign in.",
                     user: getSafeUserPayload(authUser),
-                    token: authSession?.access_token || null,
+                    token: regToken,
+                    supabaseToken: authSession?.access_token || null,
                     session: authSession
                 });
             } catch (supabaseErr) {
@@ -291,11 +298,18 @@ export const login = async (req, res) => {
                     role: actualRole
                 };
 
+                const localToken = jwt.sign(
+                    { id: data.user.id, email: data.user.email, role: actualRole, fullName: safePayload.fullName },
+                    JWT_SECRET,
+                    { expiresIn: "30d" }
+                );
+
                 return res.status(200).json({
                     success: true,
                     message: "Login successful.",
                     user: safePayload,
-                    token: data.session?.access_token,
+                    token: localToken,
+                    supabaseToken: data.session?.access_token,
                     session: data.session
                 });
             } catch (supabaseErr) {
