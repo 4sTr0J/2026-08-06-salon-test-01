@@ -721,7 +721,8 @@
             }
 
             // Fetch salons (services are pre-loaded in the response by the backend)
-            const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const API_ROOT = (window.STYLEPULSE_API_BASE || (isLocal ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
             try {
                 const headers = token ? { "Authorization": `Bearer ${token}` } : {};
                 const res = await fetch(`${API_ROOT}/api/auth/salons`, { headers });

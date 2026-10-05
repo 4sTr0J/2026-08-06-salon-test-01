@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let searchQuery = '';
     let autoPollInterval = null;
 
-    const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API_ROOT = (window.STYLEPULSE_API_BASE || (isLocal ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
 
     // Initial Auth Check
     checkAdminAuthStatus();

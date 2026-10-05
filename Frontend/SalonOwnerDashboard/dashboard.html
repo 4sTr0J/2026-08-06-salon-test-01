@@ -259,12 +259,34 @@
 
             <!-- Tab Content: Appointments -->
             <section id="tab-appointments" class="tab-section">
-                <div>
-                    <h2 class="section-title">📅 Booking Schedule</h2>
-                    <p class="section-subtitle">View and monitor client appointments booked at your salon.</p>
+                <div class="appointment-filter-header">
+                    <div>
+                        <h2 class="section-title">📅 Booking Schedule</h2>
+                        <p class="section-subtitle">View and monitor client appointments booked at your salon.</p>
+                    </div>
+
+                    <!-- Appointments Filter Tabs -->
+                    <div class="appointment-filter-tabs" id="appt-filter-tabs">
+                        <button type="button" class="appt-filter-btn active" data-filter="all">
+                            <span>All</span>
+                            <span id="count-all" class="filter-count-badge">0</span>
+                        </button>
+                        <button type="button" class="appt-filter-btn" data-filter="upcoming">
+                            <span>⏳ Upcoming</span>
+                            <span id="count-upcoming" class="filter-count-badge">0</span>
+                        </button>
+                        <button type="button" class="appt-filter-btn" data-filter="completed">
+                            <span>✓ Completed</span>
+                            <span id="count-completed" class="filter-count-badge">0</span>
+                        </button>
+                        <button type="button" class="appt-filter-btn" data-filter="cancelled">
+                            <span>❌ Cancelled</span>
+                            <span id="count-cancelled" class="filter-count-badge">0</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="appointments-table-wrapper" style="margin-top: 2rem;">
+                <div class="appointments-table-wrapper" style="margin-top: 1rem;">
                     <table class="dashboard-table">
                         <thead>
                             <tr>
@@ -279,7 +301,7 @@
                         </thead>
                         <tbody id="appointments-table-body">
                             <tr>
-                                <td colspan="6" class="empty-table-cell">Loading booking schedule...</td>
+                                <td colspan="7" class="empty-table-cell">Loading booking schedule...</td>
                             </tr>
                         </tbody>
                     </table>

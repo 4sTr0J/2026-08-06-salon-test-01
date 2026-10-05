@@ -432,10 +432,25 @@ export const getCustomerAppointments = async (req, res) => {
             console.warn("Could not load reschedule info:", dbErr.message);
         }
 
+        const now = new Date();
         const mapped = appointments.map(a => {
             const rescheduleInfo = reschedulesMap[a.id] || null;
+            const timeStr = a.appointment_time && a.appointment_time !== 'N/A' ? a.appointment_time : '00:00';
+            const apptDate = new Date(`${a.appointment_date}T${timeStr}`);
+            const isPast = !isNaN(apptDate.getTime()) && apptDate.getTime() < now.getTime();
+            const currentStatus = (a.booking_status || '').toLowerCase();
+            const effectiveStatus = currentStatus === 'cancelled' 
+                ? 'Cancelled' 
+                : (isPast ? 'Completed' : (a.booking_status || 'Confirmed'));
+
+            if (isPast && currentStatus !== 'cancelled' && currentStatus !== 'completed') {
+                client.from('appointments').update({ booking_status: 'Completed' }).eq('id', a.id).then().catch(() => {});
+            }
+
             return {
                 ...a,
+                booking_status: effectiveStatus,
+                is_past: isPast,
                 salon_name: salonsMap[a.salon_id]?.salon_name || "Premium Salon",
                 salon_address: salonsMap[a.salon_id]?.salon_address || "",
                 isReviewed: reviewedIds.has(a.id),

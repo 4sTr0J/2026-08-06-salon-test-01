@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Frontend static server",
   "scripts": {
-    "start": "echo =========================================== && echo 🚀 STYLEPULSE WEB APP IS READY AT: http://localhost:3000/login.html && echo =========================================== && npx --yes live-server --port=3000 --no-browser .",
-    "dev": "echo =========================================== && echo 🚀 STYLEPULSE WEB APP IS READY AT: http://localhost:3000/login.html && echo =========================================== && npx --yes live-server --port=3000 --no-browser ."
+    "start": "echo =========================================== && echo 🚀 STYLEPULSE WEB APP IS READY AT: http://localhost:3000/login.html && echo =========================================== && npx --yes live-server --port=3000 --host=localhost --no-browser .",
+    "dev": "echo =========================================== && echo 🚀 STYLEPULSE WEB APP IS READY AT: http://localhost:3000/login.html && echo =========================================== && npx --yes live-server --port=3000 --host=localhost --no-browser ."
   }
 }

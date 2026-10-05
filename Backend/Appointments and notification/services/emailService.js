@@ -4,32 +4,45 @@ import QRCode from 'qrcode';
 import { generateReminderEmailHTML } from '../utils/emailTemplates.js';
 import { formatDisplayDate, formatDisplayTime } from '../utils/dateUtils.js';
 
-// The system is now configured to send REAL emails to your customers using Gmail.
-// IMPORTANT: You CANNOT use your normal Gmail password. You MUST use a 16-letter App Password.
+const emailHost = process.env.EMAIL_HOST || 'smtp.gmail.com';
+const emailPort = parseInt(process.env.EMAIL_PORT || '587', 10);
+const isSecure = emailPort === 465;
+
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // Use SSL/TLS
+  host: emailHost,
+  port: emailPort,
+  secure: isSecure, // false for 587 (STARTTLS), true for 465 (SSL)
   auth: {
-    user: process.env.EMAIL_USER || 'kusalaravinda2004@gmail.com',
+    user: process.env.EMAIL_USER || 'stylepulsesalon@gmail.com',
     pass: process.env.EMAIL_PASSWORD, // Must be a Google App Password
   },
+  connectionTimeout: 8000,
+  greetingTimeout: 8000,
+  socketTimeout: 10000,
   tls: {
-    // Allow self‑signed certificates in development (optional)
     rejectUnauthorized: false,
   },
 });
 
-// Verify connection on startup to warn user immediately if password is wrong
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ GMAIL AUTHENTICATION FAILED:');
-    console.error('Google is blocking your password. To send real emails, you MUST generate a 16-letter App Password.');
-    console.error('Go to: https://myaccount.google.com/apppasswords');
-  } else {
-    console.log('✅ Gmail SMTP connected successfully! Real emails will now be sent to customers.');
-  }
-});
+let isSmtpAvailable = null; // null = pending verify, true = verified, false = failed/blocked
+
+// Non-blocking verification on startup
+if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+  transporter.verify((error, success) => {
+    if (error) {
+      isSmtpAvailable = false;
+      console.warn('⚠️ Gmail SMTP notice:', error.message);
+      if (process.env.BREVO_API_KEY) {
+        console.log('ℹ️ Brevo Email API is active as primary delivery mechanism (HTTPS).');
+      } else {
+        console.error('Google is blocking your password or ISP blocks SMTP port. Ensure 16-letter App Password or configure Brevo API.');
+      }
+    } else {
+      isSmtpAvailable = true;
+      console.log('✅ Gmail SMTP connected successfully! Real emails will now be sent to customers.');
+    }
+  });
+}
 
 export const sendConfirmationEmail = async (appointment, paymentDetails = {}) => {
   const displayDate = formatDisplayDate(appointment.appointment_date);
@@ -167,21 +180,111 @@ export const sendReminderEmail = async (appointment) => {
   return sendEmail(appointment.customer_email, appointment.customer_name, 'Appointment Reminder – Your Salon Visit is in 1 Hour', html, attachments);
 };
 
-const sendEmail = async (toEmail, toName, subject, htmlContent, attachments = []) => {
+const sendViaBrevo = async (toEmail, toName, subject, htmlContent, attachments = []) => {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) throw new Error("BREVO_API_KEY not configured");
+
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER || 'stylepulsesalon@gmail.com';
+  const senderName = (process.env.BREVO_SENDER_NAME || 'StylePulse Salon').replace(/"/g, '');
+
+  const payload = {
+    sender: { name: senderName, email: senderEmail },
+    to: [{ email: toEmail, name: toName || toEmail }],
+    subject,
+    htmlContent,
+  };
+
+  if (attachments && attachments.length > 0) {
+    payload.attachment = attachments.map(att => {
+      let b64 = '';
+      if (Buffer.isBuffer(att.content)) {
+        b64 = att.content.toString('base64');
+      } else if (typeof att.content === 'string') {
+        b64 = att.content;
+      }
+      return {
+        name: att.filename || 'booking-qrcode.png',
+        content: b64,
+      };
+    });
+  }
+
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'accept': 'application/json',
+      'api-key': apiKey,
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || `Brevo HTTP API returned status ${res.status}`);
+  }
+  return data;
+};
+
+export const sendEmail = async (toEmail, toName, subject, htmlContent, attachments = []) => {
+  const senderEmail = process.env.EMAIL_USER || 'stylepulsesalon@gmail.com';
   const mailOptions = {
-    from: `"StylePulse Salon" <${process.env.EMAIL_USER || 'kusalaravinda2004@gmail.com'}>`,
+    from: `"StylePulse Salon" <${senderEmail}>`,
     to: toEmail,
     subject: subject,
     html: htmlContent,
     attachments: attachments,
   };
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`✅ Email sent successfully to ${toEmail}. Message ID: ${info.messageId}`);
-    return info;
-  } catch (error) {
-    console.error(`❌ Failed to send email to ${toEmail}:`, error.message);
-    throw error;
+  // If Brevo is configured and SMTP is confirmed unavailable (e.g. Greeting never received / port blocked), use Brevo directly
+  if (process.env.BREVO_API_KEY && isSmtpAvailable === false) {
+    try {
+      const brevoRes = await sendViaBrevo(toEmail, toName, subject, htmlContent, attachments);
+      console.log(`✅ [Brevo API] Email sent successfully to ${toEmail}. Message ID: ${brevoRes.messageId || 'ok'}`);
+      return brevoRes;
+    } catch (brevoErr) {
+      console.error(`❌ [Brevo API] Failed to send email to ${toEmail}:`, brevoErr.message);
+      // Fallback try SMTP as last resort
+    }
   }
+
+  // Try SMTP if credentials are present and SMTP is not known to be blocked
+  if (process.env.EMAIL_PASSWORD && process.env.EMAIL_USER) {
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      isSmtpAvailable = true;
+      console.log(`✅ [SMTP] Email sent successfully to ${toEmail}. Message ID: ${info.messageId}`);
+      return info;
+    } catch (smtpErr) {
+      isSmtpAvailable = false;
+      console.warn(`⚠️ [SMTP] Failed to send email to ${toEmail} (${smtpErr.message}).`);
+      // If Brevo is configured, fallback to Brevo
+      if (process.env.BREVO_API_KEY) {
+        console.log(`🔄 [Fallback] Attempting email delivery via Brevo HTTPS API...`);
+        try {
+          const brevoRes = await sendViaBrevo(toEmail, toName, subject, htmlContent, attachments);
+          console.log(`✅ [Brevo API] Email sent successfully to ${toEmail}. Message ID: ${brevoRes.messageId || 'ok'}`);
+          return brevoRes;
+        } catch (brevoErr) {
+          console.error(`❌ [Brevo API] Fallback failed as well:`, brevoErr.message);
+          throw new Error(`SMTP Error: ${smtpErr.message}; Brevo Error: ${brevoErr.message}`);
+        }
+      }
+      throw smtpErr;
+    }
+  }
+
+  // If no SMTP password, but Brevo is configured, use Brevo directly
+  if (process.env.BREVO_API_KEY) {
+    try {
+      const brevoRes = await sendViaBrevo(toEmail, toName, subject, htmlContent, attachments);
+      console.log(`✅ [Brevo API] Email sent successfully to ${toEmail}. Message ID: ${brevoRes.messageId || 'ok'}`);
+      return brevoRes;
+    } catch (brevoErr) {
+      console.error(`❌ [Brevo API] Failed to send email to ${toEmail}:`, brevoErr.message);
+      throw brevoErr;
+    }
+  }
+
+  throw new Error("No email provider configured. Please set EMAIL_PASSWORD or BREVO_API_KEY in .env");
 };

@@ -22,7 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // API Base URL
-    const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API_ROOT = (window.STYLEPULSE_API_BASE || (isLocal ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
     const API_BASE = `${API_ROOT}/api/owner`;
 
     // DOM Elements
@@ -474,14 +475,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     return new Date(`${a.date}T${timeStr}:00`).getTime();
                 };
 
-                const isUpcomingStatus = (st) => {
-                    const s = (st || '').toLowerCase();
-                    return s !== 'completed' && s !== 'cancelled';
+                const isUpcomingAppt = (a) => {
+                    const s = (a.status || '').toLowerCase();
+                    if (s === 'completed' || s === 'cancelled') return false;
+                    const aTime = getApptTimestamp(a);
+                    return aTime === 0 || aTime >= Date.now();
                 };
 
                 const sortedAppointments = [...data.appointments].sort((a, b) => {
-                    const aUpcoming = isUpcomingStatus(a.status);
-                    const bUpcoming = isUpcomingStatus(b.status);
+                    const aUpcoming = isUpcomingAppt(a);
+                    const bUpcoming = isUpcomingAppt(b);
 
                     // If one is upcoming and the other is not, upcoming comes first
                     if (aUpcoming && !bUpcoming) return -1;
@@ -501,6 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 appointmentsList = sortedAppointments;
                 calculateStats(appointmentsList);
+                updateFilterCounts(appointmentsList);
                 renderAppointmentsTable(appointmentsList);
                 renderTodayBookings(appointmentsList);
                 renderAnalyticsChart(appointmentsList);
@@ -510,6 +514,75 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Failed to load appointments:", err);
             showAlert("Failed to retrieve booking calendar.", "error");
         }
+    }
+
+    // Appointment Status & Filter Helpers
+    let currentApptFilter = 'all';
+
+    function getApptTimestamp(a) {
+        if (!a || !a.date) return 0;
+        let timeStr = (a.time && a.time !== 'N/A') ? a.time.trim() : '00:00';
+        if (timeStr.length === 5) timeStr += ':00';
+        const parsed = new Date(`${a.date}T${timeStr}`);
+        return isNaN(parsed.getTime()) ? new Date(a.date).getTime() : parsed.getTime();
+    }
+
+    function isPastAppt(a) {
+        const t = getApptTimestamp(a);
+        return t > 0 && t < Date.now();
+    }
+
+    function isCompletedAppt(a) {
+        const s = (a.status || '').toLowerCase();
+        return s === 'completed' || (isPastAppt(a) && s !== 'cancelled');
+    }
+
+    function isUpcomingAppt(a) {
+        const s = (a.status || '').toLowerCase();
+        if (s === 'completed' || s === 'cancelled') return false;
+        return !isPastAppt(a);
+    }
+
+    function isCancelledAppt(a) {
+        return (a.status || '').toLowerCase() === 'cancelled';
+    }
+
+    function updateFilterCounts(appointments) {
+        let upcoming = 0;
+        let completed = 0;
+        let cancelled = 0;
+
+        (appointments || []).forEach(a => {
+            if (isCancelledAppt(a)) {
+                cancelled++;
+            } else if (isCompletedAppt(a)) {
+                completed++;
+            } else if (isUpcomingAppt(a)) {
+                upcoming++;
+            }
+        });
+
+        const elAll = document.getElementById('count-all');
+        const elUp = document.getElementById('count-upcoming');
+        const elComp = document.getElementById('count-completed');
+        const elCanc = document.getElementById('count-cancelled');
+
+        if (elAll) elAll.textContent = (appointments || []).length;
+        if (elUp) elUp.textContent = upcoming;
+        if (elComp) elComp.textContent = completed;
+        if (elCanc) elCanc.textContent = cancelled;
+    }
+
+    function initAppointmentFilterTabs() {
+        const filterBtns = document.querySelectorAll(".appt-filter-btn");
+        filterBtns.forEach(btn => {
+            btn.addEventListener("click", () => {
+                filterBtns.forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                currentApptFilter = btn.getAttribute("data-filter") || "all";
+                renderAppointmentsTable(appointmentsList);
+            });
+        });
     }
 
     function calculateStats(appointments) {
@@ -534,20 +607,53 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function renderAppointmentsTable(appointments) {
         if (!appointmentsTableBody) return;
-        if (appointments.length === 0) {
+        const list = appointments || appointmentsList || [];
+
+        // Filter list based on selected tab: 'all', 'upcoming', 'completed', 'cancelled'
+        let filtered = list.filter(a => {
+            if (currentApptFilter === 'upcoming') return isUpcomingAppt(a);
+            if (currentApptFilter === 'completed') return isCompletedAppt(a);
+            if (currentApptFilter === 'cancelled') return isCancelledAppt(a);
+            return true; // 'all'
+        });
+
+        if (filtered.length === 0) {
+            const filterLabel = currentApptFilter === 'all' ? '' : `${currentApptFilter} `;
             appointmentsTableBody.innerHTML = `
                 <tr>
-                    <td colspan="7" class="empty-table-cell">No appointments have been booked at your salon yet.</td>
+                    <td colspan="7" class="empty-table-cell" style="text-align: center; padding: 2.5rem 1rem; color: rgba(255,255,255,0.45); font-style: italic;">
+                        No ${filterLabel}appointments found for your salon.
+                    </td>
                 </tr>
             `;
             return;
         }
 
-        appointmentsTableBody.innerHTML = appointments.map(a => {
+        // Sort:
+        // For Upcoming: Closest upcoming first
+        // For Completed/Cancelled: Newest first
+        // For All: Upcoming first (closest), then completed/cancelled (newest)
+        filtered.sort((a, b) => {
+            const aTime = getApptTimestamp(a);
+            const bTime = getApptTimestamp(b);
+            if (currentApptFilter === 'upcoming') {
+                return aTime - bTime;
+            } else if (currentApptFilter === 'completed' || currentApptFilter === 'cancelled') {
+                return bTime - aTime;
+            } else {
+                const aUp = isUpcomingAppt(a);
+                const bUp = isUpcomingAppt(b);
+                if (aUp && !bUp) return -1;
+                if (!aUp && bUp) return 1;
+                return aUp ? (aTime - bTime) : (bTime - aTime);
+            }
+        });
+
+        appointmentsTableBody.innerHTML = filtered.map(a => {
             const dateFormatted = new Date(a.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
             const statusLower = (a.status || '').toLowerCase();
-            const isCompleted = statusLower === 'completed';
-            const isCancelled = statusLower === 'cancelled';
+            const isCompleted = isCompletedAppt(a);
+            const isCancelled = isCancelledAppt(a);
             const isRescheduled = a.is_rescheduled || statusLower === 'rescheduled';
             const canComplete = !isCompleted && !isCancelled;
 
@@ -1002,6 +1108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Init Calls
+    initAppointmentFilterTabs();
     loadSalonDetails();
     loadServices();
     loadAppointments();

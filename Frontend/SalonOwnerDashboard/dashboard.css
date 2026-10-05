@@ -674,4 +674,72 @@ body.dashboard-page {
     box-shadow: 0 0 20px rgba(255, 184, 43, 0.15);
 }
 
+/* Appointment Filter Tabs in Booking Schedule */
+.appointment-filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.appointment-filter-tabs {
+    display: inline-flex;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 204, 102, 0.2);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.appt-filter-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: rgba(255, 255, 255, 0.65);
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.appt-filter-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.appt-filter-btn.active {
+    background: linear-gradient(135deg, rgba(255, 184, 43, 0.25), rgba(255, 204, 0, 0.12));
+    border-color: rgba(255, 184, 43, 0.55);
+    color: #ffcc00;
+    box-shadow: 0 4px 16px rgba(255, 184, 43, 0.18);
+}
+
+.filter-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.85);
+    transition: all 0.25s ease;
+}
+
+.appt-filter-btn.active .filter-count-badge {
+    background: rgba(255, 184, 43, 0.3);
+    color: #ffea79;
+}
+
 

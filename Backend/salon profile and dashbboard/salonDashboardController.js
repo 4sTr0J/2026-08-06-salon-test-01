@@ -262,6 +262,14 @@ export const getSalonAppointments = async (req, res) => {
             const rescheduleFee = rescheduleInfo ? (Number(rescheduleInfo.fee_charged) || 0) : 0;
             const totalPrice = baseServicePrice + rescheduleFee;
 
+            const timeStr = apt.appointment_time && apt.appointment_time !== 'N/A' ? apt.appointment_time : '00:00';
+            const apptDate = new Date(`${apt.appointment_date}T${timeStr}`);
+            const isPast = !isNaN(apptDate.getTime()) && apptDate.getTime() < Date.now();
+            const currentStatus = (apt.booking_status || '').toLowerCase();
+            const effectiveStatus = currentStatus === 'cancelled' 
+                ? 'Cancelled' 
+                : (isPast ? 'Completed' : (apt.booking_status || 'Confirmed'));
+
             return {
                 id: apt.id,
                 client_name: clientName,
@@ -274,7 +282,8 @@ export const getSalonAppointments = async (req, res) => {
                 base_price: baseServicePrice,
                 reschedule_fee: rescheduleFee,
                 price: String(totalPrice),
-                status: apt.booking_status || "Confirmed",
+                status: effectiveStatus,
+                is_past: isPast,
                 created_at: apt.created_at,
                 late_notification: lateInfo,
                 reschedule_info: rescheduleInfo,

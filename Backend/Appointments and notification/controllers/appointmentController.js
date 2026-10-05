@@ -364,6 +364,12 @@ export const handleNotifyRunningLate = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Unauthorized to update this appointment.' });
     }
 
+    const apptTimeStr = apt.appointment_time && apt.appointment_time !== 'N/A' ? apt.appointment_time : '00:00';
+    const apptDateTime = new Date(`${apt.appointment_date}T${apptTimeStr}`);
+    if (!isNaN(apptDateTime.getTime()) && apptDateTime.getTime() < Date.now()) {
+      return res.status(400).json({ success: false, message: 'This appointment has already passed. You cannot report running late for a past appointment.' });
+    }
+
     const delayNum = parseInt(delayMinutes, 10);
     let policyNote = '';
     if (delayNum <= 15) {
@@ -436,6 +442,16 @@ export const handleGetRescheduleQuote = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Unauthorized.' });
     }
 
+    const apptTimeStrQuote = apt.appointment_time && apt.appointment_time !== 'N/A' ? apt.appointment_time : '00:00';
+    const apptDateTimeQuote = new Date(`${apt.appointment_date}T${apptTimeStrQuote}`);
+    if (!isNaN(apptDateTimeQuote.getTime()) && apptDateTimeQuote.getTime() < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        isAllowed: false,
+        message: 'This appointment has already passed and cannot be rescheduled.'
+      });
+    }
+
     // Count past reschedules
     const pastReschedules = loyaltyDb.prepare("SELECT COUNT(*) as count FROM appointment_reschedules WHERE appointment_id = ?").get(id);
     const count = pastReschedules?.count || 0;
@@ -505,6 +521,15 @@ export const handleRescheduleAppointment = async (req, res) => {
 
     if (customerEmail && apt.customer_email !== customerEmail) {
       return res.status(403).json({ success: false, message: 'Unauthorized to reschedule this appointment.' });
+    }
+
+    const apptTimeStrResched = apt.appointment_time && apt.appointment_time !== 'N/A' ? apt.appointment_time : '00:00';
+    const apptDateTimeResched = new Date(`${apt.appointment_date}T${apptTimeStrResched}`);
+    if (!isNaN(apptDateTimeResched.getTime()) && apptDateTimeResched.getTime() < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'This appointment has already passed and cannot be rescheduled.'
+      });
     }
 
     // 2. Check maximum 3 reschedules policy

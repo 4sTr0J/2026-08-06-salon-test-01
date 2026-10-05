@@ -29,6 +29,9 @@ export const previewCancellationRefund = async (appointmentId, customerEmail) =>
 
     const appointmentDateTime = new Date(`${appointment.appointment_date}T${appointment.appointment_time}`);
     const now = new Date();
+    if (appointmentDateTime.getTime() < now.getTime()) {
+        throw new Error('This appointment has already passed and cannot be cancelled or refunded.');
+    }
     const msDifference = appointmentDateTime.getTime() - now.getTime();
     const hoursDifference = msDifference / (1000 * 60 * 60);
 
@@ -106,6 +109,9 @@ export const cancelAppointmentWithPolicy = async (appointmentId, customerEmail, 
     // 3. Calculate hours until appointment
     const appointmentDateTime = new Date(`${appointment.appointment_date}T${appointment.appointment_time}`);
     const now = new Date();
+    if (appointmentDateTime.getTime() < now.getTime()) {
+        throw new Error('This appointment has already passed and cannot be cancelled.');
+    }
     const msDifference = appointmentDateTime.getTime() - now.getTime();
     const hoursDifference = msDifference / (1000 * 60 * 60);
 

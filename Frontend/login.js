@@ -88,7 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.innerHTML = `<span class="btn-text">VERIFYING CREDENTIALS...</span>`;
 
             try {
-                const apiBase = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const apiBase = (window.STYLEPULSE_API_BASE || (isLocal ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
 
                 // Check if logging in with Super Admin credentials
                 if (email.toLowerCase() === 'annyafernando915@gmail.com') {

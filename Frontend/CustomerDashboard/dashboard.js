@@ -53,7 +53,8 @@ function initDashboard() {
         console.error('Dashboard UI init error:', uiErr);
     }
 
-    const API_ROOT = (window.STYLEPULSE_API_BASE || (window.location.hostname === 'localhost' ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API_ROOT = (window.STYLEPULSE_API_BASE || (isLocal ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
 
     // Load Loyalty Rewards Summary on Dashboard
     async function loadRewardsSummary() {
@@ -103,6 +104,15 @@ function initDashboard() {
     let customerAppointments = [];
     let activeFilterStatus = "Upcoming";
 
+    // Helper: calculate appointment timestamp safely
+    function getApptTimestamp(a) {
+        if (!a || !a.appointment_date) return 0;
+        let timeStr = (a.appointment_time && a.appointment_time !== 'N/A') ? a.appointment_time.trim() : '00:00';
+        if (timeStr.length === 5) timeStr += ':00';
+        const parsed = new Date(`${a.appointment_date}T${timeStr}`);
+        return isNaN(parsed.getTime()) ? new Date(a.appointment_date).getTime() : parsed.getTime();
+    }
+
     async function loadCustomerAppointments() {
         try {
             const res = await fetch(`${API_ROOT}/api/auth/appointments`, {
@@ -114,10 +124,15 @@ function initDashboard() {
                 renderAppointments();
                 populateNotifications();
                 
-                // Automatically prompt for review if a completed appointment has not been reviewed
-                const pendingReview = customerAppointments.find(a => 
-                    (a.booking_status || "").toLowerCase() === "completed" && !a.isReviewed
-                );
+                // Automatically prompt for review if a completed or past appointment has not been reviewed
+                const nowMs = Date.now();
+                const pendingReview = customerAppointments.find(a => {
+                    const status = (a.booking_status || "").toLowerCase();
+                    const apptTime = getApptTimestamp(a);
+                    const isPast = apptTime > 0 && apptTime < nowMs;
+                    const isCompleted = status === "completed" || (status !== "cancelled" && isPast);
+                    return isCompleted && !a.isReviewed;
+                });
                 if (pendingReview) {
                     setTimeout(() => {
                         window.openReviewModal(
@@ -163,9 +178,14 @@ function initDashboard() {
     }
 
     function populateNotifications() {
-        const pending = customerAppointments.filter(a =>
-            (a.booking_status || "").toLowerCase() === "completed" && !a.isReviewed
-        );
+        const nowMs = Date.now();
+        const pending = customerAppointments.filter(a => {
+            const status = (a.booking_status || "").toLowerCase();
+            const apptTime = getApptTimestamp(a);
+            const isPast = apptTime > 0 && apptTime < nowMs;
+            const isCompleted = status === "completed" || (status !== "cancelled" && isPast);
+            return isCompleted && !a.isReviewed;
+        });
 
         // Update badge
         if (notifBadge) {
@@ -224,27 +244,32 @@ function initDashboard() {
         if (!appointmentsContainer) return;
 
         const currentTab = (activeFilterStatus || "").toLowerCase();
+        const nowMs = Date.now();
 
         let filtered = customerAppointments.filter(a => {
             const status = (a.booking_status || "").toLowerCase();
-            const isRescheduled = a.is_rescheduled || status === "rescheduled";
+            const apptTime = getApptTimestamp(a);
+            const isPast = apptTime > 0 && apptTime < nowMs;
+            const isCancelled = status === "cancelled";
+            const isCompleted = status === "completed" || (!isCancelled && isPast);
+            const isRescheduled = (a.is_rescheduled || status === "rescheduled") && !isPast;
 
             if (currentTab === "rescheduled") {
                 return isRescheduled;
             }
 
             if (currentTab === "upcoming") {
-                // If it's rescheduled, it moves to the Rescheduled tab
-                if (isRescheduled) return false;
+                // If it's rescheduled, completed, past, or cancelled, it does not belong in Upcoming
+                if (isRescheduled || isCompleted || isPast || isCancelled) return false;
                 return status === "upcoming" || status === "confirmed" || status === "pending";
             }
 
             if (currentTab === "completed") {
-                return status === "completed";
+                return isCompleted;
             }
 
             if (currentTab === "cancelled") {
-                return status === "cancelled";
+                return isCancelled;
             }
 
             return status === currentTab;
@@ -253,12 +278,6 @@ function initDashboard() {
         // Sort appointments:
         // For Upcoming/Rescheduled: Closest upcoming date/time first (ascending chronologically)
         // For Completed/Cancelled: Most recent past appointments first (descending chronologically)
-        const getApptTimestamp = (a) => {
-            if (!a.appointment_date) return 0;
-            const timeStr = a.appointment_time && a.appointment_time !== 'N/A' ? a.appointment_time : '00:00';
-            return new Date(`${a.appointment_date}T${timeStr}:00`).getTime();
-        };
-
         filtered.sort((a, b) => {
             const aTime = getApptTimestamp(a);
             const bTime = getApptTimestamp(b);
@@ -280,10 +299,13 @@ function initDashboard() {
 
         appointmentsContainer.innerHTML = filtered.map(a => {
             const dateFormatted = new Date(a.appointment_date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-            const isCompleted = (a.booking_status || "").toLowerCase() === "completed";
-            const isCancelled = (a.booking_status || "").toLowerCase() === "cancelled";
-            const isRescheduled = a.is_rescheduled || (a.booking_status || "").toLowerCase() === "rescheduled";
-            const isUpcoming = !isCancelled && !isCompleted;
+            const status = (a.booking_status || "").toLowerCase();
+            const apptTime = getApptTimestamp(a);
+            const isPast = apptTime > 0 && apptTime < nowMs;
+            const isCancelled = status === "cancelled";
+            const isCompleted = status === "completed" || (!isCancelled && isPast);
+            const isRescheduled = (a.is_rescheduled || status === "rescheduled") && !isPast;
+            const isTrulyUpcoming = !isCancelled && !isCompleted && !isPast;
             
             const reviewButtonHtml = isCompleted 
                 ? (a.isReviewed 
@@ -295,18 +317,18 @@ function initDashboard() {
             const reschedCount = a.reschedule_info ? (Number(a.reschedule_info.reschedule_count || a.reschedule_info.total_reschedules) || 1) : 0;
             const maxReached = reschedCount >= 3;
 
-            const rescheduleButtonHtml = isUpcoming
+            const rescheduleButtonHtml = isTrulyUpcoming
                 ? (maxReached
                     ? `<span style="margin-top: 8px; margin-left: 8px; font-size: 0.75rem; color: #888; border: 1px solid rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; display: inline-block;">🔒 Max Reschedules Reached (3/3)</span>`
                     : `<button onclick="window.openRescheduleModal('${a.id}', '${(a.service_name || '').replace(/'/g, "\\'")}', '${a.salon_id}')" style="margin-top: 8px; margin-left: 8px; background: rgba(52,152,219,0.15); border: 1px solid rgba(52,152,219,0.5); color: #3498db; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.background='rgba(52,152,219,0.25)'" onmouseout="this.style.background='rgba(52,152,219,0.15)'">🔄 Reschedule (${3 - reschedCount} left)</button>`
                   )
                 : '';
 
-            const cancelButtonHtml = isUpcoming
+            const cancelButtonHtml = isTrulyUpcoming
                 ? `<button onclick="window.handleCancelAppointment('${a.id}')" style="margin-top: 8px; margin-left: 8px; background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.5); color: #e74c3c; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.background='rgba(231,76,60,0.2)'" onmouseout="this.style.background='rgba(231,76,60,0.1)'">❌ Cancel</button>`
                 : '';
 
-            const lateButtonHtml = isUpcoming
+            const lateButtonHtml = isTrulyUpcoming
                 ? `<button onclick="window.openRunningLateModal('${a.id}', '${(a.service_name || '').replace(/'/g, "\\'")}', '${a.appointment_time}', '${a.salon_id}')" style="margin-top: 8px; margin-left: 8px; background: rgba(255,184,43,0.15); border: 1px solid rgba(255,184,43,0.5); color: #ffcc00; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.3s;" onmouseover="this.style.background='rgba(255,184,43,0.25)'" onmouseout="this.style.background='rgba(255,184,43,0.15)'">⏳ I'm Running Late</button>`
                 : '';
 
@@ -325,8 +347,12 @@ function initDashboard() {
                 `;
             }
 
-            const statusBadgeText = isRescheduled ? 'RESCHEDULED' : (a.booking_status || 'CONFIRMED');
-            const statusBadgeClass = isRescheduled ? 'rescheduled' : (a.booking_status || 'confirmed').toLowerCase();
+            const statusBadgeText = isCancelled ? 'CANCELLED' : (isCompleted ? 'COMPLETED' : (isRescheduled ? 'RESCHEDULED' : (a.booking_status || 'CONFIRMED')));
+            const badgeStyle = isCancelled
+                ? 'background: rgba(231,76,60,0.15); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3);'
+                : (isCompleted
+                    ? 'background: rgba(46,204,113,0.15); color: #2ecc71; border: 1px solid rgba(46,204,113,0.3);'
+                    : 'background: rgba(255,184,43,0.15); color: #ffcc00; border: 1px solid rgba(255,184,43,0.3);');
 
             return `
                 <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); padding: 1.25rem; border-radius: 12px; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 12px; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(255,204,0,0.2)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.07)'">
@@ -341,7 +367,7 @@ function initDashboard() {
                         </div>
                         <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                             <span style="font-size: 0.88rem; font-weight: 600; color: #fff; display: block; white-space: nowrap;">⏱ ${dateFormatted} at ${a.appointment_time}</span>
-                            <span style="display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: rgba(255,184,43,0.15); color: #ffcc00; border: 1px solid rgba(255,184,43,0.3);">${statusBadgeText}</span>
+                            <span style="display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; ${badgeStyle}">${statusBadgeText}</span>
                         </div>
                     </div>
                     <!-- Bottom row: action buttons always visible -->

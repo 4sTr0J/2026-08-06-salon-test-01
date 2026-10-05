@@ -113,6 +113,7 @@ export const fetchDueReminders = async () => {
     .from('appointments')
     .select('*')
     .eq('reminder_status', 'Pending')
+    .neq('booking_status', 'Cancelled')
     .lte('reminder_time', nowISO);
 
   if (error) throw new Error(`Query Error: ${error.message}`);
