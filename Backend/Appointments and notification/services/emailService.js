@@ -182,7 +182,7 @@ export const sendReminderEmail = async (appointment) => {
 
 const sendViaBrevo = async (toEmail, toName, subject, htmlContent, attachments = []) => {
   const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) throw new Error("BREVO_API_KEY not configured");
+  if (!apiKey) throw new Error("BREVO_API_KEY not configured in environment variables");
 
   const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER || 'stylepulsesalon@gmail.com';
   const senderName = (process.env.BREVO_SENDER_NAME || 'StylePulse Salon').replace(/"/g, '');
