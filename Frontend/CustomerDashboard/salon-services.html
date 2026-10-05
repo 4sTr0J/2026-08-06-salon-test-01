@@ -465,6 +465,43 @@
             const salonId = localStorage.getItem("stylepulse_selected_salon_id");
             if (!salonId) return;
 
+            const basePrice = parseFloat(price) || 0;
+
+            // ── Fetch active cancellation policy for this salon ──
+            let policyData = {
+                type: 'flexible',
+                windowHours: 24,
+                refundPct: 100,
+                lateRefundPct: 50,
+                description: 'Full refund if cancelled at least 24 hours in advance.'
+            };
+
+            try {
+                const polRes = await fetch(`${API}/api/cancellation-policy/active?salon_id=${salonId}`);
+                if (polRes.ok) {
+                    const json = await polRes.json();
+                    if (json && json.policy) {
+                        const p = json.policy;
+                        const pType = (p.policy_type || 'flexible').toLowerCase();
+                        const win = Number(p.cancellation_window_hours) || 24;
+                        const ref = p.refund_percentage !== undefined ? Number(p.refund_percentage) : 100;
+                        const lateRef = Math.max(0, ref - 50);
+                        policyData = {
+                            type: pType,
+                            windowHours: win,
+                            refundPct: ref,
+                            lateRefundPct: lateRef,
+                            description: p.description || ''
+                        };
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not fetch salon cancellation policy:', err);
+            }
+
+            const fullRefundAmount = ((basePrice * policyData.refundPct) / 100).toFixed(0);
+            const lateRefundAmount = ((basePrice * policyData.lateRefundPct) / 100).toFixed(0);
+
             // ── Build modal skeleton ──
             const modalId = "temp-booking-modal";
             let oldModal = document.getElementById(modalId);
@@ -477,8 +514,6 @@
                 display:"flex", alignItems:"center", justifyContent:"center",
                 zIndex:"10000", backdropFilter:"blur(10px)"
             });
-
-            const basePrice = parseFloat(price) || 0;
 
             modal.innerHTML = `
             <style>
@@ -529,7 +564,37 @@
                   <div id="sp-slots-grid"></div>
                 </div>
 
-                <div style="margin-top: 18px; padding: 12px 14px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,184,43,0.3); border-radius: 10px; font-size: 0.8rem; color: #ccc;">
+                <!-- Cancellation Policy & Refund Details -->
+                <div style="margin-top: 16px; background: rgba(255, 170, 0, 0.05); border: 1px solid rgba(255, 204, 102, 0.25); border-radius: 12px; padding: 12px 14px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <span style="font-size: 0.95rem;">📋</span>
+                      <span style="font-size: 0.76rem; font-weight: 700; color: #ffcc00; text-transform: uppercase; letter-spacing: 0.06em;">Cancellation &amp; Refund Policy</span>
+                    </div>
+                    <span style="font-size: 0.68rem; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; background: ${policyData.refundPct === 100 ? 'rgba(34, 197, 94, 0.15)' : 'rgba(245, 158, 11, 0.15)'}; border: 1px solid ${policyData.refundPct === 100 ? 'rgba(34, 197, 94, 0.35)' : 'rgba(245, 158, 11, 0.35)'}; color: ${policyData.refundPct === 100 ? '#4ade80' : '#fbbf24'};">
+                      ${policyData.type} (${policyData.windowHours}h)
+                    </span>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.76rem; color: #ddd;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 9px; background: rgba(255, 255, 255, 0.03); border-radius: 6px;">
+                      <span>⏱️ <strong>${policyData.windowHours}+ Hours in Advance:</strong></span>
+                      <span style="font-weight: 700; color: #4ade80;">${policyData.refundPct}% Refund ${basePrice > 0 ? `(Rs. ${Number(fullRefundAmount).toLocaleString()})` : ''}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 9px; background: rgba(255, 255, 255, 0.03); border-radius: 6px;">
+                      <span>⏳ <strong>Within ${policyData.windowHours} Hours Notice:</strong></span>
+                      <span style="font-weight: 700; color: ${policyData.lateRefundPct > 0 ? '#fbbf24' : '#f87171'};">
+                        ${policyData.lateRefundPct > 0 ? `${policyData.lateRefundPct}% Partial Refund ${basePrice > 0 ? `(Rs. ${Number(lateRefundAmount).toLocaleString()})` : ''}` : 'No Monetary Refund'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style="margin-top: 7px; font-size: 0.70rem; color: rgba(255, 255, 255, 0.55); line-height: 1.35;">
+                    💡 Refunds are processed directly to your bank account upon cancellation request.
+                  </div>
+                </div>
+
+                <div style="margin-top: 14px; padding: 12px 14px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,184,43,0.3); border-radius: 10px; font-size: 0.8rem; color: #ccc;">
                   💳 <strong>Payment Notice:</strong> Full payment via Card is required. You can redeem your Style Points for discounts on the next payment page.
                 </div>
 

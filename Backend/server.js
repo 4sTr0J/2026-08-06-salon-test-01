@@ -111,6 +111,10 @@ app.use("/api/payments", paymentRoutes);
 const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
-    console.log(`[Backend Services Active on port ${PORT}]`);
+    console.log(`=======================================================`);
+    console.log(`🚀 [Backend API Active]    : http://localhost:${PORT}`);
+    console.log(`🌐 [Frontend Web App]    : http://localhost:3000/login.html`);
+    console.log(`👑 [Admin Control Center] : http://localhost:3000/AdminDashboard/admin.html`);
+    console.log(`=======================================================`);
     startReminderScheduler();
 });
