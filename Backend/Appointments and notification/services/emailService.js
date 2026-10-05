@@ -236,20 +236,20 @@ export const sendEmail = async (toEmail, toName, subject, htmlContent, attachmen
     attachments: attachments,
   };
 
-  // If Brevo is configured and SMTP is confirmed unavailable (e.g. Greeting never received / port blocked), use Brevo directly
-  if (process.env.BREVO_API_KEY && isSmtpAvailable === false) {
+  // When Brevo is configured, prioritize fast HTTPS delivery (reliable for cloud platforms like Railway where port 587 is blocked)
+  if (process.env.BREVO_API_KEY) {
     try {
       const brevoRes = await sendViaBrevo(toEmail, toName, subject, htmlContent, attachments);
       console.log(`✅ [Brevo API] Email sent successfully to ${toEmail}. Message ID: ${brevoRes.messageId || 'ok'}`);
       return brevoRes;
     } catch (brevoErr) {
       console.error(`❌ [Brevo API] Failed to send email to ${toEmail}:`, brevoErr.message);
-      // Fallback try SMTP as last resort
+      // Fall through to SMTP fallback below if on localhost
     }
   }
 
-  // Try SMTP if credentials are present and SMTP is not known to be blocked
-  if (process.env.EMAIL_PASSWORD && process.env.EMAIL_USER) {
+  // Fallback to SMTP if credentials are present and SMTP is not blocked
+  if (process.env.EMAIL_PASSWORD && process.env.EMAIL_USER && isSmtpAvailable !== false) {
     try {
       const info = await transporter.sendMail(mailOptions);
       isSmtpAvailable = true;
@@ -258,31 +258,7 @@ export const sendEmail = async (toEmail, toName, subject, htmlContent, attachmen
     } catch (smtpErr) {
       isSmtpAvailable = false;
       console.warn(`⚠️ [SMTP] Failed to send email to ${toEmail} (${smtpErr.message}).`);
-      // If Brevo is configured, fallback to Brevo
-      if (process.env.BREVO_API_KEY) {
-        console.log(`🔄 [Fallback] Attempting email delivery via Brevo HTTPS API...`);
-        try {
-          const brevoRes = await sendViaBrevo(toEmail, toName, subject, htmlContent, attachments);
-          console.log(`✅ [Brevo API] Email sent successfully to ${toEmail}. Message ID: ${brevoRes.messageId || 'ok'}`);
-          return brevoRes;
-        } catch (brevoErr) {
-          console.error(`❌ [Brevo API] Fallback failed as well:`, brevoErr.message);
-          throw new Error(`SMTP Error: ${smtpErr.message}; Brevo Error: ${brevoErr.message}`);
-        }
-      }
       throw smtpErr;
-    }
-  }
-
-  // If no SMTP password, but Brevo is configured, use Brevo directly
-  if (process.env.BREVO_API_KEY) {
-    try {
-      const brevoRes = await sendViaBrevo(toEmail, toName, subject, htmlContent, attachments);
-      console.log(`✅ [Brevo API] Email sent successfully to ${toEmail}. Message ID: ${brevoRes.messageId || 'ok'}`);
-      return brevoRes;
-    } catch (brevoErr) {
-      console.error(`❌ [Brevo API] Failed to send email to ${toEmail}:`, brevoErr.message);
-      throw brevoErr;
     }
   }
 

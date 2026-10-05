@@ -20,6 +20,7 @@ import salonDashboardDomainRoutes from "./salon profile and dashbboard/salonDash
 import salonServicesDomainRoutes from "./salon services/serviceRoutes.js";
 
 import { startReminderScheduler } from "./Appointments and notification/jobs/reminderScheduler.js";
+import { sendEmail } from "./Appointments and notification/services/emailService.js";
 
 const app = express();
 
@@ -57,6 +58,36 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.get("/", (req, res) => {
     res.send("Salon Booking API is running");
+});
+
+app.get("/api/test-email", async (req, res) => {
+    const to = req.query.to || process.env.EMAIL_USER || 'stylepulsesalon@gmail.com';
+    try {
+        const result = await sendEmail(
+            to,
+            "Test Customer",
+            "StylePulse Email Delivery Test",
+            `<h1>StylePulse Email Delivery Test</h1>
+             <p>This email was successfully dispatched via Brevo HTTPS API from your Railway deployment!</p>
+             <p>Timestamp: ${new Date().toISOString()}</p>`
+        );
+        return res.status(200).json({
+            success: true,
+            message: `Email dispatched to ${to}`,
+            result,
+            hasBrevoKey: !!process.env.BREVO_API_KEY,
+            brevoKeyPrefix: (process.env.BREVO_API_KEY || '').slice(0, 10),
+            senderEmail: process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER || 'stylepulsesalon@gmail.com'
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            error: err.message,
+            hasBrevoKey: !!process.env.BREVO_API_KEY,
+            brevoKeyPrefix: (process.env.BREVO_API_KEY || '').slice(0, 10),
+            senderEmail: process.env.BREVO_SENDER_EMAIL || process.env.EMAIL_USER || 'stylepulsesalon@gmail.com'
+        });
+    }
 });
 
 // Domain Modular Routes
