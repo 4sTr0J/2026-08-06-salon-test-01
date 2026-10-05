@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="admin.css?v=1.0">
+    <link rel="stylesheet" href="admin.css?v=20261005-01">
 </head>
 
 <body class="admin-page">
@@ -153,21 +153,23 @@
 
                 <!-- Registrations Table -->
                 <div class="table-container">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>SALON BUSINESS & OWNER</th>
-                                <th>BUSINESS LICENSE ID</th>
-                                <th>PHYSICAL ADDRESS</th>
-                                <th>CONTACT & PORTFOLIO</th>
-                                <th>VERIFICATION STATUS</th>
-                                <th>ADMIN PERMISSION</th>
-                            </tr>
-                        </thead>
-                        <tbody id="owners-table-body">
-                            <!-- Dynamic Rows rendered via admin.js -->
-                        </tbody>
-                    </table>
+                    <div class="table-scroll-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>SALON BUSINESS & OWNER</th>
+                                    <th>BUSINESS LICENSE ID</th>
+                                    <th>PHYSICAL ADDRESS</th>
+                                    <th>CONTACT & PORTFOLIO</th>
+                                    <th>VERIFICATION STATUS</th>
+                                    <th>ADMIN PERMISSION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="owners-table-body">
+                                <!-- Dynamic Rows rendered via admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -252,25 +254,27 @@
                         </div>
                         <span style="font-size: 0.82rem; color: var(--text-muted);">Payouts are released to the salon once the customer appointment is completed.</span>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>DATE & TIME</th>
-                                <th>APPOINTMENT & SERVICE</th>
-                                <th>CUSTOMER DETAILS</th>
-                                <th>SALON</th>
-                                <th>METHOD</th>
-                                <th>CUSTOMER PAID</th>
-                                <th>ADMIN FEE (10%)</th>
-                                <th>SALON SHARE (90%)</th>
-                                <th>ORDER STATUS</th>
-                                <th>SALON PAYOUT</th>
-                            </tr>
-                        </thead>
-                        <tbody id="payments-table-body">
-                            <!-- Populated dynamically via admin.js -->
-                        </tbody>
-                    </table>
+                    <div class="table-scroll-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>DATE & TIME</th>
+                                    <th>APPOINTMENT & SERVICE</th>
+                                    <th>CUSTOMER DETAILS</th>
+                                    <th>SALON</th>
+                                    <th>METHOD</th>
+                                    <th>CUSTOMER PAID</th>
+                                    <th>ADMIN FEE (10%)</th>
+                                    <th>SALON SHARE (90%)</th>
+                                    <th>ORDER STATUS</th>
+                                    <th>SALON PAYOUT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-table-body">
+                                <!-- Populated dynamically via admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Customer Cancellation Refunds & Bank Transfers Table -->
@@ -282,25 +286,27 @@
                         </div>
                         <span style="font-size: 0.82rem; color: var(--text-muted);">Transfer the eligible refund to the customer's bank account and mark as settled.</span>
                     </div>
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>REQUEST DATE</th>
-                                <th>CUSTOMER</th>
-                                <th>APPOINTMENT</th>
-                                <th>REFUND AMOUNT</th>
-                                <th>BANK NAME</th>
-                                <th>BRANCH</th>
-                                <th>ACCOUNT NUMBER</th>
-                                <th>ACCOUNT HOLDER</th>
-                                <th>STATUS</th>
-                                <th>SETTLE REFUND</th>
-                            </tr>
-                        </thead>
-                        <tbody id="refunds-table-body">
-                            <!-- Populated dynamically via admin.js -->
-                        </tbody>
-                    </table>
+                    <div class="table-scroll-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>REQUEST DATE</th>
+                                    <th>CUSTOMER</th>
+                                    <th>APPOINTMENT</th>
+                                    <th>REFUND AMOUNT</th>
+                                    <th>BANK NAME</th>
+                                    <th>BRANCH</th>
+                                    <th>ACCOUNT NUMBER</th>
+                                    <th>ACCOUNT HOLDER</th>
+                                    <th>STATUS</th>
+                                    <th>SETTLE REFUND</th>
+                                </tr>
+                            </thead>
+                            <tbody id="refunds-table-body">
+                                <!-- Populated dynamically via admin.js -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -308,7 +314,7 @@
 
     </div>
 
-    <script src="admin.js?v=20260904-08"></script>
+    <script src="admin.js?v=20261005-01"></script>
 </body>
 
 </html>

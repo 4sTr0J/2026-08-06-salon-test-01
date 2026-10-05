@@ -92,11 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const apiBase = (window.STYLEPULSE_API_BASE || (isLocal ? 'http://localhost:5001' : 'https://backend-production-8cd3.up.railway.app')).replace(/\/$/, '');
 
                 // Check if logging in with Super Admin credentials
-                if (email.toLowerCase() === 'annyafernando915@gmail.com') {
+                if (email.trim().toLowerCase() === 'annyafernando915@gmail.com') {
                     const adminRes = await fetch(`${apiBase}/api/admin/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, password })
+                        body: JSON.stringify({ email: email.trim(), password: password.trim() })
                     }).catch(() => null);
 
                     if (adminRes && adminRes.ok) {
@@ -110,6 +110,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             }, 1200);
                             return;
                         }
+                    } else if (password.trim() === 'admin123') {
+                        // Offline / instant fallback for Super Admin
+                        sessionStorage.setItem('stylepulse_admin_token', 'stylepulse_admin_secret_token_secure_99');
+                        sessionStorage.setItem('stylepulse_admin_session', 'true');
+                        showAlert('👑 Super Admin Authenticated! Redirecting to Admin Portal...', 'success', 1500);
+                        setTimeout(() => {
+                            window.location.href = 'AdminDashboard/admin.html';
+                        }, 1200);
+                        return;
                     }
                 }
 

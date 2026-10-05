@@ -490,29 +490,72 @@ body.admin-page {
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+/* Horizontal scrolling wrapper to ensure wide tables and action buttons never clip */
+.table-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Luxury Gold Scrollbar */
+.table-scroll-wrapper::-webkit-scrollbar,
+.table-container::-webkit-scrollbar {
+    height: 9px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-track,
+.table-container::-webkit-scrollbar-track {
+    background: rgba(14, 10, 8, 0.95);
+    border-radius: 6px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb,
+.table-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #d97706, #ffaa00, #ffcc00);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 204, 102, 0.3);
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover,
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #f59e0b, #ffcc00, #ffe066);
 }
 
 .admin-table {
     width: 100%;
+    min-width: 1180px;
     border-collapse: collapse;
     text-align: left;
 }
 
 .admin-table th {
-    padding: 1.1rem 1.4rem;
+    padding: 0.95rem 1.1rem;
     background: rgba(255, 170, 0, 0.06);
     border-bottom: 1px solid rgba(255, 204, 102, 0.2);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     color: var(--gold-bright);
+    white-space: nowrap;
 }
 
 .admin-table td {
-    padding: 1.1rem 1.4rem;
+    padding: 0.95rem 1.1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     vertical-align: middle;
+    white-space: nowrap;
+}
+
+.admin-table th:last-child,
+.admin-table td:last-child {
+    text-align: center;
+    padding-right: 1.5rem;
+    white-space: nowrap;
 }
 
 .admin-table tr:hover {

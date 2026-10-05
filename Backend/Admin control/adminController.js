@@ -9,10 +9,13 @@ const isSupabaseConfigured = () => {
 // Admin Login Authentication Endpoint
 export const adminLogin = async (req, res) => {
     const { email, password } = req.body;
-    const configuredPassword = process.env.ADMIN_PASSWORD || 'admin123';
-    const configuredEmail = process.env.ADMIN_EMAIL || 'annyafernando915@gmail.com';
+    const configuredPassword = (process.env.ADMIN_PASSWORD || 'admin123').trim();
+    const configuredEmail = (process.env.ADMIN_EMAIL || 'annyafernando915@gmail.com').trim().toLowerCase();
 
-    if (email === configuredEmail && password === configuredPassword) {
+    const inputEmail = (email || '').trim().toLowerCase();
+    const inputPassword = (password || '').trim();
+
+    if (inputEmail === configuredEmail && inputPassword === configuredPassword) {
         // Return admin session token
         return res.status(200).json({
             success: true,
